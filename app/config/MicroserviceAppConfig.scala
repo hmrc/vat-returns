@@ -18,6 +18,7 @@ package config
 
 import javax.inject.{Inject, Singleton}
 
+import config.{ConfigKeys => Keys}
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -36,7 +37,7 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
   private def loadConfig(key: String) = runModeConfiguration.getString(key)
     .getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
-  override lazy val desEnvironment: String = loadConfig("microservice.services.des.environment")
-  override lazy val desToken: String = loadConfig("microservice.services.des.authorization-token")
-  override lazy val desUrl: String = loadConfig("microservice.services.des.url")
+  override lazy val desEnvironment: String = getString(Keys.desEnvironment)
+  override lazy val desToken: String = getString(Keys.desToken)
+  override lazy val desUrl: String = getString(Keys.desUrl)
 }
