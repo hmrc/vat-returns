@@ -37,6 +37,8 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
   private def loadConfig(key: String) = runModeConfiguration.getString(key)
     .getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
+  lazy val appName: String = loadConfig("appName")
+
   override lazy val desEnvironment: String = getString(Keys.desEnvironment)
   override lazy val desToken: String = getString(Keys.desToken)
   override lazy val desUrl: String = getString(Keys.desUrl)

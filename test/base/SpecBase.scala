@@ -37,7 +37,7 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite with MaterializerSuppor
 
   lazy val mockAppConfig: MicroserviceAppConfig = injector.instanceOf[MicroserviceAppConfig]
 
-  implicit lazy val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders(REFERER -> "/dummy/referer/path")
+  implicit lazy val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders(REFERER -> "/dummy/referrer/path")
   implicit lazy val ec: ExecutionContext = injector.instanceOf[ExecutionContext]
 
   def stringToDate(date: String): LocalDate = {LocalDate.parse(date)}
