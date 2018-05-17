@@ -21,7 +21,7 @@ import play.api.libs.json.{Format, Json}
 
 sealed trait Errors
 
-case class Error(code: String, message: String) extends Errors
+case class Error(code: String, reason: String) extends Errors
 
 object Error {
   implicit val format: Format[Error] = Json.format[Error]
@@ -38,19 +38,19 @@ case class ErrorResponse(status: Int, error: Errors)
 
 object UnauthenticatedError extends Error(
   code = "UNAUTHENTICATED",
-  message = "Not authenticated"
+  reason = "Not authenticated"
 )
 
 object ForbiddenError extends Error(
   code = "UNAUTHORISED",
-  message = "Not authorised"
+  reason = "Not authorised"
 )
 
 object InvalidJsonResponse extends ErrorResponse(
   status = Status.INTERNAL_SERVER_ERROR,
   error = Error(
     code = "INVALID_JSON",
-    message = "The downstream service responded with invalid json."
+    reason = "The downstream service responded with invalid json."
   )
 )
 
@@ -58,7 +58,7 @@ object UnexpectedJsonFormat extends ErrorResponse(
   status = Status.INTERNAL_SERVER_ERROR,
   error = Error(
     code = "UNEXPECTED_JSON_FORMAT",
-    message = "The downstream service responded with json which did not match the expected format."
+    reason = "The downstream service responded with json which did not match the expected format."
   )
 )
 
@@ -66,11 +66,11 @@ object UnexpectedResponse extends ErrorResponse(
   status = Status.INTERNAL_SERVER_ERROR,
   error = Error(
     code = "UNEXPECTED_DOWNSTREAM_ERROR",
-    message = "The downstream service responded with an unexpected response."
+    reason = "The downstream service responded with an unexpected response."
   )
 )
 
 object InvalidVrn extends Error(
   code = "ERROR_VRN_INVALID",
-  message = "The supplied Vrn is invalid."
+  reason = "The supplied Vrn is invalid."
 )

@@ -45,11 +45,11 @@ class VatReturnsConnectorSpec extends SpecBase with MockHttp {
     )
 
   val successResponse: Either[Nothing, VatReturn] = Right(testReturn)
-  val badRequestSingleError: Either[ErrorResponse, Nothing] = Left(ErrorResponse(Status.BAD_REQUEST, Error(code = "CODE", message = "ERROR MESSAGE")))
+  val badRequestSingleError: Either[ErrorResponse, Nothing] = Left(ErrorResponse(Status.BAD_REQUEST, Error(code = "CODE", reason = "ERROR MESSAGE")))
   val badRequestMultiError = Left(ErrorResponse(Status.BAD_REQUEST, MultiError(
     failures = Seq(
-      Error(code = "ERROR CODE 1", message = "ERROR MESSAGE 1"),
-      Error(code = "ERROR CODE 2", message = "ERROR MESSAGE 2")
+      Error(code = "ERROR CODE 1", reason = "ERROR MESSAGE 1"),
+      Error(code = "ERROR CODE 2", reason = "ERROR MESSAGE 2")
     )
   )))
 

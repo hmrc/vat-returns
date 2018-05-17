@@ -43,12 +43,12 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
     )
   )
 
-  val singleError = Error(code = "CODE", message = "ERROR MESSAGE")
+  val singleError = Error(code = "CODE", reason = "ERROR MESSAGE")
   val multiError = MultiError(
     failures = Seq(
-      Error(code = "ERROR CODE 1", message = "ERROR MESSAGE 1"),
+      Error(code = "ERROR CODE 1", reason = "ERROR MESSAGE 1"),
       Error(code = "ERROR CODE 2" +
-        "", message = "ERROR MESSAGE 2")
+        "", reason = "ERROR MESSAGE 2")
     )
   )
 
