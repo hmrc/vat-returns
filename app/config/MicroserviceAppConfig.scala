@@ -28,7 +28,6 @@ trait AppConfig extends ServicesConfig {
   val desToken: String
   val desServiceUrl: String
   val setupDesReturnsStartPath: String
-  val setupDesReturnsEndPath: String
 }
 
 @Singleton
@@ -45,6 +44,5 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
   override lazy val desToken: String = getString(Keys.desToken)
   override lazy val desServiceUrl: String = baseUrl(Keys.desServiceBase)
   override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
-  override lazy val setupDesReturnsEndPath: String = loadConfig(Keys.setupDesReturnsEndPath)
 
 }

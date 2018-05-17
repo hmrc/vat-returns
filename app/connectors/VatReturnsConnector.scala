@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: MicroserviceAppConfig) {
 
   private[connectors] def setupDesVatReturnsUrl(vrn: String): String = appConfig.desServiceUrl +
-    appConfig.setupDesReturnsStartPath + vrn + appConfig.setupDesReturnsEndPath
+    appConfig.setupDesReturnsStartPath + vrn
 
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
                    (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
