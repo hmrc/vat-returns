@@ -26,7 +26,9 @@ import uk.gov.hmrc.play.config.ServicesConfig
 trait AppConfig extends ServicesConfig {
   val desEnvironment: String
   val desToken: String
-  val desUrl: String
+  val desServiceUrl: String
+  val setupDesReturnsStartPath: String
+  val setupDesReturnsEndPath: String
 }
 
 @Singleton
@@ -41,5 +43,8 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
 
   override lazy val desEnvironment: String = getString(Keys.desEnvironment)
   override lazy val desToken: String = getString(Keys.desToken)
-  override lazy val desUrl: String = getString(Keys.desUrl)
+  override lazy val desServiceUrl: String = baseUrl(Keys.desServiceBase)
+  override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
+  override lazy val setupDesReturnsEndPath: String = loadConfig(Keys.setupDesReturnsEndPath)
+
 }
