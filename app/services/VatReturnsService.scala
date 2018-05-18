@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector) {
 
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
-                       (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, VatReturn]] = {
+                       (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, VatReturnDetail]] = {
 
     VatReturnsConnector.getVatReturns(vrn, queryParameters).map {
       case success@Right(_) => success

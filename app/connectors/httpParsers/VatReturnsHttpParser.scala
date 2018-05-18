@@ -16,18 +16,20 @@
 
 package connectors.httpParsers
 
-import models.{UnexpectedJsonFormat, UnexpectedResponse, VatReturn}
-import play.api.Logger
+import models.{UnexpectedJsonFormat, UnexpectedResponse, VatReturnDetail}
 import play.api.http.Status.OK
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object VatReturnsHttpParser extends ResponseHttpParsers {
 
-  implicit object VatReturnReads extends HttpReads[HttpGetResult[VatReturn]] {
-    override def read(method: String, url: String, response: HttpResponse): HttpGetResult[VatReturn] = {
+  implicit object VatReturnReads extends HttpReads[HttpGetResult[VatReturnDetail]] {
+    override def read(method: String, url: String, response: HttpResponse): HttpGetResult[VatReturnDetail] = {
       response.status match {
-        case OK => response.json.validate[VatReturn].fold(
-          invalid => Left(UnexpectedJsonFormat),
+        case OK => response.json.validate[VatReturnDetail].fold(
+          invalid => {
+            println(s"DES Response: ${response.json}\nJson Errors: $invalid")
+            Left(UnexpectedJsonFormat)
+          },
           valid => Right(valid)
         )
         case status if status >= 400 && status < 600 => handleErrorResponse(response)

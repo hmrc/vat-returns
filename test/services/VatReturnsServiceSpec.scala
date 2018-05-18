@@ -31,8 +31,7 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector {
 
     "Return a VatReturn when a success response is returned from the Connector" in {
 
-      val vatReturn: VatReturn = VatReturn(
-        VatReturnIdentification("VRN", exampleVrn),
+      val vatReturn: VatReturnDetail =
         VatReturnDetail(
           "17AA",
           1.23,
@@ -45,16 +44,15 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector {
           1.23,
           1.23
         )
-      )
 
-      val successResponse: Either[Nothing, VatReturn] = Right(vatReturn)
+      val successResponse: Either[Nothing, VatReturnDetail] = Right(vatReturn)
       val queryParams: VatReturnFilters = VatReturnFilters(
         periodKey = "17AA"
       )
 
       setupMockGetVatReturns(exampleVrn, queryParams)(successResponse)
 
-      val actual: Either[ErrorResponse, VatReturn] = await(TestVatReturnsService.getVatReturns(
+      val actual: Either[ErrorResponse, VatReturnDetail] = await(TestVatReturnsService.getVatReturns(
         exampleVrn,
         VatReturnFilters(
           periodKey = "17AA"
@@ -73,7 +71,7 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector {
         periodKey = "17AA"
       ))(singleErrorResponse)
 
-      val actual: Either[ErrorResponse, VatReturn] = await(TestVatReturnsService.getVatReturns(
+      val actual: Either[ErrorResponse, VatReturnDetail] = await(TestVatReturnsService.getVatReturns(
         exampleVrn,
         VatReturnFilters(
           periodKey = "17AA"
@@ -94,7 +92,7 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector {
         periodKey = "17AA"
       ))(multiErrorResponse)
 
-      val actual: Either[ErrorResponse, VatReturn] = await(TestVatReturnsService.getVatReturns(
+      val actual: Either[ErrorResponse, VatReturnDetail] = await(TestVatReturnsService.getVatReturns(
         exampleVrn,
         VatReturnFilters(
           periodKey = "17AA"

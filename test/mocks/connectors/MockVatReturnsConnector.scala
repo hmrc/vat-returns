@@ -18,7 +18,7 @@ package mocks.connectors
 
 import connectors.VatReturnsConnector
 import connectors.httpParsers.VatReturnsHttpParser.HttpGetResult
-import models.{VatReturn, VatReturnFilters}
+import models.{VatReturnDetail, VatReturnFilters}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
@@ -38,7 +38,7 @@ trait MockVatReturnsConnector extends UnitSpec with MockitoSugar with BeforeAndA
   }
 
   def setupMockGetVatReturns(vrn: String, queryParameters: VatReturnFilters)
-                                (response: HttpGetResult[VatReturn]): OngoingStubbing[Future[HttpGetResult[VatReturn]]] =
+                                (response: HttpGetResult[VatReturnDetail]): OngoingStubbing[Future[HttpGetResult[VatReturnDetail]]] =
     when(
       mockVatReturnsConnector.getVatReturns(
         ArgumentMatchers.eq(vrn),

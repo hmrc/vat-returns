@@ -38,7 +38,7 @@ trait MockVatReturnsService extends UnitSpec with MockitoSugar with BeforeAndAft
   }
 
   def setupMockGetVatReturns(vrn: String, queryParameters: VatReturnFilters)
-                                (response: HttpGetResult[VatReturn]): OngoingStubbing[Future[HttpGetResult[VatReturn]]] =
+                                (response: HttpGetResult[VatReturnDetail]): OngoingStubbing[Future[HttpGetResult[VatReturnDetail]]] =
     when(
       mockVatReturnsService.getVatReturns(
         ArgumentMatchers.eq(vrn),

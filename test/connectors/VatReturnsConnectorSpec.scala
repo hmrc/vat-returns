@@ -66,14 +66,13 @@ class VatReturnsConnectorSpec extends SpecBase with MockHttp {
     }
 
     "when calling the getVatReturns" when {
-
       "calling for a user with all Query Parameters defined and a success response received" should {
 
         "return a VatReturn model" in {
           setupMockHttpGet(TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn), Seq(
             periodKeyValue -> "17AA"
           ))(successResponse)
-          val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturn]] = TestVatReturnsConnector.getVatReturns(
+          val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = TestVatReturnsConnector.getVatReturns(
             vrn = testVrn,
             queryParameters = VatReturnFilters("17AA")
           )
@@ -88,7 +87,7 @@ class VatReturnsConnectorSpec extends SpecBase with MockHttp {
         setupMockHttpGet(TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn), Seq(
           periodKeyValue -> "17AA"
         ))(badRequestSingleError)
-        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturn]] = TestVatReturnsConnector.getVatReturns(
+        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = TestVatReturnsConnector.getVatReturns(
           vrn = testVrn,
           queryParameters = VatReturnFilters("17AA")
         )
@@ -102,7 +101,7 @@ class VatReturnsConnectorSpec extends SpecBase with MockHttp {
         setupMockHttpGet(TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn), Seq(
           periodKeyValue -> "17AA"
         ))(badRequestMultiError)
-        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturn]] = TestVatReturnsConnector.getVatReturns(
+        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = TestVatReturnsConnector.getVatReturns(
           vrn = testVrn,
           queryParameters = VatReturnFilters("17AA")
         )

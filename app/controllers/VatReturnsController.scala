@@ -43,7 +43,7 @@ class VatReturnsController @Inject()(val authenticate: AuthAction, val vatReturn
 
   private def retrieveVatReturns(vrn: String, filters: VatReturnFilters)(implicit hc: HeaderCarrier) = {
     vatReturnsService.getVatReturns(vrn, filters).map {
-      case _@Right(vatReturns) => Ok(Json.toJson(vatReturns.returnDetails))
+      case _@Right(vatReturns) => Ok(Json.toJson(vatReturns))
       case _@Left(error) => error.error match {
         case singleError: Error => Status(error.status)(Json.toJson(singleError))
         case multiError: MultiError => Status(error.status)(Json.toJson(multiError))

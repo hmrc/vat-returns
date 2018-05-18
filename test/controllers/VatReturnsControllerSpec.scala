@@ -27,8 +27,7 @@ import play.api.mvc.Result
 
 class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with MockMicroserviceAuthorisedFunctions {
 
-  val success: VatReturn = VatReturn(
-    VatReturnIdentification("VRN", "555555555"),
+  val success: VatReturnDetail =
     VatReturnDetail(
       "17AA",
       1.23,
@@ -41,7 +40,6 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
       1.23,
       1.23
     )
-  )
 
   val singleError = Error(code = "CODE", reason = "ERROR MESSAGE")
   val multiError = MultiError(
@@ -66,7 +64,7 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
       |   "totalAcquisitionsExVAT" : 1.23
       |}""".stripMargin)
 
-  val successResponse: Either[Nothing, VatReturn] = Right(success)
+  val successResponse: Either[Nothing, VatReturnDetail] = Right(success)
   val badRequestSingleError: Either[ErrorResponse, Nothing] = Left(ErrorResponse(Status.BAD_REQUEST, singleError))
   val badRequestMultiError: Either[ErrorResponse, Nothing] = Left(ErrorResponse(Status.BAD_REQUEST, multiError))
   val testVrn: String = "555555555"

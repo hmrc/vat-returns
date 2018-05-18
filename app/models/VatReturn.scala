@@ -43,7 +43,7 @@ object VatReturnDetail {
       (JsPath \ "vatDueAcquisitions").read[BigDecimal] and
       (JsPath \ "totalVatDue").read[BigDecimal] and
       (JsPath \ "vatReclaimedCurrPeriod").read[BigDecimal] and
-      (JsPath \ "netVatDue").read[BigDecimal] and
+      (JsPath \ "vatDueNet").read[BigDecimal] and
       (JsPath \ "totalValueSalesExVAT").read[BigDecimal] and
       (JsPath \ "totalValuePurchasesExVAT").read[BigDecimal] and
       (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and

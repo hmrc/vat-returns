@@ -21,20 +21,21 @@ import play.api.libs.json.{JsValue, Json}
 
 class VatReturnDetailSpec extends SpecBase {
 
-  val vatReturnModel: VatReturnDetail = VatReturnDetail(
-    "18AA",
-    100,
-    200,
-    300,
-    400,
-    500,
-    600,
-    700,
-    800,
-    900
-  )
+  val vatReturnModel: VatReturnDetail =
+    VatReturnDetail(
+      "18AA",
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    )
 
-  val vatReturnJson: JsValue = Json.parse(
+  val writeJson: JsValue = Json.parse(
     """{
       |"periodKey":"18AA",
       |"vatDueSales":100,
@@ -49,14 +50,29 @@ class VatReturnDetailSpec extends SpecBase {
     }""".stripMargin
   )
 
+  val readJson: JsValue = Json.parse(
+    """{
+      |"periodKey":"18AA",
+      |"vatDueSales":100,
+      |"vatDueAcquisitions":200,
+      |"totalVatDue":300,
+      |"vatReclaimedCurrPeriod":400,
+      |"vatDueNet":500,
+      |"totalValueSalesExVAT":600,
+      |"totalValuePurchasesExVAT":700,
+      |"totalValueGoodsSuppliedExVAT":800,
+      |"totalAcquisitionsExVAT":900
+    }""".stripMargin
+  )
+
   "A VAT Return" should {
 
     "serialize to JSON" in {
-      Json.toJson(vatReturnModel) shouldBe vatReturnJson
+      Json.toJson(vatReturnModel) shouldBe writeJson
     }
 
     "deserialize to a VatReturn model" in {
-      vatReturnJson.as[VatReturnDetail] shouldBe vatReturnModel
+      readJson.as[VatReturnDetail] shouldBe vatReturnModel
     }
   }
 }

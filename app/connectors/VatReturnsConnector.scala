@@ -19,7 +19,7 @@ package connectors
 import config.MicroserviceAppConfig
 import connectors.httpParsers.VatReturnsHttpParser._
 import javax.inject.{Inject, Singleton}
-import models.{VatReturn, VatReturnFilters}
+import models.{VatReturnDetail, VatReturnFilters}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -33,7 +33,7 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
     appConfig.setupDesReturnsStartPath + vrn
 
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
-                   (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
+                   (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnDetail]] = {
 
     val url = setupDesVatReturnsUrl(vrn)
     val desHC = headerCarrier.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
