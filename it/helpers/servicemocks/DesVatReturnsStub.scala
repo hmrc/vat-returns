@@ -25,15 +25,20 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 object DesVatReturnsStub {
 
   private def vatReturnsUrl(vrn: String, queryParameters: VatReturnFilters): String = {
-    s"/vat-returns/returns/vrn/$vrn" +
+    s"/vat/returns/vrn/$vrn" +
       s"?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}"
   }
 
   def stubGetVatReturns(vrn: String, queryParams: VatReturnFilters)(status: Int, response: JsValue): StubMapping = {
+
+    println(s"xxxxxxxxxxxxxxxxxxxxx In StubGet URL: ${vatReturnsUrl(vrn, queryParams)}")
+
     stubGet(vatReturnsUrl(vrn, queryParams), status, response.toString())
   }
 
   def verifyGetVatReturns(vrn: String, queryParams: VatReturnFilters): Unit = {
+
+    println(s"xxxxxxxxxxxxxxxxxxxxx In verify stub URL: ${vatReturnsUrl(vrn, queryParams)}")
     verifyGet(vatReturnsUrl(vrn, queryParams))
   }
 }

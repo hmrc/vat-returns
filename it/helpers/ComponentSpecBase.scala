@@ -36,7 +36,7 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
   val mockUrl: String = s"http://$mockHost:$mockPort"
   val mockToken = "localToken"
   val mockEnvironment = "localEnvironment"
-  val mockEndpointStart = "/vat-returns/returns/vrn/"
+  val mockEndpointStart = "/vat/returns/vrn/"
 
   def config: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
@@ -64,10 +64,21 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
   }
 
   object VatReturnsComponent {
-    def get(uri: String): WSResponse = await(buildClient(uri).get())
+    def get(uri: String): WSResponse = {
 
-    def getVatReturns(vrn: String, queryParameters: VatReturnFilters): WSResponse =
+      val x = await(buildClient(uri).get())
+      println(s"HERE IT IS!: ${x.body}")
+      x
+    }
+
+    def getVatReturns(vrn: String, queryParameters: VatReturnFilters): WSResponse = {
+
+      println(s"in getVatReturns url is: ")
+      println(s"/vat-returns/returns/vrn/$vrn?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}")
+
       get(s"/vat-returns/returns/vrn/$vrn?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}")
+    }
+
   }
 
   def isAuthorised(authorised: Boolean = true): StubMapping = {

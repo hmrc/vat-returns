@@ -43,10 +43,10 @@ class VatReturnsComponentSpec extends ComponentSpecBase {
 
           isAuthorised()
 
-          /*And("When wiremock stubbing a successful Get Vat Returns Data response")
+        And("When wiremock stubbing a successful Get Vat Returns Data response")
           DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(OK,
             Json.toJson(VatReturnData.successResponse))
-*/
+
           When(s"Calling GET /vat-returns/returns/vrn/$vrn")
           val res: WSResponse = VatReturnsComponent.getVatReturns("555555555", queryParameters)
 
@@ -60,78 +60,79 @@ class VatReturnsComponentSpec extends ComponentSpecBase {
         }
       }
 
-      "authorised with a valid request with a period key and an error response" should {
 
-        lazy val queryParameters: VatReturnFilters= VatReturnFilters(
-          periodKey = "17AA"
-        )
-
-        "return a single error response" in {
-
-          isAuthorised()
-
-          And("When wiremock stubbing a failure Get Vat Returns Data response")
-          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(BAD_REQUEST,
-            Json.toJson(VatReturnData.singleErrorResponse))
-
-          When(s"Calling GET /vat-returns/vrn/$vrn")
-          val res: WSResponse = VatReturnsComponent.getVatReturns(vrn, queryParameters)
-
-          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
-
-          Then("the correct single error response is returned")
-
-          res should have(
-            httpStatus(BAD_REQUEST),
-            jsonBodyAs[Error](VatReturnData.singleErrorResponse)
-          )
-        }
-      }
-
-      "authorised with a valid request with a period key and a multi error response" should {
-
-        lazy val queryParameters: VatReturnFilters= VatReturnFilters(
-          periodKey = "17AA"
-        )
-
-        "return a multi error response model" in {
-
-          isAuthorised()
-
-          And("When wiremock stubbing a failure Get Vat Returns Data response")
-          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(BAD_REQUEST,
-            Json.toJson(VatReturnData.multiErrorModel))
-
-          When(s"Call GET /vat-returns/returns/vrn/$vrn/")
-          val res: WSResponse = VatReturnsComponent.getVatReturns("555555555", queryParameters)
-
-          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
-
-          Then("the correct multi error response is returned")
-
-          res should have(
-            httpStatus(BAD_REQUEST),
-            jsonBodyAs[MultiError](VatReturnData.multiErrorModel)
-          )
-        }
-      }
-
-      "unauthorised" should {
-
-        "return an FORBIDDEN response" in {
-
-          isAuthorised(false)
-
-          When(s"Call GET /vat-returns/returns/vrn/$vrn/")
-          val res: WSResponse = VatReturnsComponent.getVatReturns(vrn, VatReturnFilters(
-            periodKey = "17AA"
-          ))
-
-          res should have(
-            httpStatus(FORBIDDEN)
-          )
-        }
-      }
+//      "authorised with a valid request with a period key and an error response" should {
+//
+//        lazy val queryParameters: VatReturnFilters= VatReturnFilters(
+//          periodKey = "17AA"
+//        )
+//
+//        "return a single error response" in {
+//
+//          isAuthorised()
+//
+//          And("When wiremock stubbing a failure Get Vat Returns Data response")
+//          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(BAD_REQUEST,
+//            Json.toJson(VatReturnData.singleErrorResponse))
+//
+//          When(s"Calling GET /vat-returns/vrn/$vrn")
+//          val res: WSResponse = VatReturnsComponent.getVatReturns(vrn, queryParameters)
+//
+//          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
+//
+//          Then("the correct single error response is returned")
+//
+//          res should have(
+//            httpStatus(BAD_REQUEST),
+//            jsonBodyAs[Error](VatReturnData.singleErrorResponse)
+//          )
+//        }
+//      }
+//
+//      "authorised with a valid request with a period key and a multi error response" should {
+//
+//        lazy val queryParameters: VatReturnFilters= VatReturnFilters(
+//          periodKey = "17AA"
+//        )
+//
+//        "return a multi error response model" in {
+//
+//          isAuthorised()
+//
+//          And("When wiremock stubbing a failure Get Vat Returns Data response")
+//          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(BAD_REQUEST,
+//            Json.toJson(VatReturnData.multiErrorModel))
+//
+//          When(s"Call GET /vat-returns/returns/vrn/$vrn/")
+//          val res: WSResponse = VatReturnsComponent.getVatReturns("555555555", queryParameters)
+//
+//          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
+//
+//          Then("the correct multi error response is returned")
+//
+//          res should have(
+//            httpStatus(BAD_REQUEST),
+//            jsonBodyAs[MultiError](VatReturnData.multiErrorModel)
+//          )
+//        }
+//      }
+//
+//      "unauthorised" should {
+//
+//        "return an FORBIDDEN response" in {
+//
+//          isAuthorised(false)
+//
+//          When(s"Call GET /vat-returns/returns/vrn/$vrn/")
+//          val res: WSResponse = VatReturnsComponent.getVatReturns(vrn, VatReturnFilters(
+//            periodKey = "17AA"
+//          ))
+//
+//          res should have(
+//            httpStatus(FORBIDDEN)
+//          )
+//        }
+//      }
     }
 
   }
