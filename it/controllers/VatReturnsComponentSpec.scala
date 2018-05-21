@@ -16,16 +16,28 @@
 
 package controllers
 
-import binders.VatReturnsBinders
 import helpers.ComponentSpecBase
-import helpers.servicemocks.DesVatReturnsStub
+import helpers.servicemocks.{AuthStub, DesVatReturnsStub}
 import models._
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSResponse
 import testData.VatReturnData
 
 class VatReturnsComponentSpec extends ComponentSpecBase {
+
+  val vrn = "555555555"
+
+  def getStubResponse(responseStatus: Integer, responseJson: JsValue, authorised: Boolean = true): WSResponse = {
+    if (authorised) AuthStub.stubAuthorised() else AuthStub.stubUnauthorised()
+
+    lazy val queryParameters: VatReturnFilters = VatReturnFilters(periodKey = "17AA")
+    DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(responseStatus, responseJson)
+    val response = VatReturnsComponent.getVatReturns(vrn, queryParameters)
+    DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
+
+    response
+  }
 
   "Sending a request to /vat-returns/returns/vrn/:vrn/ (VatReturnsController)" when {
 
@@ -35,105 +47,59 @@ class VatReturnsComponentSpec extends ComponentSpecBase {
 
       "be authorised with a valid request with a period key and a success response" should {
 
-        lazy val queryParameters: VatReturnFilters = VatReturnFilters(
-          periodKey = "17AA"
-        )
-
         "return a success response" in {
+          val response = getStubResponse(OK, Json.toJson(VatReturnData.successResponse))
 
-          isAuthorised()
+          response.status shouldBe OK
+        }
 
-        And("When wiremock stubbing a successful Get Vat Returns Data response")
-          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(OK,
-            Json.toJson(VatReturnData.successResponse))
+        "return the expected json" in {
+          val response = getStubResponse(OK, Json.toJson(VatReturnData.successResponse))
 
-          When(s"Calling GET /vat-returns/returns/vrn/$vrn")
-          val res: WSResponse = VatReturnsComponent.getVatReturns("555555555", queryParameters)
-
-          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
-
-          Then("a successful response is returned with the correct transformed vat obligations")
-          res should have(
-            httpStatus(OK),
-            jsonBodyAs[VatReturnDetail](VatReturnData.successResponse)
-          )
+          response.json shouldBe VatReturnData.successResponse
         }
       }
 
 
-//      "authorised with a valid request with a period key and an error response" should {
-//
-//        lazy val queryParameters: VatReturnFilters= VatReturnFilters(
-//          periodKey = "17AA"
-//        )
-//
-//        "return a single error response" in {
-//
-//          isAuthorised()
-//
-//          And("When wiremock stubbing a failure Get Vat Returns Data response")
-//          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(BAD_REQUEST,
-//            Json.toJson(VatReturnData.singleErrorResponse))
-//
-//          When(s"Calling GET /vat-returns/vrn/$vrn")
-//          val res: WSResponse = VatReturnsComponent.getVatReturns(vrn, queryParameters)
-//
-//          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
-//
-//          Then("the correct single error response is returned")
-//
-//          res should have(
-//            httpStatus(BAD_REQUEST),
-//            jsonBodyAs[Error](VatReturnData.singleErrorResponse)
-//          )
-//        }
-//      }
-//
-//      "authorised with a valid request with a period key and a multi error response" should {
-//
-//        lazy val queryParameters: VatReturnFilters= VatReturnFilters(
-//          periodKey = "17AA"
-//        )
-//
-//        "return a multi error response model" in {
-//
-//          isAuthorised()
-//
-//          And("When wiremock stubbing a failure Get Vat Returns Data response")
-//          DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(BAD_REQUEST,
-//            Json.toJson(VatReturnData.multiErrorModel))
-//
-//          When(s"Call GET /vat-returns/returns/vrn/$vrn/")
-//          val res: WSResponse = VatReturnsComponent.getVatReturns("555555555", queryParameters)
-//
-//          DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
-//
-//          Then("the correct multi error response is returned")
-//
-//          res should have(
-//            httpStatus(BAD_REQUEST),
-//            jsonBodyAs[MultiError](VatReturnData.multiErrorModel)
-//          )
-//        }
-//      }
-//
-//      "unauthorised" should {
-//
-//        "return an FORBIDDEN response" in {
-//
-//          isAuthorised(false)
-//
-//          When(s"Call GET /vat-returns/returns/vrn/$vrn/")
-//          val res: WSResponse = VatReturnsComponent.getVatReturns(vrn, VatReturnFilters(
-//            periodKey = "17AA"
-//          ))
-//
-//          res should have(
-//            httpStatus(FORBIDDEN)
-//          )
-//        }
-//      }
-    }
+      "authorised with a valid request with a period key and an error response" should {
 
+        "return a single error response" in {
+          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.singleErrorResponse))
+
+          response.status shouldBe BAD_REQUEST
+        }
+
+        "return the expected json" in {
+          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.singleErrorResponse))
+
+          response.json.as[Error] shouldBe VatReturnData.singleErrorResponse
+        }
+      }
+
+      "authorised with a valid request with a period key and a multi error response" should {
+
+        "return a BAD_REQUEST status" in {
+          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.multiErrorModel))
+
+          response.status shouldBe BAD_REQUEST
+        }
+
+        "return the expected json" in {
+          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.multiErrorModel))
+
+          response.json.as[MultiError] shouldBe VatReturnData.multiErrorModel
+        }
+      }
+
+      "unauthorised" should {
+
+        "return an FORBIDDEN response" in {
+          val response = getStubResponse(FORBIDDEN, Json.toJson(VatReturnData.singleErrorResponse), authorised = false)
+
+          response.status shouldBe FORBIDDEN
+        }
+      }
+    }
   }
 }
+

@@ -17,8 +17,6 @@
 package helpers
 
 import binders.VatReturnsBinders
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.servicemocks.AuthStub
 import models.VatReturnFilters
 import org.scalatest._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
@@ -64,30 +62,11 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
   }
 
   object VatReturnsComponent {
-    def get(uri: String): WSResponse = {
+    def get(uri: String): WSResponse =
+     await(buildClient(uri).get())
 
-      val x = await(buildClient(uri).get())
-      println(s"HERE IT IS!: ${x.body}")
-      x
-    }
-
-    def getVatReturns(vrn: String, queryParameters: VatReturnFilters): WSResponse = {
-
-      println(s"in getVatReturns url is: ")
-      println(s"/vat-returns/returns/vrn/$vrn?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}")
-
+    def getVatReturns(vrn: String, queryParameters: VatReturnFilters): WSResponse =
       get(s"/vat-returns/returns/vrn/$vrn?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}")
-    }
 
-  }
-
-  def isAuthorised(authorised: Boolean = true): StubMapping = {
-    if (authorised) {
-      Given("I wiremock stub an authorised user response")
-      AuthStub.stubAuthorised()
-    } else {
-      Given("I wiremock stub an unauthorised user response")
-      AuthStub.stubUnauthorised()
-    }
   }
 }

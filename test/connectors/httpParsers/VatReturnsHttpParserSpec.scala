@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HttpResponse
 
 class VatReturnsHttpParserSpec extends SpecBase {
 
-  "The VatObligationsHttpParser" when {
+  "The VatReturnsHttpParser" when {
 
     "the http response status is 200 OK and matches expected Schema" should {
 

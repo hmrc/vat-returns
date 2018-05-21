@@ -43,7 +43,7 @@ object VatReturnsBinders {
         case Some(values) =>
           values.head match {
             case data if data.matches("^([0-9]{2}[A-Z][A-Z0-9])$|^(#[0-9]{3})$") => Right(Some(values.head))
-            case _ => Left(s"Failed to bind '$key=${values.head}' valid values are ################################.")
+            case _ => Left(s"Failed to bind '$key=${values.head}'.")
           }
         case _ => Right(None)
       }

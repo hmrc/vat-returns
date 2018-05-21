@@ -18,7 +18,7 @@ package helpers
 
 import org.scalatest._
 import org.scalatest.matchers._
-import play.api.libs.json.Reads
+import play.api.libs.json.{JsValue, Reads}
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -40,6 +40,8 @@ trait CustomMatchers extends UnitSpec with GivenWhenThen {
   def jsonBodyAs[T](expectedValue: T)(implicit reads: Reads[T]): HavePropertyMatcher[WSResponse, T] =
     new HavePropertyMatcher[WSResponse, T] {
       def apply(response: WSResponse): HavePropertyMatchResult[T] = {
+        println(s"RECEIVED:: ${response.json}")
+        println(s"EXPECTED:: ${expectedValue.toString()}")
         Then(s"the response json should be '${expectedValue.toString}'")
         HavePropertyMatchResult(
           response.json.as[T] == expectedValue,

@@ -17,10 +17,11 @@
 package testData
 
 import models._
+import play.api.libs.json.{JsValue, Json}
 
 object VatReturnData {
 
-  val successResponse: VatReturnDetail =
+  /*val successResponse: VatReturnDetail =
     VatReturnDetail(
       "17AA",
       1.23,
@@ -32,7 +33,22 @@ object VatReturnData {
       1.23,
       1.23,
       1.23
-    )
+    )*/
+
+  val successResponse: JsValue = Json.parse(
+    """{
+      |"periodKey":"18AA",
+      |"vatDueSales":100,
+      |"vatDueAcquisitions":200,
+      |"totalVatDue":300,
+      |"vatReclaimedCurrPeriod":400,
+      |"netVatDue":500,
+      |"totalValueSalesExVAT":600,
+      |"totalValuePurchasesExVAT":700,
+      |"totalValueGoodsSuppliedExVAT":800,
+      |"totalAcquisitionsExVAT":900
+    }""".stripMargin
+  )
 
   val singleErrorResponse: Error = Error("CODE", "ERROR MESSAGE")
 
