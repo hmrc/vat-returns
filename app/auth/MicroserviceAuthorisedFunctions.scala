@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package auth
 
-import play.api.http.Status
-import play.api.test.FakeRequest
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 
-class MicroserviceHelloWorldControllerSpec extends UnitSpec with WithFakeApplication{
-
-  val fakeRequest = FakeRequest("GET", "/")
-
-  "GET /" should {
-    "return 200" in {
-      val controller = new MicroserviceHelloWorld()
-      val result = controller.hello()(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
-  }
-}
+@Singleton
+class MicroserviceAuthorisedFunctions @Inject()(val authConnector: AuthConnector) extends AuthorisedFunctions

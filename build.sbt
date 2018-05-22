@@ -61,6 +61,7 @@ def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
   "org.scalatest" %% "scalatest" % "3.0.4" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
+  "com.github.tomakehurst" % "wiremock" % "2.6.0" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % scope,
   "org.mockito" % "mockito-core" % "2.13.0" % scope,
   "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
@@ -82,6 +83,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
+    routesImport += "binders.VatReturnsBinders._",
     routesGenerator := InjectedRoutesGenerator
   )
   .configs(IntegrationTest)

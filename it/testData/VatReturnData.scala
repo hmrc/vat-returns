@@ -14,28 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package testData
 
-import base.SpecBase
+import models._
 import play.api.libs.json.{JsValue, Json}
 
-class VatReturnDetailSpec extends SpecBase {
+object VatReturnData {
 
-  val vatReturnModel: VatReturnDetail =
-    VatReturnDetail(
-      "18AA",
-      100,
-      200,
-      300,
-      400,
-      500,
-      600,
-      700,
-      800,
-      900
-    )
-
-  val writeJson: JsValue = Json.parse(
+  val successResponse: JsValue = Json.parse(
     """{
       |"periodKey":"18AA",
       |"vatDueSales":100,
@@ -50,29 +36,12 @@ class VatReturnDetailSpec extends SpecBase {
     }""".stripMargin
   )
 
-  val readJson: JsValue = Json.parse(
-    """{
-      |"periodKey":"18AA",
-      |"vatDueSales":100,
-      |"vatDueAcquisitions":200,
-      |"totalVatDue":300,
-      |"vatReclaimedCurrPeriod":400,
-      |"vatDueNet":500,
-      |"totalValueSalesExVAT":600,
-      |"totalValuePurchasesExVAT":700,
-      |"totalValueGoodsSuppliedExVAT":800,
-      |"totalAcquisitionsExVAT":900
-    }""".stripMargin
+  val singleErrorResponse: Error = Error("CODE", "ERROR MESSAGE")
+
+  val multiErrorModel: MultiError = MultiError(
+    failures = Seq(
+      Error("CODE 1", "ERROR MESSAGE 1"),
+      Error("CODE 2", "ERROR MESSAGE 2")
+    )
   )
-
-  "A VAT Return" should {
-
-    "serialize to JSON" in {
-      Json.toJson(vatReturnModel) shouldBe writeJson
-    }
-
-    "deserialize to a VatReturn model" in {
-      readJson.as[VatReturnDetail] shouldBe vatReturnModel
-    }
-  }
 }

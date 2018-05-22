@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package auth
 
-object ConfigKeys {
-  val desServiceBase: String = "des"
-  val setupDesReturnsStartPath: String = "microservice.services.des.endpoints.vatReturnsUrlStart"
-  val desEnvironment: String = "microservice.services.des.environment"
-  val desToken: String = "microservice.services.des.authorization-token"
+import com.google.inject.AbstractModule
+import controllers.actions.{AuthAction, AuthActionImpl}
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
+
+class AuthModule extends AbstractModule {
+  def configure(): Unit = {
+    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
+    bind(classOf[AuthorisedFunctions]).to(classOf[MicroserviceAuthorisedFunctions])
+  }
 }

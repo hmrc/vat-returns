@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package config
+package helpers.servicemocks
 
-object ConfigKeys {
-  val desServiceBase: String = "des"
-  val setupDesReturnsStartPath: String = "microservice.services.des.endpoints.vatReturnsUrlStart"
-  val desEnvironment: String = "microservice.services.des.environment"
-  val desToken: String = "microservice.services.des.authorization-token"
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import helpers.WiremockHelper
+import play.api.http.Status
+
+object AuthStub {
+
+  val postAuthoriseUrl: String = "/auth/authorise"
+
+  def stubAuthorised(): StubMapping =
+    WiremockHelper.stubPost(postAuthoriseUrl, Status.OK, """{"externalId": "1234"}""")
+
+  def stubUnauthorised(): StubMapping =
+    WiremockHelper.stubPost(postAuthoriseUrl, Status.UNAUTHORIZED, """{"externalId": "1234"}""")
 }

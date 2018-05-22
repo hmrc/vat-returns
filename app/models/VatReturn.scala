@@ -17,12 +17,7 @@
 package models
 
 import play.api.libs.json._
-
-case class VatReturn(identification: VatReturnIdentification, returnDetails: VatReturnDetail)
-
-object VatReturn {
-  implicit val format: OFormat[VatReturn] = Json.format[VatReturn]
-}
+import play.api.libs.functional.syntax._
 
 case class VatReturnIdentification(idType: String, idValue: String)
 
@@ -42,5 +37,37 @@ case class VatReturnDetail(periodKey: String,
                            totalAllAcquisitionsExVAT: BigDecimal)
 
 object VatReturnDetail {
-  implicit val format: OFormat[VatReturnDetail] = Json.format[VatReturnDetail]
+  implicit val reads: Reads[VatReturnDetail] = (
+      (JsPath \ "periodKey").read[String] and
+      (JsPath \ "vatDueSales").read[BigDecimal] and
+      (JsPath \ "vatDueAcquisitions").read[BigDecimal] and
+      (JsPath \ "totalVatDue").read[BigDecimal] and
+      (JsPath \ "vatReclaimedCurrPeriod").read[BigDecimal] and
+      (JsPath \ "vatDueNet").read[BigDecimal] and
+      (JsPath \ "totalValueSalesExVAT").read[BigDecimal] and
+      (JsPath \ "totalValuePurchasesExVAT").read[BigDecimal] and
+      (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and
+      (JsPath \ "totalAcquisitionsExVAT").read[BigDecimal]
+    ) (VatReturnDetail.apply _)
+
+  implicit val writes: Writes[VatReturnDetail] = new Writes[VatReturnDetail] {
+    def writes(vatReturnDetail: VatReturnDetail): JsObject = Json.obj(
+      "periodKey" -> vatReturnDetail.periodKey,
+      "vatDueSales" -> vatReturnDetail.vatDueSales,
+      "vatDueAcquisitions" -> vatReturnDetail.vatDueAcquisitions,
+      "totalVatDue" -> vatReturnDetail.vatDueTotal,
+      "vatReclaimedCurrPeriod" -> vatReturnDetail.vatReclaimedCurrPeriod,
+      "netVatDue" -> vatReturnDetail.vatDueNet,
+      "totalValueSalesExVAT" -> vatReturnDetail.totalValueSalesExVAT,
+      "totalValuePurchasesExVAT" -> vatReturnDetail.totalValuePurchasesExVAT,
+      "totalValueGoodsSuppliedExVAT" -> vatReturnDetail.totalValueGoodsSuppliedExVAT,
+      "totalAcquisitionsExVAT" -> vatReturnDetail.totalAllAcquisitionsExVAT
+    )
+  }
 }
+
+object VatReturn {
+  implicit val format: OFormat[VatReturn] = Json.format[VatReturn]
+}
+
+case class VatReturn(identification: VatReturnIdentification, returnDetails: VatReturnDetail)
