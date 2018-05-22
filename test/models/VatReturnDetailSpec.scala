@@ -55,13 +55,13 @@ class VatReturnDetailSpec extends SpecBase {
       |"periodKey":"18AA",
       |"vatDueSales":100,
       |"vatDueAcquisitions":200,
-      |"totalVatDue":300,
+      |"vatDueTotal":300,
       |"vatReclaimedCurrPeriod":400,
       |"vatDueNet":500,
       |"totalValueSalesExVAT":600,
       |"totalValuePurchasesExVAT":700,
       |"totalValueGoodsSuppliedExVAT":800,
-      |"totalAcquisitionsExVAT":900
+      |"totalAllAcquisitionsExVAT":900
     }""".stripMargin
   )
 

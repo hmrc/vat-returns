@@ -30,7 +30,7 @@ class AppRoutesSpec extends SpecBase {
 
         lazy val queryParams: VatReturnFilters = VatReturnFilters(periodKey = "17AA")
 
-        val expected = "/vat-returns/returns/vrn/555555555/?period-key=17AA"
+        val expected = "/vat-returns/returns/vrn/555555555?period-key=17AA"
 
         s"have the route '$expected'" in {
           val route: String = controllers.routes.VatReturnsController.getVatReturns(vrn, queryParams).url
