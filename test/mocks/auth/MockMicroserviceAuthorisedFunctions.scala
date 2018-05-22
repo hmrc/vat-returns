@@ -46,9 +46,8 @@ trait MockMicroserviceAuthorisedFunctions extends BeforeAndAfterEach with Mockit
       .thenReturn(
         new mockAuth.AuthorisedFunction(EmptyPredicate) {
           override def retrieve[A](retrieval: Retrieval[A]): mockAuth.AuthorisedFunctionWithResult[A] {
-  def apply[B](body: A => Future[B])
-(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[B]
-} = new mockAuth.AuthorisedFunctionWithResult[A](EmptyPredicate, retrieval) {
+            def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[B]
+          } = new mockAuth.AuthorisedFunctionWithResult[A](EmptyPredicate, retrieval) {
             override def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[B] =
               body.apply(retrievalValue.asInstanceOf[A])
           }
@@ -61,9 +60,9 @@ trait MockMicroserviceAuthorisedFunctions extends BeforeAndAfterEach with Mockit
         new mockAuth.AuthorisedFunction(EmptyPredicate) {
           override def apply[A](body: => Future[A])(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[Nothing] =
             Future.failed(exception)
+
           override def retrieve[A](retrieval: Retrieval[A]): mockAuth.AuthorisedFunctionWithResult[A] {
-            def apply[B](body: A => Future[B])
-                        (implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[B]
+            def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[B]
           } = new mockAuth.AuthorisedFunctionWithResult[A](EmptyPredicate, retrieval) {
             override def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[B] =
               Future.failed(exception)

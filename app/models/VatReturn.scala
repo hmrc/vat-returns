@@ -50,7 +50,7 @@ object VatReturnDetail {
       (JsPath \ "totalAcquisitionsExVAT").read[BigDecimal]
     ) (VatReturnDetail.apply _)
 
-  implicit val writes = new Writes[VatReturnDetail] {
+  implicit val writes: Writes[VatReturnDetail] = new Writes[VatReturnDetail] {
     def writes(vatReturnDetail: VatReturnDetail): JsObject = Json.obj(
       "periodKey" -> vatReturnDetail.periodKey,
       "vatDueSales" -> vatReturnDetail.vatDueSales,
