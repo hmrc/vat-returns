@@ -41,13 +41,13 @@ object VatReturnDetail {
       (JsPath \ "periodKey").read[String] and
       (JsPath \ "vatDueSales").read[BigDecimal] and
       (JsPath \ "vatDueAcquisitions").read[BigDecimal] and
-      (JsPath \ "totalVatDue").read[BigDecimal] and
+      (JsPath \ "vatDueTotal").read[BigDecimal] and
       (JsPath \ "vatReclaimedCurrPeriod").read[BigDecimal] and
       (JsPath \ "vatDueNet").read[BigDecimal] and
       (JsPath \ "totalValueSalesExVAT").read[BigDecimal] and
       (JsPath \ "totalValuePurchasesExVAT").read[BigDecimal] and
       (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and
-      (JsPath \ "totalAcquisitionsExVAT").read[BigDecimal]
+      (JsPath \ "totalAllAcquisitionsExVAT").read[BigDecimal]
     ) (VatReturnDetail.apply _)
 
   implicit val writes: Writes[VatReturnDetail] = new Writes[VatReturnDetail] {
