@@ -20,6 +20,7 @@ import config.MicroserviceAppConfig
 import connectors.httpParsers.VatReturnsHttpParser._
 import javax.inject.{Inject, Singleton}
 import models.{VatReturnDetail, VatReturnFilters}
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -39,9 +40,12 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
     val desHC = headerCarrier.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
       .withExtraHeaders("Environment" -> appConfig.desEnvironment)
 
+    Logger.debug(s"[VatReturnsConnector][getVatReturns] - Calling GET $url \nHeaders: $desHC\n QueryParams: $queryParameters")
     http.GET(url, queryParameters.toSeqQueryParams)(VatReturnReads, desHC, ec).map {
       case vatReturns@Right(_) => vatReturns
-      case error@Left(_) => error
+      case error@Left(message) =>
+        Logger.warn("[VatReturnsConnector][getVatReturns] DES Error Received. Message: " + message)
+        error
     }
   }
 }

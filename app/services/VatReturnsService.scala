@@ -16,22 +16,33 @@
 
 package services
 
+import audit.AuditingService
+import audit.models.{VatReturnRequestAuditModel, VatReturnResponseAuditModel}
 import javax.inject.{Inject, Singleton}
 import connectors.VatReturnsConnector
 import models._
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector) {
+class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector, val auditingService: AuditingService) {
 
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, VatReturnDetail]] = {
 
+    Logger.debug(s"[VatReturnsService][getVatReturns] Auditing Vat Returns request")
+    auditingService.audit(VatReturnRequestAuditModel(vrn, queryParameters))
+
+    Logger.debug(s"[VatReturnsService][getVatReturns] Calling vatReturnsConnector with Vrn: $vrn\nParams: $queryParameters")
     VatReturnsConnector.getVatReturns(vrn, queryParameters).map {
-      case success@Right(_) => success
-      case error@Left(_) => error
+      case success@Right(vatReturns) =>
+        Logger.debug(s"[VatReturnsService][getVatReturns] Auditing Vat Returns response")
+        auditingService.audit(VatReturnResponseAuditModel(vrn, vatReturns))
+        success
+      case error@Left(_) =>
+        error
     }
   }
 }

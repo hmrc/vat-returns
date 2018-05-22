@@ -18,12 +18,13 @@ package services
 
 import base.SpecBase
 import mocks.connectors.MockVatReturnsConnector
+import mocks.audit.MockAuditingService
 import models._
 import play.api.http.Status
 
-class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector {
+class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector with MockAuditingService {
 
-  object TestVatReturnsService extends VatReturnsService(mockVatReturnsConnector)
+  object TestVatReturnsService extends VatReturnsService(mockVatReturnsConnector, mockAuditingService)
 
   lazy val exampleVrn = "555555555"
 

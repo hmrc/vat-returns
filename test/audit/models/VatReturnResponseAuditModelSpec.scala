@@ -17,7 +17,7 @@
 package audit.models
 
 import base.SpecBase
-import models.{VatReturn, VatReturnDetail, VatReturnIdentification}
+import models.VatReturnDetail
 import play.api.libs.json.{JsValue, Json}
 
 class VatReturnResponseAuditModelSpec extends SpecBase {
@@ -28,20 +28,17 @@ class VatReturnResponseAuditModelSpec extends SpecBase {
 
   "The VatReturnsResponseAuditModel" should {
 
-    val testTransaction: VatReturn = VatReturn(
-      VatReturnIdentification("VRN", testVrn),
-      VatReturnDetail(
-        "18AA",
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      )
+    val testTransaction: VatReturnDetail = VatReturnDetail(
+      "18AA",
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
     )
 
     object TestVatReturnResponseAuditModel extends VatReturnResponseAuditModel(testVrn, testTransaction)

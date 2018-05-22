@@ -17,10 +17,10 @@
 package controllers.actions
 
 import javax.inject.Singleton
-
 import auth.AuthenticatedRequest
 import com.google.inject.Inject
 import models.{ForbiddenError, UnauthenticatedError}
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Results.{Forbidden, Unauthorized}
 import play.api.mvc._
@@ -40,12 +40,18 @@ class AuthActionImpl @Inject()(val authorisedFunctions: AuthorisedFunctions)(imp
 
     authorisedFunctions.authorised().retrieve(Retrievals.externalId) {
       case Some (externalId) => block(AuthenticatedRequest(request, externalId))
+
       case _ =>
+        Logger.debug("[AuthActionImpl][invokeBlock] Did not retrieve externalID, returning Unauthorised - Unauthenticated Error")
         Future.successful(Unauthorized(Json.toJson(UnauthenticatedError)))
+
     } recover {
       case _: NoActiveSession =>
+        Logger.debug("[AuthActionImpl][invokeBlock] Request did not have an Active Session, returning Unauthorised - Unauthenticated Error")
         Unauthorized(Json.toJson(UnauthenticatedError))
+
       case _ =>
+        Logger.debug("[AuthActionImpl][invokeBlock] Request has an active session but was not authorised, returning Forbidden - Not Authorised Error")
         Forbidden(Json.toJson(ForbiddenError))
     }
   }
