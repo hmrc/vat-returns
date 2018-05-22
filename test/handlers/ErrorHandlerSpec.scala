@@ -106,13 +106,13 @@ class ErrorHandlerSpec extends SpecBase {
 
     "triggered by a Authorisation exception (e.g. BearerTokenExpired)" should {
 
-      "Return an UNAUTHORInternal Server ErrorD result" which {
+      "Return an UNAUTHORISED result" which {
 
         val request = FakeRequest("","/test/path")
         val error = new BearerTokenExpired
         lazy val result = await(TestErrorHandler.onServerError(request, error))
 
-        "has the status UNAUTHORInternal Server ErrorD (401)" in {
+        "has the status UNAUTHORISED (401)" in {
           status(result) shouldBe Status.UNAUTHORIZED
         }
 

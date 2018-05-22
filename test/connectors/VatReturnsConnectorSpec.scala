@@ -59,7 +59,7 @@ class VatReturnsConnectorSpec extends SpecBase with MockHttp {
 
   "The VatReturnsConnector" should {
 
-    "format the request url correctly for Income Tax TaxRegime requests" in {
+    "format the request url correctly for vat-returns DES requests" in {
       val actualUrl: String = TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn)
       val expectedUrl: String = s"${mockAppConfig.desServiceUrl}${mockAppConfig.setupDesReturnsStartPath}$testVrn"
       actualUrl shouldBe expectedUrl

@@ -40,8 +40,6 @@ trait CustomMatchers extends UnitSpec with GivenWhenThen {
   def jsonBodyAs[T](expectedValue: T)(implicit reads: Reads[T]): HavePropertyMatcher[WSResponse, T] =
     new HavePropertyMatcher[WSResponse, T] {
       def apply(response: WSResponse): HavePropertyMatchResult[T] = {
-        println(s"RECEIVED:: ${response.json}")
-        println(s"EXPECTED:: ${expectedValue.toString()}")
         Then(s"the response json should be '${expectedValue.toString}'")
         HavePropertyMatchResult(
           response.json.as[T] == expectedValue,

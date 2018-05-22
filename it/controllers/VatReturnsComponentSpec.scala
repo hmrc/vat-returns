@@ -43,8 +43,6 @@ class VatReturnsComponentSpec extends ComponentSpecBase {
 
     "Requesting Vat Returns" should {
 
-      lazy val vrn: String = "555555555"
-
       "be authorised with a valid request with a period key and a success response" should {
 
         "return a success response" in {
