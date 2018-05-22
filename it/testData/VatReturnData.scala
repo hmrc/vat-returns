@@ -21,20 +21,6 @@ import play.api.libs.json.{JsValue, Json}
 
 object VatReturnData {
 
-  /*val successResponse: VatReturnDetail =
-    VatReturnDetail(
-      "17AA",
-      1.23,
-      1.23,
-      1.23,
-      1.23,
-      1.23,
-      1.23,
-      1.23,
-      1.23,
-      1.23
-    )*/
-
   val successResponse: JsValue = Json.parse(
     """{
       |"periodKey":"18AA",
