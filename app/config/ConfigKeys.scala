@@ -17,7 +17,7 @@
 package config
 
 object ConfigKeys {
-  val desServiceBase: String = "des"
+  val desServiceUrl: String = "microservice.services.des.url"
   val setupDesReturnsStartPath: String = "microservice.services.des.endpoints.vatReturnsUrlStart"
   val desEnvironment: String = "microservice.services.des.environment"
   val desToken: String = "microservice.services.des.authorization-token"
