@@ -42,7 +42,7 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
 
   override lazy val desEnvironment: String = getString(Keys.desEnvironment)
   override lazy val desToken: String = getString(Keys.desToken)
-  override lazy val desServiceUrl: String = baseUrl(Keys.desServiceBase)
+  override lazy val desServiceUrl: String = loadConfig(Keys.desServiceUrl)
   override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
 
 }
