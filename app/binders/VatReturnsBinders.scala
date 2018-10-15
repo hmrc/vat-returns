@@ -42,7 +42,7 @@ object VatReturnsBinders {
       private[binders] def bindPeriodKey(key: String, params: Map[String, Seq[String]]) = params.get(key) match {
         case Some(values) =>
           values.head match {
-            case data if data.matches("^([0-9]{2}[A-Z][A-Z0-9])$|^(#[0-9]{3})$") => Right(Some(values.head))
+            case data if data.matches("^([0-9]{2}[A-Z0-9]{2})$|^(#[0-9]{3})$") => Right(Some(values.head))
             case _ => Left(s"Failed to bind '$key=${values.head}'.")
           }
         case _ => Right(None)
