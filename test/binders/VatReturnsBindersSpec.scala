@@ -39,7 +39,7 @@ class VatReturnsBindersSpec extends SpecBase {
 
     "If a period-key query parameter is passed" which {
 
-      "is formatted correctly" should {
+      "is formatted correctly as a non final obligation" should {
 
         val queryParams: Map[String, Seq[String]] = Map(periodKeyValue -> Seq("17AA"))
 
@@ -47,6 +47,22 @@ class VatReturnsBindersSpec extends SpecBase {
 
           val expected: Option[Right[Nothing, VatReturnFilters]] = Some(Right(VatReturnFilters(
             periodKey = "17AA"
+          )))
+          val actual: Option[Either[String, VatReturnFilters]] =
+            VatReturnsBinders.vatReturnsQueryBinder.bind("", queryParams)
+
+          actual shouldBe expected
+        }
+      }
+
+      "is formatted correctly as a final obligation" should {
+
+        val queryParams: Map[String, Seq[String]] = Map(periodKeyValue -> Seq("9999"))
+
+        "return an VatReturnFilters instance with correct parameters" in {
+
+          val expected: Option[Right[Nothing, VatReturnFilters]] = Some(Right(VatReturnFilters(
+            periodKey = "9999"
           )))
           val actual: Option[Either[String, VatReturnFilters]] =
             VatReturnsBinders.vatReturnsQueryBinder.bind("", queryParams)
