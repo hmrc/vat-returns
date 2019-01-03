@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,10 +133,6 @@ class AuditingServiceSpec extends SpecBase with MockAuditingConnector {
 
         "has the correct audit detail" in {
           val expected: JsValue = Json.obj(
-            "ipAddress"->"-",
-            "Authorization"->"-",
-            "token"->"-",
-            "deviceID"->"-",
             "testDetailA"->"foo",
             "testDetailB"->"bar",
             "testNestedA"-> Json.arr(
