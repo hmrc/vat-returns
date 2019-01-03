@@ -133,10 +133,6 @@ class AuditingServiceSpec extends SpecBase with MockAuditingConnector {
 
         "has the correct audit detail" in {
           val expected: JsValue = Json.obj(
-            "ipAddress"->"-",
-            "Authorization"->"-",
-            "token"->"-",
-            "deviceID"->"-",
             "testDetailA"->"foo",
             "testDetailB"->"bar",
             "testNestedA"-> Json.arr(
