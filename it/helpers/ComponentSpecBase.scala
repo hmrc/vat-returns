@@ -35,12 +35,14 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
   val mockToken = "localToken"
   val mockEnvironment = "localEnvironment"
   val mockEndpointStart = "/vat/returns/vrn/"
+  val mockSubmitVatReturn = "/enterprise/return/vat/"
 
   def config: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
     "microservice.services.auth.port" -> mockPort,
     "microservice.services.des.url" -> mockUrl,
     "microservice.services.des.endpoints.vatReturnsUrlStart" -> mockEndpointStart,
+    "microservice.services.des.endpoints.submitVatReturn" -> mockSubmitVatReturn,
     "microservice.services.des.environment" -> mockEnvironment,
     "microservice.services.des.authorization-token" -> mockToken
   )

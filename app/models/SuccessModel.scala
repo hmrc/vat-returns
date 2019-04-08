@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package services
+package models
 
-import java.time.LocalDateTime
-import config.AppConfig
-import javax.inject.Inject
+import play.api.libs.json.{Format, Json}
 
-class DateService @Inject()(appConfig: AppConfig) {
+case class SuccessModel(formBundleNumber: String)
 
-  def now(): LocalDateTime = if(appConfig.useCurrentTime) LocalDateTime.now() else appConfig.staticDateTime
-
+object SuccessModel {
+  implicit val format: Format[SuccessModel] = Json.format[SuccessModel]
 }

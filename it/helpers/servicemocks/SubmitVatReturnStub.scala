@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package config
+package helpers.servicemocks
 
-object ConfigKeys {
-  val desServiceUrl: String = "microservice.services.des.url"
-  val setupDesReturnsStartPath: String = "microservice.services.des.endpoints.vatReturnsUrlStart"
-  val desSubmitVatReturnPath: String = "microservice.services.des.endpoints.submitVatReturn"
-  val desEnvironment: String = "microservice.services.des.environment"
-  val desToken: String = "microservice.services.des.authorization-token"
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import helpers.WiremockHelper._
+import play.api.libs.json.JsValue
+
+object SubmitVatReturnStub {
+
+  private def url(vrn: String): String = s"/enterprise/return/vat/$vrn"
+
+  def stubSubmitVatReturn(vrn: String)(status: Int, response: JsValue): StubMapping = {
+    stubPost(url(vrn), status, response.toString())
+  }
+
 }
