@@ -16,8 +16,9 @@
 
 package config
 
-import javax.inject.{Inject, Singleton}
+import java.time.{LocalDate, LocalDateTime, LocalTime}
 
+import javax.inject.{Inject, Singleton}
 import config.{ConfigKeys => Keys}
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
@@ -28,6 +29,8 @@ trait AppConfig extends ServicesConfig {
   val desToken: String
   val desServiceUrl: String
   val setupDesReturnsStartPath: String
+  val useCurrentTime: Boolean
+  val staticDateTime: LocalDateTime
 }
 
 @Singleton
@@ -44,5 +47,6 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
   override lazy val desToken: String = getString(Keys.desToken)
   override lazy val desServiceUrl: String = loadConfig(Keys.desServiceUrl)
   override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
-
+  override lazy val useCurrentTime: Boolean = getConfBool(Keys.useCurrentTime, defBool = true)
+  override lazy val staticDateTime: LocalDateTime = LocalDateTime.parse(loadConfig(Keys.staticDateTime))
 }

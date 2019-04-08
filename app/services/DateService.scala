@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package config
+package services
 
-object ConfigKeys {
-  val desServiceUrl: String = "microservice.services.des.url"
-  val setupDesReturnsStartPath: String = "microservice.services.des.endpoints.vatReturnsUrlStart"
-  val desEnvironment: String = "microservice.services.des.environment"
-  val desToken: String = "microservice.services.des.authorization-token"
-  val useCurrentTime: String = "dateService.useCurrentTime"
-  val staticDateTime: String = "dateService.staticDateTime"
+import java.time.LocalDateTime
+import config.AppConfig
+import javax.inject.Inject
+
+class DateService @Inject()(appConfig: AppConfig) {
+
+  def now(): LocalDateTime = if(appConfig.useCurrentTime) LocalDateTime.now() else appConfig.staticDateTime
+
 }

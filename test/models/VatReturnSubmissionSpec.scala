@@ -16,19 +16,17 @@
 
 package models
 
-import java.time.{LocalDate, LocalDateTime}
-
+import java.time.LocalDateTime
 import base.SpecBase
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 
-class SubmitVatReturnSpec extends SpecBase {
+class VatReturnSubmissionSpec extends SpecBase {
 
   "writes" when {
 
     "all fields are supplied" should {
 
-      val model: SubmitVatReturn = SubmitVatReturn(
+      val model: VatReturnSubmission = VatReturnSubmission(
         periodKey = "#001",
         vatDueSales = 1234567890123.23,
         vatDueAcquisitions = -9876543210912.87,
@@ -68,7 +66,7 @@ class SubmitVatReturnSpec extends SpecBase {
 
     "only mandatory fields are supplied" should {
 
-      val model: SubmitVatReturn = SubmitVatReturn(
+      val model: VatReturnSubmission = VatReturnSubmission(
         periodKey = "#001",
         vatDueSales = 1234567890123.23,
         vatDueAcquisitions = -9876543210912.87,

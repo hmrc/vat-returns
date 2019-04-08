@@ -22,25 +22,25 @@ import play.api.libs.json.Writes
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, _}
 
-case class SubmitVatReturn(periodKey: String,
-                           vatDueSales: BigDecimal,
-                           vatDueAcquisitions: BigDecimal,
-                           vatDueTotal: BigDecimal,
-                           vatReclaimedCurrPeriod: BigDecimal,
-                           vatDueNet: BigDecimal,
-                           totalValueSalesExVAT: BigDecimal,
-                           totalValuePurchasesExVAT: BigDecimal,
-                           totalValueGoodsSuppliedExVAT: BigDecimal,
-                           totalAllAcquisitionsExVAT: BigDecimal,
-                           agentReferenceNumber: Option[String] = None,
-                           receivedAt: LocalDateTime)
+case class VatReturnSubmission(periodKey: String,
+                               vatDueSales: BigDecimal,
+                               vatDueAcquisitions: BigDecimal,
+                               vatDueTotal: BigDecimal,
+                               vatReclaimedCurrPeriod: BigDecimal,
+                               vatDueNet: BigDecimal,
+                               totalValueSalesExVAT: BigDecimal,
+                               totalValuePurchasesExVAT: BigDecimal,
+                               totalValueGoodsSuppliedExVAT: BigDecimal,
+                               totalAllAcquisitionsExVAT: BigDecimal,
+                               agentReferenceNumber: Option[String] = None,
+                               receivedAt: LocalDateTime)
 
-object SubmitVatReturn {
+object VatReturnSubmission {
 
   private val dateTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
   private val formatDate: LocalDateTime => String = _.format(dateTimeFormat)
 
-  implicit val writes: Writes[SubmitVatReturn] = (
+  implicit val writes: Writes[VatReturnSubmission] = (
     (JsPath \ "periodKey").write[String] and
     (JsPath \ "vatDueSales").write[BigDecimal] and
     (JsPath \ "vatDueAcquisitions").write[BigDecimal] and
@@ -53,8 +53,6 @@ object SubmitVatReturn {
     (JsPath \ "totalAllAcquisitionsExVAT").write[BigDecimal] and
     (JsPath \ "agentReferenceNumber").writeNullable[String] and
     (JsPath \ "receivedAt").write[String].contramap(formatDate)
-  )(unlift(SubmitVatReturn.unapply))
-
-  implicit val reads: Reads[SubmitVatReturn] = Json.reads[SubmitVatReturn]
+  )(unlift(VatReturnSubmission.unapply))
 
 }
