@@ -16,9 +16,10 @@
 
 package helpers.servicemocks
 
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WiremockHelper._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.JsValue
+import com.github.tomakehurst.wiremock.client.WireMock._
 
 object SubmitVatReturnStub {
 
@@ -27,5 +28,10 @@ object SubmitVatReturnStub {
   def stubSubmitVatReturn(vrn: String)(status: Int, response: JsValue): StubMapping = {
     stubPost(url(vrn), status, response.toString())
   }
+
+  def verifySubmission(vrn: String, body: JsValue): Unit =
+    verify(
+      postRequestedFor(urlEqualTo(s"/enterprise/return/vat/$vrn")
+    ).withRequestBody(equalToJson(body.toString())))
 
 }

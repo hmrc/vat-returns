@@ -17,31 +17,54 @@
 package connectors
 
 import java.time.LocalDateTime
+
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.ComponentSpecBase
 import helpers.servicemocks.SubmitVatReturnStub
 import models._
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
   private trait Test {
     def setupStubs(): StubMapping
+
     val model: VatReturnSubmission = VatReturnSubmission(
       periodKey = "#001",
-      vatDueSales = 1234567890123.23,
-      vatDueAcquisitions = -9876543210912.87,
-      vatDueTotal = 1234567890112.23,
-      vatReclaimedCurrPeriod = -1234567890122.23,
-      vatDueNet = 2345678901.12,
-      totalValueSalesExVAT = 1234567890123.00,
-      totalValuePurchasesExVAT = 1234567890123.00,
-      totalValueGoodsSuppliedExVAT = 1234567890123.00,
-      totalAllAcquisitionsExVAT = -1234567890123.00,
-      receivedAt = LocalDateTime.now()
+      vatDueSales = 9999999999999.99,
+      vatDueAcquisitions = -9999999999999.99,
+      vatDueTotal = 0.00,
+      vatReclaimedCurrPeriod = 0.00,
+      vatDueNet = 0.00,
+      totalValueSalesExVAT = 0.00,
+      totalValuePurchasesExVAT = 0.00,
+      totalValueGoodsSuppliedExVAT = 0.00,
+      totalAllAcquisitionsExVAT = 0.00,
+      agentReferenceNumber = Some("XAIT1234567"),
+      receivedAt = LocalDateTime.of(2018, 8, 14, 12, 12, 12)
+    )
+
+    val postRequestJsonBody: JsValue = Json.parse(
+      """
+        |{
+        |  "periodKey" : "#001",
+        |  "vatDueSales" : 9999999999999.99,
+        |  "vatDueAcquisitions" : -9999999999999.99,
+        |  "vatDueTotal" : 0.00,
+        |  "vatReclaimedCurrPeriod" : 0.00,
+        |  "vatDueNet" : 0.00,
+        |  "totalValueSalesExVAT" : 0.00,
+        |  "totalValuePurchasesExVAT" : 0.00,
+        |  "totalValueGoodsSuppliedExVAT" : 0.00,
+        |  "totalAllAcquisitionsExVAT" : 0.00,
+        |  "agentReferenceNumber" : "XAIT1234567",
+        |  "receivedAt" : "2018-08-14T12:12:12Z"
+        |}
+      """.stripMargin
     )
 
     val connector: SubmitVatReturnConnector = app.injector.instanceOf[SubmitVatReturnConnector]
@@ -58,12 +81,12 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
           override def setupStubs(): StubMapping =
             SubmitVatReturnStub.stubSubmitVatReturn("999999999")(Status.OK, Json.parse(""" { "formBundleNumber": "12345" } """))
-
           setupStubs()
-          private val result = await(connector.submitVatReturn("999999999", model))
-          val expectedResult = Right(SuccessModel(formBundleNumber = "12345"))
 
-          result shouldBe expectedResult
+          private val result = await(connector.submitVatReturn("999999999", model))
+          SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
+
+          result shouldBe Right(SuccessModel(formBundleNumber = "12345"))
         }
       }
 
@@ -72,13 +95,13 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
         "return an InvalidJsonResponse" in new Test {
 
           override def setupStubs(): StubMapping =
-          SubmitVatReturnStub.stubSubmitVatReturn("999999999")(Status.OK, Json.parse(""" {  } """))
-
+            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(Status.OK, Json.parse(""" {  } """))
           setupStubs()
-          private val result = await(connector.submitVatReturn("999999999", model))
-          val expectedResult = Left(UnexpectedJsonFormat)
 
-          result shouldBe expectedResult
+          private val result = await(connector.submitVatReturn("999999999", model))
+          SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
+
+          result shouldBe Left(UnexpectedJsonFormat)
         }
       }
     }
@@ -90,16 +113,16 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
         "return an ErrorResponse" in new Test {
 
           override def setupStubs(): StubMapping =
-          SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
-            Status.INTERNAL_SERVER_ERROR,
-            Json.parse(""" { "code" : "500", "reason" : "DES" } """)
-          )
-
+            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
+              Status.INTERNAL_SERVER_ERROR,
+              Json.parse(""" { "code" : "500", "reason" : "DES" } """)
+            )
           setupStubs()
-          private val result = await(connector.submitVatReturn("999999999", model))
-          val expectedResult = Left(ErrorResponse(500, Error("500", "DES")))
 
-          result shouldBe expectedResult
+          private val result = await(connector.submitVatReturn("999999999", model))
+          SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
+
+          result shouldBe Left(ErrorResponse(500, Error("500", "DES")))
         }
       }
 
@@ -112,9 +135,11 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
               Status.INTERNAL_SERVER_ERROR,
               Json.parse(""" { "failures" : [ { "code" : "500", "reason" : "DES" }, { "code" : "503", "reason" : "Also DES" } ] } """)
             )
-
           setupStubs()
+
           private val result = await(connector.submitVatReturn("999999999", model))
+          SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
+
           val expectedResult = Left(ErrorResponse(500, MultiError(Seq(Error("500", "DES"), Error("503", "Also DES")))))
 
           result shouldBe expectedResult
@@ -126,22 +151,18 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
         "return an InvalidJsonResponse" in new Test {
 
           override def setupStubs(): StubMapping =
-          SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
-            Status.INTERNAL_SERVER_ERROR,
-            Json.parse(""" { } """)
-          )
-
+            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
+              Status.INTERNAL_SERVER_ERROR,
+              Json.parse(""" { } """)
+            )
           setupStubs()
-          private val result = await(connector.submitVatReturn("999999999", model))
-          val expectedResult = Left(UnexpectedJsonFormat)
 
-          result shouldBe expectedResult
+          private val result = await(connector.submitVatReturn("999999999", model))
+          SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
+
+          result shouldBe Left(UnexpectedJsonFormat)
         }
       }
     }
   }
-}
-
-object SubmitVatReturnConnectorSpec {
-
 }
