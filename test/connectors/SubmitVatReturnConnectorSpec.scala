@@ -25,7 +25,7 @@ import models.VatReturnFilters._
 
 import scala.concurrent.Future
 
-class VatReturnsConnectorSpec extends SpecBase with MockHttp {
+class SubmitVatReturnConnectorSpec extends SpecBase with MockHttp {
 
   val testReturn: VatReturn =
     VatReturn(

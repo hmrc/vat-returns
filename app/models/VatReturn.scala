@@ -34,36 +34,26 @@ case class VatReturnDetail(periodKey: String,
                            totalValueSalesExVAT: BigDecimal,
                            totalValuePurchasesExVAT: BigDecimal,
                            totalValueGoodsSuppliedExVAT: BigDecimal,
-                           totalAllAcquisitionsExVAT: BigDecimal)
+                           totalAllAcquisitionsExVAT: BigDecimal,
+                           agentReferenceNumber: Option[String] = None)
 
 object VatReturnDetail {
-  implicit val reads: Reads[VatReturnDetail] = (
-      (JsPath \ "periodKey").read[String] and
-      (JsPath \ "vatDueSales").read[BigDecimal] and
-      (JsPath \ "vatDueAcquisitions").read[BigDecimal] and
-      (JsPath \ "vatDueTotal").read[BigDecimal] and
-      (JsPath \ "vatReclaimedCurrPeriod").read[BigDecimal] and
-      (JsPath \ "vatDueNet").read[BigDecimal] and
-      (JsPath \ "totalValueSalesExVAT").read[BigDecimal] and
-      (JsPath \ "totalValuePurchasesExVAT").read[BigDecimal] and
-      (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and
-      (JsPath \ "totalAllAcquisitionsExVAT").read[BigDecimal]
-    ) (VatReturnDetail.apply _)
+  
+  implicit val reads: Reads[VatReturnDetail] = Json.reads[VatReturnDetail]
 
-  implicit val writes: Writes[VatReturnDetail] = new Writes[VatReturnDetail] {
-    def writes(vatReturnDetail: VatReturnDetail): JsObject = Json.obj(
-      "periodKey" -> vatReturnDetail.periodKey,
-      "vatDueSales" -> vatReturnDetail.vatDueSales,
-      "vatDueAcquisitions" -> vatReturnDetail.vatDueAcquisitions,
-      "totalVatDue" -> vatReturnDetail.vatDueTotal,
-      "vatReclaimedCurrPeriod" -> vatReturnDetail.vatReclaimedCurrPeriod,
-      "netVatDue" -> vatReturnDetail.vatDueNet,
-      "totalValueSalesExVAT" -> vatReturnDetail.totalValueSalesExVAT,
-      "totalValuePurchasesExVAT" -> vatReturnDetail.totalValuePurchasesExVAT,
-      "totalValueGoodsSuppliedExVAT" -> vatReturnDetail.totalValueGoodsSuppliedExVAT,
-      "totalAcquisitionsExVAT" -> vatReturnDetail.totalAllAcquisitionsExVAT
-    )
-  }
+  implicit val writes: Writes[VatReturnDetail] = (
+    (JsPath \ "periodKey").write[String] and
+    (JsPath \ "vatDueSales").write[BigDecimal] and
+    (JsPath \ "vatDueAcquisitions").write[BigDecimal] and
+    (JsPath \ "totalVatDue").write[BigDecimal] and
+    (JsPath \ "vatReclaimedCurrPeriod").write[BigDecimal] and
+    (JsPath \ "netVatDue").write[BigDecimal] and
+    (JsPath \ "totalValueSalesExVAT").write[BigDecimal] and
+    (JsPath \ "totalValuePurchasesExVAT").write[BigDecimal] and
+    (JsPath \ "totalValueGoodsSuppliedExVAT").write[BigDecimal] and
+    (JsPath \ "totalAcquisitionsExVAT").write[BigDecimal] and
+    (JsPath \ "agentReferenceNumber").writeNullable[String]
+  )(unlift(VatReturnDetail.unapply))
 }
 
 object VatReturn {

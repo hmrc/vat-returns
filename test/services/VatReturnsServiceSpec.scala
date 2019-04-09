@@ -17,14 +17,18 @@
 package services
 
 import base.SpecBase
-import mocks.connectors.MockVatReturnsConnector
+import mocks.connectors._
 import mocks.audit.MockAuditingService
 import models._
 import play.api.http.Status
 
-class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector with MockAuditingService {
+class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector with MockAuditingService with MockSubmitVatReturnConnector {
 
-  object TestVatReturnsService extends VatReturnsService(mockVatReturnsConnector, mockAuditingService)
+  object TestVatReturnsService extends VatReturnsService(
+    mockVatReturnsConnector,
+    mockSubmitVatReturnConnector,
+    mockAuditingService
+  )
 
   lazy val exampleVrn = "555555555"
 
@@ -101,6 +105,45 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector with M
       ))
 
       actual shouldBe multiErrorResponse
+    }
+  }
+
+  "VatReturnService.submitVatReturn" when {
+
+    val vatReturn: VatReturnDetail = VatReturnDetail(
+      "17AA",
+      1.23,
+      1.23,
+      1.23,
+      1.23,
+      1.23,
+      1.23,
+      1.23,
+      1.23,
+      1.23,
+      agentReferenceNumber = Some("XAIT1234567")
+    )
+
+    "connector call is successful" should {
+
+      mockSubmitVatReturn(exampleVrn)(Right(SuccessModel("12345")))
+
+      val result = await(TestVatReturnsService.submitVatReturn(exampleVrn, vatReturn))
+
+      "return a SuccessModel" in {
+        result shouldBe Right(SuccessModel("12345"))
+      }
+    }
+
+    "connector call is unsuccessful" should {
+
+      mockSubmitVatReturn(exampleVrn)(Left(UnexpectedJsonFormat))
+
+      val result = await(TestVatReturnsService.submitVatReturn(exampleVrn, vatReturn))
+
+      "return an ErrorResponse" in {
+        result shouldBe Left(UnexpectedJsonFormat)
+      }
     }
   }
 }

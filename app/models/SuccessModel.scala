@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-object ConfigKeys {
-  val desServiceUrl: String = "microservice.services.des.url"
-  val setupDesReturnsStartPath: String = "microservice.services.des.endpoints.vatReturnsUrlStart"
-  val desSubmitVatReturnPath: String = "microservice.services.des.endpoints.submitVatReturn"
-  val desEnvironment: String = "microservice.services.des.environment"
-  val desToken: String = "microservice.services.des.authorization-token"
+import play.api.libs.json.{Format, Json}
+
+case class SuccessModel(formBundleNumber: String)
+
+object SuccessModel {
+  implicit val format: Format[SuccessModel] = Json.format[SuccessModel]
 }
