@@ -16,7 +16,7 @@
 
 package services
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 
 import audit.AuditingService
 import audit.models.{VatReturnRequestAuditModel, VatReturnResponseAuditModel}
@@ -25,6 +25,7 @@ import connectors.{SubmitVatReturnConnector, VatReturnsConnector}
 import models._
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -63,7 +64,7 @@ class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector,
       model.totalValueGoodsSuppliedExVAT,
       model.totalAllAcquisitionsExVAT,
       model.agentReferenceNumber,
-      LocalDateTime.now()
+      LocalDateTime.now(ZoneOffset.UTC)
     )
     Logger.debug(s"[VatReturnsService][submitVatReturn] Calling SubmitVatReturnConnector with model: $submissionModel")
     submitVatReturnConnector.submitVatReturn(vrn, submissionModel)

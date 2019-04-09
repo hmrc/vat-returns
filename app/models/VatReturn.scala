@@ -38,19 +38,8 @@ case class VatReturnDetail(periodKey: String,
                            agentReferenceNumber: Option[String] = None)
 
 object VatReturnDetail {
-  implicit val reads: Reads[VatReturnDetail] = (
-    (JsPath \ "periodKey").read[String] and
-    (JsPath \ "vatDueSales").read[BigDecimal] and
-    (JsPath \ "vatDueAcquisitions").read[BigDecimal] and
-    (JsPath \ "vatDueTotal").read[BigDecimal] and
-    (JsPath \ "vatReclaimedCurrPeriod").read[BigDecimal] and
-    (JsPath \ "vatDueNet").read[BigDecimal] and
-    (JsPath \ "totalValueSalesExVAT").read[BigDecimal] and
-    (JsPath \ "totalValuePurchasesExVAT").read[BigDecimal] and
-    (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and
-    (JsPath \ "totalAllAcquisitionsExVAT").read[BigDecimal] and
-    (JsPath \ "agentReferenceNumber").readNullable[String]
-  )(VatReturnDetail.apply _)
+  
+  implicit val reads: Reads[VatReturnDetail] = Json.reads[VatReturnDetail]
 
   implicit val writes: Writes[VatReturnDetail] = (
     (JsPath \ "periodKey").write[String] and
