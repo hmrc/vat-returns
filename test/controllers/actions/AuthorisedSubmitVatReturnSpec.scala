@@ -24,6 +24,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.~
 
 import scala.concurrent.Future
 
@@ -48,27 +49,45 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
           lazy val result = action("999999999")
 
           "return 200" in {
-            mockAuthorise()(Future.successful(enrolments))
+            mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
             status(result) shouldBe Status.OK
           }
         }
 
-        "enrolment VRN is different from requested VRN" should {
+        "enrolment VRN is different from request VRN" should {
 
+          val enrolments = Enrolments(Set(Enrolment("HMRC-MTD-VAT").withIdentifier("VRN", "123456789")))
+          lazy val result = action("999999999")
+
+          "return 403" in {
+            mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
+            status(result) shouldBe Status.FORBIDDEN
+          }
+
+          "return a reason in JSON body" in {
+            jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+              "403",
+              "Forbidden access to vat-returns service. Requested VRN does not match VRN in auth header")
+            )
+          }
         }
       }
 
       "user does not have HMRC-MTD-VAT enrolment" should {
 
+        val enrolments = Enrolments(Set(Enrolment("SOME-OTHER-ENROLMENT").withIdentifier("CTUTR", "123456789")))
         lazy val result = action("999999999")
 
         "return FORBIDDEN status" in {
-          mockAuthorise()(Future.failed(InsufficientEnrolments()))
+          mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
           status(result) shouldBe Status.FORBIDDEN
         }
 
         "return a reason in JSON body" in {
-          jsonBodyOf(await(result)) shouldBe Json.toJson(Error("403", "Forbidden access to vat-returns service. Reason: Insufficient Enrolments"))
+          jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+            "403",
+            "Forbidden access to vat-returns service. User does not have HMRC-MTD-VAT enrolment")
+          )
         }
       }
     }
@@ -77,52 +96,72 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
 
       "user has HMRC-AS-AGENT enrolment" when {
 
-        "user has delegated HMRC-MTD-VAT enrolment" when {
+        "user has a delegated HMRC-MTD-VAT enrolment" when {
 
-          "enrolment VRN is same as requested VRN" should {
+          val enrolments = Enrolments(Set(Enrolment("HMRC-AS-AGENT").withIdentifier("AgentReferenceNumber", "XAIT12234567")))
+          lazy val result = action("999999999")
 
-          }
-
-          "enrolment VRN is different from requested VRN" should {
-
+          "return 200" in {
+            mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Agent), enrolments)))
+            mockAuthoriseAgent()(Future.successful(enrolments))
+            status(result) shouldBe Status.OK
           }
         }
 
-        "user does not have delegated HMRC-MTD-VAT enrolment" should {
+        "user does not have a delegated HMRC-MTD-VAT enrolment" should {
+
+          val enrolments = Enrolments(Set(Enrolment("HMRC-AS-AGENT").withIdentifier("AgentReferenceNumber", "XAIT12234567")))
+          lazy val result = action("999999999")
 
           "return FORBIDDEN status" in {
-
+            mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Agent), enrolments)))
+            mockAuthoriseAgent()(Future.failed(InsufficientEnrolments()))
+            status(result) shouldBe Status.FORBIDDEN
           }
 
           "return a reason in JSON body" in {
-
+            jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+              "403",
+              "Forbidden access to vat-returns service. Insufficient Enrolments")
+            )
           }
         }
       }
 
       "user does not have HMRC-AS-AGENT enrolment" should {
 
+        val enrolments = Enrolments(Set(Enrolment("SOME-OTHER-ENROLMENT").withIdentifier("CTUTR", "123456789")))
         lazy val result = action("999999999")
 
         "return FORBIDDEN status" in {
-          mockAuthorise()(Future.failed(InsufficientEnrolments()))
+          mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Agent), enrolments)))
+          mockAuthoriseAgent()(Future.successful(enrolments))
           status(result) shouldBe Status.FORBIDDEN
         }
 
         "return a reason in JSON body" in {
-          jsonBodyOf(await(result)) shouldBe Json.toJson(Error("403", "Forbidden access to vat-returns service. Reason: Insufficient Enrolments"))
+          jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+            "403",
+            "Forbidden access to vat-returns service. User does not have HMRC-AS-AGENT enrolment")
+          )
         }
       }
     }
 
     "no session exists" should {
 
-      "return UNAUTHORIZED status" in {
+      lazy val result = action("999999999")
 
+      "return UNAUTHORIZED status" in {
+        mockAuthorise()(Future.failed(MissingBearerToken()))
+        status(result) shouldBe Status.UNAUTHORIZED
       }
 
       "return a reason in JSON body" in {
-
+        jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+          "401",
+          "User has no active session")
+        )
       }
     }
   }

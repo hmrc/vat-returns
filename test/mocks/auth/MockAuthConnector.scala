@@ -22,7 +22,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve._
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
+import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,11 +32,22 @@ trait MockAuthConnector extends BeforeAndAfterEach with MockitoSugar {
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
-  def mockAuthorise()(response: Future[Enrolments]): Unit = {
+  def mockAuthorise()(response: Future[~[Option[AffinityGroup], Enrolments]]): Unit = {
     when(
       mockAuthConnector.authorise(
         ArgumentMatchers.any[Predicate],
-        ArgumentMatchers.any[Retrieval[Enrolments]]
+        ArgumentMatchers.eq(Retrievals.affinityGroup and Retrievals.allEnrolments)
+      )(
+        ArgumentMatchers.any[HeaderCarrier],
+        ArgumentMatchers.any[ExecutionContext])
+    ) thenReturn response
+  }
+
+  def mockAuthoriseAgent()(response: Future[Enrolments]): Unit = {
+    when(
+      mockAuthConnector.authorise(
+        ArgumentMatchers.any[Predicate],
+        ArgumentMatchers.eq(Retrievals.allEnrolments)
       )(
         ArgumentMatchers.any[HeaderCarrier],
         ArgumentMatchers.any[ExecutionContext])
