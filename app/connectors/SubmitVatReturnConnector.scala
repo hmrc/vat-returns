@@ -20,8 +20,11 @@ import config.MicroserviceAppConfig
 import connectors.httpParsers.SubmitVatReturnHttpParser._
 import javax.inject.Inject
 import models.{SuccessModel, VatReturnSubmission}
+import play.api.Logger
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: MicroserviceAppConfig) {
@@ -37,6 +40,7 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
       "Authorization" -> s"Bearer ${appConfig.desToken}"
     )
 
+    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: $desVatReturnsUrl(vrn). Body: ${Json.toJson(model)}")
     http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model, headers)
   }
 }

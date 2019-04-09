@@ -16,18 +16,21 @@
 
 package services
 
+import java.time.LocalDateTime
+
 import audit.AuditingService
 import audit.models.{VatReturnRequestAuditModel, VatReturnResponseAuditModel}
 import javax.inject.{Inject, Singleton}
-import connectors.VatReturnsConnector
+import connectors.{SubmitVatReturnConnector, VatReturnsConnector}
 import models._
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector, val auditingService: AuditingService) {
+class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector,
+                                  submitVatReturnConnector: SubmitVatReturnConnector,
+                                  val auditingService: AuditingService) {
 
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, VatReturnDetail]] = {
@@ -44,6 +47,26 @@ class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector, 
       case error@Left(_) =>
         error
     }
+  }
+
+  def submitVatReturn(vrn: String, model: VatReturnDetail)
+                     (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, SuccessModel]] = {
+    val submissionModel = VatReturnSubmission(
+      model.periodKey,
+      model.vatDueSales,
+      model.vatDueAcquisitions,
+      model.vatDueTotal,
+      model.vatReclaimedCurrPeriod,
+      model.vatDueNet,
+      model.totalValueSalesExVAT,
+      model.totalValuePurchasesExVAT,
+      model.totalValueGoodsSuppliedExVAT,
+      model.totalAllAcquisitionsExVAT,
+      model.agentReferenceNumber,
+      LocalDateTime.now()
+    )
+    Logger.debug(s"[VatReturnsService][submitVatReturn] Calling SubmitVatReturnConnector with model: $submissionModel")
+    submitVatReturnConnector.submitVatReturn(vrn, submissionModel)
   }
 }
 

@@ -32,7 +32,10 @@ object SubmitVatReturnHttpParser extends ResponseHttpParsers {
             Logger.warn("[SubmitVatReturnReads][read] DES response did not contain formBundleNumber")
             Left(UnexpectedJsonFormat)
           },
-          valid => Right(valid)
+          valid => {
+            Logger.debug(s"[SubmitVatReturnReads][read] Successful response from submission. Body: ${response.body}")
+            Right(valid)
+          }
         )
         case status =>
           Logger.warn(s"[SubmitVatReturnReads][read] Unexpected Response. Status: $status. Body: ${response.body}")
