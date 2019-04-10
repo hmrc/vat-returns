@@ -33,9 +33,13 @@ trait ResponseHttpParsers {
     Left(Try(Json.parse(httpResponse.body)) match {
       case Success(json) => json.asOpt[MultiError].orElse(json.asOpt[Error]) match {
         case Some(error) => ErrorResponse(httpResponse.status, error)
-        case _ => UnexpectedJsonFormat
+        case _ =>
+          Logger.warn(s"[ResponseHttpParsers][handleErrorResponse] Unexpected JSON response: ${httpResponse.body}")
+          UnexpectedJsonFormat
       }
-      case Failure(_) => InvalidJsonResponse
+      case Failure(_) =>
+        Logger.warn(s"[ResponseHttpParsers][handleErrorResponse] Invalid JSON response: ${httpResponse.body}")
+        InvalidJsonResponse
     })
   }
 }

@@ -43,7 +43,7 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
     http.GET(url, queryParameters.toSeqQueryParams)(VatReturnReads, desHC, ec).map {
       case vatReturns@Right(_) => vatReturns
       case error@Left(message) =>
-        Logger.warn("[VatReturnsConnector][getVatReturns] DES Error Received. Message: " + message)
+        Logger.warn("[VatReturnsConnector][getVatReturns] Error Received. Message: " + message)
         error
     }
   }
