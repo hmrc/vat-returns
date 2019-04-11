@@ -17,24 +17,39 @@
 package models
 
 import play.api.http.Status
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, JsValue, Json}
 
-sealed trait Errors
+sealed trait Errors {
+  def toJson: JsValue
+}
 
-case class Error(code: String, reason: String) extends Errors
+case class Error(code: String, reason: String) extends Errors {
+  override def toJson: JsValue = Json.obj(
+    "code" -> code,
+    "reason" -> reason
+  )
+}
 
 object Error {
   implicit val format: Format[Error] = Json.format[Error]
 }
 
-case class MultiError(failures: Seq[Error]) extends Errors
+case class MultiError(failures: Seq[Error]) extends Errors {
+  override def toJson: JsValue = Json.obj(
+    "failures" -> failures.map(_.toJson)
+  )
+}
 
 object MultiError {
   implicit val format: Format[MultiError] = Json.format[MultiError]
 }
 
-case class ErrorResponse(status: Int, error: Errors)
-
+case class ErrorResponse(status: Int, error: Errors) {
+  def toJson: JsValue = Json.obj(
+    "status" -> status,
+    "error" -> error.toJson
+  )
+}
 
 object UnauthenticatedError extends Error(
   code = "UNAUTHENTICATED",
