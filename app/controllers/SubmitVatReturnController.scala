@@ -20,7 +20,7 @@ import javax.inject.Inject
 import models.Error._
 import models.{InvalidJsonResponse, VatReturnDetail}
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
 import services.VatReturnsService
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
@@ -31,7 +31,13 @@ class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService)
                                          (implicit ec: ExecutionContext) extends BaseController {
 
   def submitVatReturn(vrn: String): Action[AnyContent] = Action.async { implicit request =>
-    val requestAsJson: Option[VatReturnDetail] = request.body.asJson.flatMap(_.asOpt[VatReturnDetail])
+    val requestAsJson: Option[VatReturnDetail] = request.body.asJson match {
+      case Some(validJson) => validJson.asOpt[VatReturnDetail]
+      case None =>
+        Logger.warn("[SubmitVatReturnController][submitVatReturn] Issue parsing body as json")
+        Logger.debug("[SubmitVatReturnController][submitVatReturn] The body provided in the request is not valid Json")
+        None
+    }
 
     requestAsJson match {
       case Some(vatReturnModel) => vatReturnsService.submitVatReturn(vrn, vatReturnModel).map {
