@@ -67,6 +67,9 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
   val negativeFakeRequest: FakeRequest[AnyContent] = FakeRequest(
     "POST", "", Headers(), AnyContentAsJson(invalidJson)
   )
+  val nonJsonFakeRequest: FakeRequest[AnyContent] = FakeRequest(
+    "POST", "", Headers(), AnyContentAsText("This is some text, and defo not Json")
+  )
 
   "submitVatReturn" should {
     "return a success" when {
@@ -113,6 +116,12 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
       }
       "the json cannot be parsed" in {
         val response = await(controller.submitVatReturn("101202303").apply(negativeFakeRequest))
+
+        status(response) shouldBe INTERNAL_SERVER_ERROR
+        Json.parse(bodyOf(response)) shouldBe InvalidJsonResponse.toJson
+      }
+      "the body is not JSON" in {
+        val response = await(controller.submitVatReturn("101202303").apply(nonJsonFakeRequest))
 
         status(response) shouldBe INTERNAL_SERVER_ERROR
         Json.parse(bodyOf(response)) shouldBe InvalidJsonResponse.toJson
