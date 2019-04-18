@@ -40,7 +40,7 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
         "Content-Type" -> "application/json",
         "Environment" -> appConfig.desEnvironment
       )
-      .copy(authorization = Some(Authorization(appConfig.desToken)))
+      .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
 
     Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: ${desVatReturnsUrl(vrn)}. Body: ${Json.toJson(model)}")
     Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: ${hc.headers}")
