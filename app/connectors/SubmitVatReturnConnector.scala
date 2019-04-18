@@ -21,8 +21,9 @@ import connectors.httpParsers.SubmitVatReturnHttpParser._
 import javax.inject.Inject
 import models.{SuccessModel, VatReturnSubmission}
 import play.api.Logger
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
+import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,13 +35,20 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
   def submitVatReturn(vrn: String, model: VatReturnSubmission)
                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[SuccessModel]] = {
 
-    val headers: Seq[(String, String)] = Seq(
-      "Content-Type" -> "application/json",
-      "Environment" -> appConfig.desEnvironment,
-      "Authorization" -> s"Bearer ${appConfig.desToken}"
-    )
+    implicit val hc: HeaderCarrier = headerCarrier
+      .withExtraHeaders(
+        "Content-Type" -> "application/json",
+        "Environment" -> appConfig.desEnvironment
+      )
+      .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
 
-    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: $desVatReturnsUrl(vrn). Body: ${Json.toJson(model)}")
-    http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model, headers)
+    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: ${desVatReturnsUrl(vrn)}. Body: ${Json.toJson(model)}")
+    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: ${hc.headers}")
+    http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model)(
+      implicitly[Writes[VatReturnSubmission]],
+      implicitly[HttpReads[HttpGetResult[SuccessModel]]],
+      hc,
+      implicitly[ExecutionContext]
+    )
   }
 }
