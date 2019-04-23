@@ -16,22 +16,23 @@
 
 package helpers.servicemocks
 
-import helpers.WiremockHelper._
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.JsValue
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import helpers.WireMockMethods
+import play.api.http.Status.OK
+import play.api.libs.json.JsValue
 
-object SubmitVatReturnStub {
+object SubmitVatReturnStub extends WireMockMethods {
 
-  private def url(vrn: String): String = s"/enterprise/return/vat/$vrn"
+  private def uri(vrn: String): String = s"/enterprise/return/vat/$vrn"
 
-  def stubSubmitVatReturn(vrn: String)(status: Int, response: JsValue): StubMapping = {
-    stubPost(url(vrn), status, response.toString())
+  def stubResponse(vrn: String)(status: Int, body: JsValue): StubMapping = {
+    when(method = POST, uri = uri(vrn))
+      .thenReturn(status = status, body = body)
   }
 
   def verifySubmission(vrn: String, body: JsValue): Unit =
     verify(
       postRequestedFor(urlEqualTo(s"/enterprise/return/vat/$vrn")
     ).withRequestBody(equalToJson(body.toString())))
-
 }

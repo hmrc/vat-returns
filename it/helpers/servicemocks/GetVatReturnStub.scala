@@ -16,22 +16,17 @@
 
 package helpers.servicemocks
 
-import binders.VatReturnsBinders
-import helpers.WiremockHelper._
-import models.VatReturnFilters
-import play.api.libs.json.JsValue
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import helpers.WireMockMethods
+import play.api.http.Status.OK
+import play.api.libs.json.JsValue
 
-object DesVatReturnsStub {
+object GetVatReturnStub extends WireMockMethods {
 
-  private def vatReturnsUrl(vrn: String, queryParameters: VatReturnFilters): String = {
-    s"/vat-returns/returns/vrn/$vrn" +
-      s"?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}"
+  private val uri: String = "/vat/returns/vrn/(.+)"
+
+  def stubResponse(vrn: String)(status: Int, body: JsValue): StubMapping = {
+    when(method = GET, uri = uri)
+      .thenReturn(status = status, body = body)
   }
-
-  def stubGetVatReturns(vrn: String, queryParams: VatReturnFilters)(status: Int, response: JsValue): StubMapping =
-    stubGet(vatReturnsUrl(vrn, queryParams), status, response.toString())
-
-  def verifyGetVatReturns(vrn: String, queryParams: VatReturnFilters): Unit =
-    verifyGet(vatReturnsUrl(vrn, queryParams))
 }
