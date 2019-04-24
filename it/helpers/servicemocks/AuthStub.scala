@@ -17,16 +17,48 @@
 package helpers.servicemocks
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WiremockHelper
-import play.api.http.Status
+import helpers.WireMockMethods
+import play.api.http.Status._
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 
-object AuthStub {
+object AuthStub extends WireMockMethods {
 
-  val postAuthoriseUrl: String = "/auth/authorise"
+  val authoriseUrl: String = "/auth/authorise"
 
-  def stubAuthorised(): StubMapping =
-    WiremockHelper.stubPost(postAuthoriseUrl, Status.OK, """{"externalId": "1234"}""")
+  def stubResponse(status: Int = OK, body: JsObject = authResponse(mtdVatEnrolment)): StubMapping = {
+    when(method = POST, uri = authoriseUrl)
+      .thenReturn(status = status, body = body)
+  }
 
-  def stubUnauthorised(): StubMapping =
-    WiremockHelper.stubPost(postAuthoriseUrl, Status.UNAUTHORIZED, """{"externalId": "1234"}""")
+  def authResponse(enrolments: JsObject*): JsObject = {
+    Json.obj(
+      "affinityGroup" -> Individual,
+      "allEnrolments" -> enrolments
+    )
+  }
+
+  val mtdVatEnrolment = Json.obj(
+    "key" -> "HMRC-MTD-VAT",
+    "identifiers" -> Json.arr(
+      Json.obj(
+        "key" -> "VRN",
+        "value" -> "999999999"
+      )
+    )
+  )
+
+  val externalId = Json.obj(
+    "externalId" -> "1234"
+  )
+
+  val otherEnrolment: JsObject = Json.obj(
+    "key" -> "HMRC-XXX-XXX",
+    "identifiers" -> Json.arr(
+      Json.obj(
+        "key" -> "XXX",
+        "value" -> "XXX"
+      )
+    )
+  )
 }

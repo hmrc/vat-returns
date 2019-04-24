@@ -31,7 +31,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
   private trait Test {
-    def setupStubs(): StubMapping
 
     val model: VatReturnSubmission = VatReturnSubmission(
       periodKey = "#001",
@@ -79,9 +78,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
         "return a SuccessModel" in new Test {
 
-          override def setupStubs(): StubMapping =
-            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(Status.OK, Json.parse(""" { "formBundleNumber": "12345" } """))
-          setupStubs()
+          SubmitVatReturnStub.stubResponse("999999999")(Status.OK, Json.parse(""" { "formBundleNumber": "12345" } """))
 
           private val result = await(connector.submitVatReturn("999999999", model))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
@@ -94,9 +91,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
         "return an InvalidJsonResponse" in new Test {
 
-          override def setupStubs(): StubMapping =
-            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(Status.OK, Json.parse(""" {  } """))
-          setupStubs()
+          SubmitVatReturnStub.stubResponse("999999999")(Status.OK, Json.parse(""" {  } """))
 
           private val result = await(connector.submitVatReturn("999999999", model))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
@@ -112,12 +107,10 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
         "return an ErrorResponse" in new Test {
 
-          override def setupStubs(): StubMapping =
-            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
-              Status.INTERNAL_SERVER_ERROR,
-              Json.parse(""" { "code" : "500", "reason" : "DES" } """)
-            )
-          setupStubs()
+          SubmitVatReturnStub.stubResponse("999999999")(
+            Status.INTERNAL_SERVER_ERROR,
+            Json.parse(""" { "code" : "500", "reason" : "DES" } """)
+          )
 
           private val result = await(connector.submitVatReturn("999999999", model))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
@@ -130,12 +123,10 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
         "return an ErrorResponse" in new Test {
 
-          override def setupStubs(): StubMapping =
-            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
-              Status.INTERNAL_SERVER_ERROR,
-              Json.parse(""" { "failures" : [ { "code" : "500", "reason" : "DES" }, { "code" : "503", "reason" : "Also DES" } ] } """)
-            )
-          setupStubs()
+          SubmitVatReturnStub.stubResponse("999999999")(
+            Status.INTERNAL_SERVER_ERROR,
+            Json.parse(""" { "failures" : [ { "code" : "500", "reason" : "DES" }, { "code" : "503", "reason" : "Also DES" } ] } """)
+          )
 
           private val result = await(connector.submitVatReturn("999999999", model))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
@@ -150,12 +141,10 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
         "return an InvalidJsonResponse" in new Test {
 
-          override def setupStubs(): StubMapping =
-            SubmitVatReturnStub.stubSubmitVatReturn("999999999")(
-              Status.INTERNAL_SERVER_ERROR,
-              Json.parse(""" { } """)
-            )
-          setupStubs()
+          SubmitVatReturnStub.stubResponse("999999999")(
+            Status.INTERNAL_SERVER_ERROR,
+            Json.parse(""" { } """)
+          )
 
           private val result = await(connector.submitVatReturn("999999999", model))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)

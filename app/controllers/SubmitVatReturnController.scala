@@ -16,21 +16,24 @@
 
 package controllers
 
-import javax.inject.Inject
+import controllers.actions.AuthorisedSubmitVatReturn
+import javax.inject.{Inject, Singleton}
 import models.Error._
 import models.{InvalidJsonResponse, VatReturnDetail}
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import services.VatReturnsService
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService)
+@Singleton
+class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService,
+                                          authorisedAction: AuthorisedSubmitVatReturn)
                                          (implicit ec: ExecutionContext) extends BaseController {
 
-  def submitVatReturn(vrn: String): Action[AnyContent] = Action.async { implicit request =>
+  def submitVatReturn(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
     val requestAsJson: Option[VatReturnDetail] = request.body.asJson match {
       case Some(validJson) => validJson.asOpt[VatReturnDetail]
       case None =>
@@ -55,5 +58,4 @@ class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService)
         Future.successful(InternalServerError(Json.toJson(InvalidJsonResponse.toJson)))
     }
   }
-
 }

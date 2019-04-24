@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector) extends BaseController with AuthorisedFunctions {
 
-  def async(vrn: String)(block: Request[_] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
+  def async(vrn: String)(block: Request[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(Retrievals.affinityGroup and Retrievals.allEnrolments) {
         case Some(affinityGroup) ~ enrolments =>
@@ -43,7 +43,7 @@ class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector) exte
   }
 
   private def authoriseAsIndividual(enrolments: Enrolments,
-                                    block: Request[_] => Future[Result],
+                                    block: Request[AnyContent] => Future[Result],
                                     requestedVrn: String)(implicit request: Request[AnyContent]): Future[Result] = {
     enrolments.enrolments.collectFirst {
       case Enrolment(`vatEnrolmentId`, EnrolmentIdentifier(_, vrn) :: _, _, _) =>
@@ -55,7 +55,7 @@ class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector) exte
     } getOrElse Future.successful(forbiddenAction(s"User does not have $vatEnrolmentId enrolment"))
   }
 
-  private def authoriseAsAgent(block: Request[_] => Future[Result],
+  private def authoriseAsAgent(block: Request[AnyContent] => Future[Result],
                                requestedVrn: String)(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Result] = {
 
     val agentDelegatedAuthorityRule: String => Enrolment = vrn =>

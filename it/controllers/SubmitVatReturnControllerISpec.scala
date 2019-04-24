@@ -16,27 +16,16 @@
 
 package controllers
 
-import akka.stream.Materializer
 import helpers.ComponentSpecBase
-import helpers.WiremockHelper.stubPost
-import models.{InvalidJsonResponse, SuccessModel, VatReturnDetail}
+import helpers.servicemocks.{AuthStub, SubmitVatReturnStub}
+import models.InvalidJsonResponse
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc._
-import play.api.test.FakeRequest
-import services.VatReturnsService
-import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import helpers.servicemocks.AuthStub._
 
 class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val mat: Materializer = app.injector.instanceOf[Materializer]
-
   val vrn: String = "101202303"
-  val service: VatReturnsService = app.injector.instanceOf[VatReturnsService]
-  val controller = new SubmitVatReturnController(service)
 
   val validJson: JsObject = Json.obj(
     "periodKey" -> "17AA",
@@ -61,70 +50,101 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
   val successReturnBody: JsValue = Json.obj("formBundleNumber" -> "ASDFGHJKL")
   val errorReturnBody: String => JsValue = someValue => Json.obj("code" -> someValue, "reason" -> "this doesn't really matter now, does it?")
 
-  val positiveFakeRequest: FakeRequest[AnyContent] = FakeRequest(
-    "POST", "", Headers(), AnyContentAsJson(validJson)
-  )
-  val negativeFakeRequest: FakeRequest[AnyContent] = FakeRequest(
-    "POST", "", Headers(), AnyContentAsJson(invalidJson)
-  )
-  val nonJsonFakeRequest: FakeRequest[AnyContent] = FakeRequest(
-    "POST", "", Headers(), AnyContentAsText("This is some text, and defo not Json")
-  )
+  "Posting to /vat-returns/returns/vrn/:vrn" when {
 
-  "submitVatReturn" should {
-    "return a success" when {
-      "the service layer returns a successful response" in {
-        stubPost("/enterprise/return/vat/101202303", OK, Json.stringify(successReturnBody))
+    "user is authorised" should {
 
-        val response = await(controller.submitVatReturn("101202303").apply(positiveFakeRequest))
+      "return a success" when {
 
-        status(response) shouldBe 200
-        val bodyReturn: String = bodyOf(response)
-        Json.parse(bodyReturn) shouldBe successReturnBody
+        "the service layer returns a successful response" in {
+
+          AuthStub.stubResponse()
+          SubmitVatReturnStub.stubResponse("999999999")(OK, successReturnBody)
+
+          val response = await(post("/returns/vrn/999999999")(validJson))
+
+          response.status shouldBe 200
+          response.json shouldBe successReturnBody
+        }
+      }
+
+      "return an error" when {
+
+        "the service layer returns an error" when {
+
+          "the error is a 400" in {
+
+            AuthStub.stubResponse()
+            SubmitVatReturnStub.stubResponse("999999999")(BAD_REQUEST, errorReturnBody("REEEEEEEEE"))
+
+            val response = await(post("/returns/vrn/999999999")(validJson))
+
+            response.status shouldBe BAD_REQUEST
+          }
+
+          "the error is a 404" in {
+
+            AuthStub.stubResponse()
+            SubmitVatReturnStub.stubResponse("999999999")(NOT_FOUND, errorReturnBody("REEEE"))
+
+            val response = await(post("/returns/vrn/999999999")(validJson))
+
+            response.status shouldBe NOT_FOUND
+          }
+
+          "the error is a 500" in {
+
+            AuthStub.stubResponse()
+            SubmitVatReturnStub.stubResponse("999999999")(INTERNAL_SERVER_ERROR, errorReturnBody("REEEE"))
+
+            val response = await(post("/returns/vrn/999999999")(validJson))
+
+            response.status shouldBe INTERNAL_SERVER_ERROR
+          }
+
+          "the error is a 503" in {
+
+            AuthStub.stubResponse()
+            SubmitVatReturnStub.stubResponse("999999999")(SERVICE_UNAVAILABLE, errorReturnBody("REEEE"))
+
+            val response = await(post("/returns/vrn/999999999")(validJson))
+
+            response.status shouldBe SERVICE_UNAVAILABLE
+          }
+        }
+
+        "the json cannot be parsed" in {
+
+          AuthStub.stubResponse()
+          val response = await(post("/returns/vrn/999999999")(invalidJson))
+
+          response.status shouldBe INTERNAL_SERVER_ERROR
+          response.json shouldBe InvalidJsonResponse.toJson
+        }
       }
     }
-    "return an error" when {
-      "the service layer returns an error" when {
-        "the error is a 400" in {
-          stubPost("/enterprise/return/vat/101202303", BAD_REQUEST, Json.stringify(errorReturnBody("REEEEEEEEE")))
 
-          val response = controller.submitVatReturn("101202303").apply(positiveFakeRequest)
+    "requested VRN does not match auth VRN" should {
 
-          status(response) shouldBe BAD_REQUEST
-        }
-        "the error is a 404" in {
-          stubPost("/enterprise/return/vat/101202303", NOT_FOUND, Json.stringify(errorReturnBody("PLEASE GIMME CHOCOLATE")))
+      "return FORBIDDEN" in {
 
-          val response = controller.submitVatReturn("101202303").apply(positiveFakeRequest)
+        AuthStub.stubResponse()
 
-          status(response) shouldBe NOT_FOUND
-        }
-        "the error is a 500" in {
-          stubPost("/enterprise/return/vat/101202303", INTERNAL_SERVER_ERROR, Json.stringify(errorReturnBody("I'M A PRETTY FLOWER")))
+        val response = await(post("/returns/vrn/123123123")(validJson))
 
-          val response = controller.submitVatReturn("101202303").apply(positiveFakeRequest)
-
-          status(response) shouldBe INTERNAL_SERVER_ERROR
-        }
-        "the error is a 503" in {
-          stubPost("/enterprise/return/vat/101202303", SERVICE_UNAVAILABLE, Json.stringify(errorReturnBody("WHY WON'T YOU LOVE ME?!")))
-
-          val response = controller.submitVatReturn("101202303").apply(positiveFakeRequest)
-
-          status(response) shouldBe SERVICE_UNAVAILABLE
-        }
+        response.status shouldBe FORBIDDEN
       }
-      "the json cannot be parsed" in {
-        val response = await(controller.submitVatReturn("101202303").apply(negativeFakeRequest))
+    }
 
-        status(response) shouldBe INTERNAL_SERVER_ERROR
-        Json.parse(bodyOf(response)) shouldBe InvalidJsonResponse.toJson
-      }
-      "the body is not JSON" in {
-        val response = await(controller.submitVatReturn("101202303").apply(nonJsonFakeRequest))
+    "user does not have HMRC-MTD-VAT enrolment" should {
 
-        status(response) shouldBe INTERNAL_SERVER_ERROR
-        Json.parse(bodyOf(response)) shouldBe InvalidJsonResponse.toJson
+      "return FORBIDDEN" in {
+
+        AuthStub.stubResponse(OK, authResponse(otherEnrolment))
+
+        val response = await(post("/returns/vrn/999999999")(validJson))
+
+        response.status shouldBe FORBIDDEN
       }
     }
   }

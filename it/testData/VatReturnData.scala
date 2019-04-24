@@ -36,6 +36,21 @@ object VatReturnData {
     }""".stripMargin
   )
 
+  val successDesResponse: JsValue = Json.parse(
+    """{
+      |"periodKey":"18AA",
+      |"vatDueSales":100,
+      |"vatDueAcquisitions":200,
+      |"vatDueTotal":300,
+      |"vatReclaimedCurrPeriod":400,
+      |"vatDueNet":500,
+      |"totalValueSalesExVAT":600,
+      |"totalValuePurchasesExVAT":700,
+      |"totalValueGoodsSuppliedExVAT":800,
+      |"totalAllAcquisitionsExVAT":900
+    }""".stripMargin
+  )
+
   val singleErrorResponse: Error = Error("CODE", "ERROR MESSAGE")
 
   val multiErrorModel: MultiError = MultiError(

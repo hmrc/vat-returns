@@ -26,54 +26,33 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.{WSClient, WSRequest}
 
-object WiremockHelper extends Eventually with IntegrationPatience {
+object WireMockHelper extends Eventually with IntegrationPatience {
 
-  val wiremockPort = 11111
-  val wiremockHost = "localhost"
-  val url = s"http://$wiremockHost:$wiremockPort"
+  val wireMockPort = 11111
+  val wireMockHost = "localhost"
+  val url = s"http://$wireMockHost:$wireMockPort"
+  val appRouteContext: String = "/vat-returns"
 
-  def verifyGet(uri: String): Unit = {
-     verify(getRequestedFor(urlEqualTo(uri)))
-  }
-
-  def stubGet(url: String, status: Integer, body: String): StubMapping =
-    stubFor(get(urlEqualTo(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(body)
-      )
-    )
-
-  def stubPost(url: String, status: Integer, responseBody: String): StubMapping =
-    stubFor(post(urlMatching(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(responseBody)
-      )
-    )
 }
 
-trait WiremockHelper {
+trait WireMockHelper {
   self: GuiceOneServerPerSuite =>
 
-  import WiremockHelper._
+  import WireMockHelper._
 
   lazy val ws: WSClient = app.injector.instanceOf[WSClient]
 
-  lazy val wmConfig: WireMockConfiguration = wireMockConfig().port(wiremockPort)
+  lazy val wmConfig: WireMockConfiguration = wireMockConfig().port(wireMockPort)
   lazy val wireMockServer = new WireMockServer(wmConfig)
 
-  def startWiremock(): Unit = {
+  def startWireMock(): Unit = {
     wireMockServer.start()
-    WireMock.configureFor(wiremockHost, wiremockPort)
+    WireMock.configureFor(wireMockHost, wireMockPort)
   }
 
-  def stopWiremock(): Unit = wireMockServer.stop()
+  def stopWireMock(): Unit = wireMockServer.stop()
 
-  def resetWiremock(): Unit = WireMock.reset()
+  def resetWireMock(): Unit = WireMock.reset()
 
-  def buildClient(path: String): WSRequest =
-    ws.url(s"http://localhost:$wiremockPort$path").withFollowRedirects(false)
+  def buildClient(path: String): WSRequest = ws.url(s"http://localhost:$port$appRouteContext$path").withFollowRedirects(false)
 }

@@ -16,26 +16,32 @@
 
 package helpers
 
+import akka.stream.Materializer
 import binders.VatReturnsBinders
 import models.VatReturnFilters
 import org.scalatest._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsValue, Writes}
 import play.api.libs.ws.WSResponse
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait ComponentSpecBase extends TestSuite with CustomMatchers
   with GuiceOneServerPerSuite with ScalaFutures with IntegrationPatience with Matchers
-  with WiremockHelper with BeforeAndAfterEach with BeforeAndAfterAll with Eventually {
+  with WireMockHelper with BeforeAndAfterEach with BeforeAndAfterAll with Eventually {
 
-  val mockHost: String = WiremockHelper.wiremockHost
-  val mockPort: String = WiremockHelper.wiremockPort.toString
+  val mockHost: String = WireMockHelper.wireMockHost
+  val mockPort: String = WireMockHelper.wireMockPort.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"
   val mockToken = "localToken"
   val mockEnvironment = "localEnvironment"
   val mockEndpointStart = "/vat/returns/vrn/"
   val mockSubmitVatReturn = "/enterprise/return/vat/"
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val mat: Materializer = app.injector.instanceOf[Materializer]
 
   def config: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
@@ -54,20 +60,18 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    startWiremock()
+    startWireMock()
   }
 
   override def afterAll(): Unit = {
-    stopWiremock()
+    stopWireMock()
     super.afterAll()
   }
 
-  object VatReturnsComponent {
-    def get(uri: String): WSResponse =
-     await(buildClient(uri).get())
+  def post(path: String)(body: JsValue): WSResponse =
+    await(buildClient(path).post(body))
 
-    def getVatReturns(vrn: String, queryParameters: VatReturnFilters): WSResponse =
-      get(s"/vat-returns/returns/vrn/$vrn?${VatReturnsBinders.vatReturnsQueryBinder.unbind("", queryParameters)}")
-
+  def get(uri: String): WSResponse = {
+    await(buildClient(uri).get())
   }
 }

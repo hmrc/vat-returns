@@ -17,10 +17,11 @@
 package controllers
 
 import helpers.ComponentSpecBase
-import helpers.servicemocks.{AuthStub, DesVatReturnsStub}
-import models._
+import helpers.servicemocks.{AuthStub, GetVatReturnStub}
+import models.MultiError
+import models.Error
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import testData.VatReturnData
 
@@ -28,74 +29,74 @@ class VatReturnsComponentSpec extends ComponentSpecBase {
 
   val vrn = "555555555"
 
-  def getStubResponse(responseStatus: Integer, responseJson: JsValue, authorised: Boolean = true): WSResponse = {
-    if (authorised) AuthStub.stubAuthorised() else AuthStub.stubUnauthorised()
+  "Sending a request to /vat-returns/returns/vrn/:vrn (VatReturnsController)" when {
 
-    lazy val queryParameters: VatReturnFilters = VatReturnFilters(periodKey = "17AA")
-    DesVatReturnsStub.stubGetVatReturns(vrn, queryParameters)(responseStatus, responseJson)
-    val response = VatReturnsComponent.getVatReturns(vrn, queryParameters)
-    DesVatReturnsStub.verifyGetVatReturns(vrn, queryParameters)
+    "authorised" when {
 
-    response
-  }
-
-  "Sending a request to /vat-returns/returns/vrn/:vrn/ (VatReturnsController)" when {
-
-    "Requesting Vat Returns" should {
-
-      "be authorised with a valid request with a period key and a success response" should {
+      "downstream response is successful" should {
 
         "return a success response" in {
-          val response = getStubResponse(OK, Json.toJson(VatReturnData.successResponse))
+
+          AuthStub.stubResponse(OK, AuthStub.externalId)
+          GetVatReturnStub.stubResponse("555555555")(OK, Json.toJson(VatReturnData.successDesResponse))
+
+          val response: WSResponse = get("/returns/vrn/555555555?period-key=17AA")
 
           response.status shouldBe OK
-        }
-
-        "return the expected json" in {
-          val response = getStubResponse(OK, Json.toJson(VatReturnData.successResponse))
-
           response.json shouldBe VatReturnData.successResponse
         }
       }
 
+      "downstream response is BAD_REQUEST with a single error" should {
 
-      "authorised with a valid request with a period key and an error response" should {
+        "return the correct error response" in {
 
-        "return a single error response" in {
-          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.singleErrorResponse))
+          AuthStub.stubResponse(OK, AuthStub.externalId)
+          GetVatReturnStub.stubResponse("555555555")(BAD_REQUEST, VatReturnData.singleErrorResponse.toJson)
+
+          val response: WSResponse = get("/returns/vrn/555555555?period-key=17AA")
 
           response.status shouldBe BAD_REQUEST
-        }
-
-        "return the expected json" in {
-          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.singleErrorResponse))
-
           response.json.as[Error] shouldBe VatReturnData.singleErrorResponse
         }
       }
 
-      "authorised with a valid request with a period key and a multi error response" should {
+      "downstream response is BAD_REQUEST with a multi error" should {
 
-        "return a BAD_REQUEST status" in {
-          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.multiErrorModel))
+        "return the correct error response" in {
+
+          AuthStub.stubResponse(OK, AuthStub.externalId)
+          GetVatReturnStub.stubResponse("555555555")(BAD_REQUEST, VatReturnData.multiErrorModel.toJson)
+
+          val response: WSResponse = get("/returns/vrn/555555555?period-key=17AA")
 
           response.status shouldBe BAD_REQUEST
-        }
-
-        "return the expected json" in {
-          val response = getStubResponse(BAD_REQUEST, Json.toJson(VatReturnData.multiErrorModel))
-
           response.json.as[MultiError] shouldBe VatReturnData.multiErrorModel
         }
       }
+    }
 
-      "unauthorised" should {
+    "auth returns UNAUTHORIZED" should {
 
-        "return an FORBIDDEN response" in {
-          val response = getStubResponse(FORBIDDEN, Json.toJson(VatReturnData.singleErrorResponse), authorised = false)
+      "return FORBIDDEN" in {
 
-          response.status shouldBe FORBIDDEN
-        }
+        AuthStub.stubResponse(UNAUTHORIZED, Json.obj())
+
+        val response: WSResponse = get("/returns/vrn/555555555?period-key=17AA")
+
+        response.status shouldBe FORBIDDEN
+      }
+    }
+
+    "no external ID is returned from auth" should {
+
+      "return a UNAUTHORIZED response" in {
+
+        AuthStub.stubResponse(OK, Json.obj())
+
+        val response: WSResponse = get("/returns/vrn/555555555?period-key=17AA")
+
+        response.status shouldBe UNAUTHORIZED
       }
     }
   }
