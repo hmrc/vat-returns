@@ -50,7 +50,7 @@ class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector,
     }
   }
 
-  def submitVatReturn(vrn: String, model: VatReturnDetail)
+  def submitVatReturn(vrn: String, model: VatReturnDetail, originatorID: String)
                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, SuccessModel]] = {
     val submissionModel = VatReturnSubmission(
       model.periodKey,
@@ -67,7 +67,7 @@ class VatReturnsService @Inject()(val VatReturnsConnector: VatReturnsConnector,
       LocalDateTime.now(ZoneOffset.UTC)
     )
     Logger.debug(s"[VatReturnsService][submitVatReturn] Calling SubmitVatReturnConnector with model: $submissionModel")
-    submitVatReturnConnector.submitVatReturn(vrn, submissionModel)
+    submitVatReturnConnector.submitVatReturn(vrn, submissionModel, originatorID)
   }
 }
 

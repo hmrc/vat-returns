@@ -128,7 +128,7 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector with M
 
       mockSubmitVatReturn(exampleVrn)(Right(SuccessModel("12345")))
 
-      val result = await(TestVatReturnsService.submitVatReturn(exampleVrn, vatReturn))
+      val result = await(TestVatReturnsService.submitVatReturn(exampleVrn, vatReturn, "VATUI"))
 
       "return a SuccessModel" in {
         result shouldBe Right(SuccessModel("12345"))
@@ -139,7 +139,7 @@ class VatReturnsServiceSpec extends SpecBase with MockVatReturnsConnector with M
 
       mockSubmitVatReturn(exampleVrn)(Left(UnexpectedJsonFormat))
 
-      val result = await(TestVatReturnsService.submitVatReturn(exampleVrn, vatReturn))
+      val result = await(TestVatReturnsService.submitVatReturn(exampleVrn, vatReturn, "VATUI"))
 
       "return an ErrorResponse" in {
         result shouldBe Left(UnexpectedJsonFormat)
