@@ -32,13 +32,14 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
 
   private lazy val desVatReturnsUrl: String => String = vrn => appConfig.desServiceUrl + appConfig.desSubmitVatReturnPath + vrn
 
-  def submitVatReturn(vrn: String, model: VatReturnSubmission)
+  def submitVatReturn(vrn: String, model: VatReturnSubmission, originatorID: String)
                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[SuccessModel]] = {
 
     implicit val hc: HeaderCarrier = headerCarrier
       .withExtraHeaders(
         "Content-Type" -> "application/json",
-        "Environment" -> appConfig.desEnvironment
+        "Environment" -> appConfig.desEnvironment,
+        "OriginatorID" -> originatorID
       )
       .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
 

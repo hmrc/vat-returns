@@ -80,7 +80,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
           SubmitVatReturnStub.stubResponse("999999999")(Status.OK, Json.parse(""" { "formBundleNumber": "12345" } """))
 
-          private val result = await(connector.submitVatReturn("999999999", model))
+          private val result = await(connector.submitVatReturn("999999999", model, "VATUI"))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
 
           result shouldBe Right(SuccessModel(formBundleNumber = "12345"))
@@ -93,7 +93,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 
           SubmitVatReturnStub.stubResponse("999999999")(Status.OK, Json.parse(""" {  } """))
 
-          private val result = await(connector.submitVatReturn("999999999", model))
+          private val result = await(connector.submitVatReturn("999999999", model, "VATUI"))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
 
           result shouldBe Left(UnexpectedJsonFormat)
@@ -112,7 +112,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
             Json.parse(""" { "code" : "500", "reason" : "DES" } """)
           )
 
-          private val result = await(connector.submitVatReturn("999999999", model))
+          private val result = await(connector.submitVatReturn("999999999", model, "VATUI"))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
 
           result shouldBe Left(ErrorResponse(500, Error("500", "DES")))
@@ -128,7 +128,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
             Json.parse(""" { "failures" : [ { "code" : "500", "reason" : "DES" }, { "code" : "503", "reason" : "Also DES" } ] } """)
           )
 
-          private val result = await(connector.submitVatReturn("999999999", model))
+          private val result = await(connector.submitVatReturn("999999999", model, "VATUI"))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
 
           val expectedResult = Left(ErrorResponse(500, MultiError(Seq(Error("500", "DES"), Error("503", "Also DES")))))
@@ -146,7 +146,7 @@ class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
             Json.parse(""" { } """)
           )
 
-          private val result = await(connector.submitVatReturn("999999999", model))
+          private val result = await(connector.submitVatReturn("999999999", model, "VATUI"))
           SubmitVatReturnStub.verifySubmission("999999999", postRequestJsonBody)
 
           result shouldBe Left(UnexpectedJsonFormat)

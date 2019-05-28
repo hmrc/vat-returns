@@ -68,8 +68,8 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
     super.afterAll()
   }
 
-  def post(path: String)(body: JsValue): WSResponse =
-    await(buildClient(path).post(body))
+  def post(path: String, headers: Map[String, String] = Map.empty)(body: JsValue): WSResponse =
+    await(buildClient(path, headers).post(body))
 
   def get(uri: String): WSResponse = {
     await(buildClient(uri).get())

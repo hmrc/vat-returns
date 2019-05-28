@@ -42,7 +42,8 @@ trait MockSubmitVatReturnConnector extends UnitSpec with MockitoSugar with Befor
     when(
       mockSubmitVatReturnConnector.submitVatReturn(
         ArgumentMatchers.eq(vrn),
-        ArgumentMatchers.any[VatReturnSubmission]
+        ArgumentMatchers.any[VatReturnSubmission],
+        ArgumentMatchers.any[String]
       )(ArgumentMatchers.any(), ArgumentMatchers.any())
     ).thenReturn(Future.successful(response))
 }

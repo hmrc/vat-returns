@@ -17,15 +17,17 @@
 package controllers
 
 import helpers.ComponentSpecBase
+import helpers.servicemocks.AuthStub._
 import helpers.servicemocks.{AuthStub, SubmitVatReturnStub}
 import models.InvalidJsonResponse
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, JsValue, Json}
-import helpers.servicemocks.AuthStub._
 
 class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
   val vrn: String = "101202303"
+
+  val headers = Map("OriginatorID" -> "VATUI")
 
   val validJson: JsObject = Json.obj(
     "periodKey" -> "17AA",
@@ -52,7 +54,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
   "Posting to /vat-returns/returns/vrn/:vrn" when {
 
-    "user is authorised" should {
+    "user is authorised" when {
 
       "return a success" when {
 
@@ -61,8 +63,9 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
           AuthStub.stubResponse()
           SubmitVatReturnStub.stubResponse("999999999")(OK, successReturnBody)
 
-          val response = await(post("/returns/vrn/999999999")(validJson))
+          val response = await(post("/returns/vrn/999999999", headers)(validJson))
 
+          SubmitVatReturnStub.verifySubmissionHeaders("999999999")
           response.status shouldBe 200
           response.json shouldBe successReturnBody
         }
@@ -77,7 +80,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(BAD_REQUEST, errorReturnBody("REEEEEEEEE"))
 
-            val response = await(post("/returns/vrn/999999999")(validJson))
+            val response = await(post("/returns/vrn/999999999", headers)(validJson))
 
             response.status shouldBe BAD_REQUEST
           }
@@ -87,7 +90,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(NOT_FOUND, errorReturnBody("REEEE"))
 
-            val response = await(post("/returns/vrn/999999999")(validJson))
+            val response = await(post("/returns/vrn/999999999", headers)(validJson))
 
             response.status shouldBe NOT_FOUND
           }
@@ -97,7 +100,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(INTERNAL_SERVER_ERROR, errorReturnBody("REEEE"))
 
-            val response = await(post("/returns/vrn/999999999")(validJson))
+            val response = await(post("/returns/vrn/999999999", headers)(validJson))
 
             response.status shouldBe INTERNAL_SERVER_ERROR
           }
@@ -107,7 +110,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(SERVICE_UNAVAILABLE, errorReturnBody("REEEE"))
 
-            val response = await(post("/returns/vrn/999999999")(validJson))
+            val response = await(post("/returns/vrn/999999999", headers)(validJson))
 
             response.status shouldBe SERVICE_UNAVAILABLE
           }
@@ -120,6 +123,24 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
           response.status shouldBe INTERNAL_SERVER_ERROR
           response.json shouldBe InvalidJsonResponse.toJson
+        }
+
+        "request does not have an OriginatorID in header" in {
+
+          AuthStub.stubResponse()
+          val response = await(post("/returns/vrn/999999999")(validJson))
+
+          response.status shouldBe BAD_REQUEST
+          response.json shouldBe Json.obj("code" -> "400", "reason" -> "No OriginatorID found in header")
+        }
+
+        "OriginatorID in header is invalid" in {
+
+          AuthStub.stubResponse()
+          val response = await(post("/returns/vrn/999999999", Map("OriginatorID" -> "Another channel"))(validJson))
+
+          response.status shouldBe BAD_REQUEST
+          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Invalid OriginatorID header value")
         }
       }
     }

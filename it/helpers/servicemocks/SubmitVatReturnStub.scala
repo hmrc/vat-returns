@@ -35,4 +35,9 @@ object SubmitVatReturnStub extends WireMockMethods {
     verify(
       postRequestedFor(urlEqualTo(s"/enterprise/return/vat/$vrn")
     ).withRequestBody(equalToJson(body.toString())))
+
+  def verifySubmissionHeaders(vrn: String): Unit =
+    verify(
+      postRequestedFor(urlEqualTo(s"/enterprise/return/vat/$vrn")
+    ).withHeader("OriginatorID", equalTo("VATUI")))
 }
