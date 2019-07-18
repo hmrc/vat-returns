@@ -16,6 +16,7 @@
 
 package config
 
+import config.featureSwitch.Features
 import javax.inject.{Inject, Singleton}
 import config.{ConfigKeys => Keys}
 import play.api.Mode.Mode
@@ -28,10 +29,11 @@ trait AppConfig extends ServicesConfig {
   val desServiceUrl: String
   val setupDesReturnsStartPath: String
   val desSubmitVatReturnPath: String
+  val features: Features
 }
 
 @Singleton
-class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Configuration) extends AppConfig {
+class MicroserviceAppConfig @Inject()(val environment: Environment, implicit val conf: Configuration) extends AppConfig {
 
   override protected def runModeConfiguration: Configuration = conf
   override protected def mode: Mode = environment.mode
@@ -45,4 +47,6 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, val conf: Co
   override lazy val desServiceUrl: String = loadConfig(Keys.desServiceUrl)
   override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
   override lazy val desSubmitVatReturnPath: String = loadConfig(Keys.desSubmitVatReturnPath)
+
+  override val features = new Features
 }
