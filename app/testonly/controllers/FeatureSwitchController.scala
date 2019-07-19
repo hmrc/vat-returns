@@ -25,9 +25,9 @@ import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 class FeatureSwitchController @Inject()(appConfig: AppConfig) extends BaseController {
 
-  val get: Action[AnyContent] = Action { implicit request => result }
+  def get: Action[AnyContent] = Action { implicit request => result }
 
-  lazy val update: Action[FeatureSwitchModel] = Action(parse.json[FeatureSwitchModel]) { req =>
+  def update: Action[FeatureSwitchModel] = Action(parse.json[FeatureSwitchModel]) { req =>
     appConfig.features.useStubFeature(req.body.useStubFeature)
     result
   }
