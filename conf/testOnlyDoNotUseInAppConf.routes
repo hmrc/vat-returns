@@ -10,4 +10,8 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 # Add all the application routes to the prod.routes file
-->         /                          prod.Routes
+
+GET        /vat-subscription/test-only/feature-switch               testonly.controllers.FeatureSwitchController.get
+POST       /vat-subscription/test-only/feature-switch               testonly.controllers.FeatureSwitchController.update
+
+->         /                                                        prod.Routes
