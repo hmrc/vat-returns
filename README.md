@@ -48,23 +48,11 @@ Where:
 
 #### Error Responses
 
-##### INVALID_VRN
-* **Status**: 400
-
-##### INVALID_PERIODKEY
-* **Status**: 400
-
-##### NOT_FOUND_VRN
-* **Status**: 403
-
-##### INVALID_IDENTIFIER
-* **Status**: 403
-
-##### INVALID_INPUTDATA
-* **Status**: 403
-
-##### NOT_FOUND
-* **Status**: 404
+Status | Error codes
+:---:|:---:
+400    |INVALID_VRN, INVALID_PERIODKEY
+403    |NOT_FOUND_VRN, INVALID_IDENTIFIER, INVALID_INPUTDATA
+404    |NOT_FOUND
 
 
 ### POST /returns/vrn/:vrn
@@ -85,27 +73,11 @@ Where:
 
 #### Error Responses
 
-##### INVALID_VRN
-* **Status**: 400
-
-##### INVALID_PAYLOAD
-* **Status**: 400
-
-##### INVALID_SUBMISSION
-* **Status**: 400
-
-##### INVALID_PERIODKEY
-* **Status**: 400
-
-##### DUPLICATE_SUBMISSION
-* **Status**: 409
-
-##### TAX_PERIOD_NOT_ENDED
-* **Status**: 403
-
-##### NOT_FOUND_VRN
-* **Status**: 403
-
+Status | Error codes
+:---:|:---:
+400    |INVALID_VRN, INVALID_PAYLOAD, INVALID_SUBMISSION, INVALID_PERIODKEY
+403    |TAX_PERIOD_NOT_ENDED
+409    |DUPLICATE_SUBMISSION
 
 ### POST /submission
 
@@ -122,18 +94,12 @@ Where:
 
 #### Error Responses
 
-##### Bad Request
-* **Status**: 400
-
-##### Unauthorised
-* **Status**: 401
-
-##### Not Found
-* **Status**: 404
-
-##### Checksum Failed
-* **Status**: 419
-
+Status | Error
+:---:|:---:
+400    |Bad Request
+401    |Unauthorised
+404    |Not Found
+419    |Checksum Failed
 
 
 
