@@ -16,18 +16,24 @@
 
 package models.nrs
 
-import base.SpecBase
-import play.api.libs.json.Json
-import utils.NrsTestData.Answers._
+import play.api.libs.json._
 
-class NrsAnswersSpec extends SpecBase {
+case class Language(languageCode: String)
 
-  "Formats" should {
-    "parse correctly from json" in {
-      correctJson.as[NrsAnswers] shouldBe correctModel
+object EN extends Language("en")
+object CY extends Language("cy")
+
+object Language {
+  implicit val reads: Reads[Language] = for {
+    languageString <- JsPath.read[String]
+  } yield {
+    languageString match {
+      case EN.languageCode => EN
+      case CY.languageCode => CY
     }
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
-    }
+  }
+
+  implicit val writes: Writes[Language] = Writes { model =>
+    Json.toJson(model.languageCode)
   }
 }

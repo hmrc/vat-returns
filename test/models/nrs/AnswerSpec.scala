@@ -18,18 +18,18 @@ package models.nrs
 
 import base.SpecBase
 import play.api.libs.json.Json
-import utils.NrsTestData.Answer.MockJson._
-import utils.NrsTestData.Answer.Models._
+import utils.NrsTestData.AnswerTestData.MockJson._
+import utils.NrsTestData.AnswerTestData.Models._
 
-class NrsAnswerSpec extends SpecBase {
+class AnswerSpec extends SpecBase {
 
   "Formats" should {
     "parse correctly from json" when {
       "parsing a single line answer" in {
-        correctJsonSingleLineAnswer.as[NrsAnswer] shouldBe correctModelSingleLineAnswer
+        correctJsonSingleLineAnswer.as[Answer] shouldBe correctModelSingleLineAnswer
       }
       "parsing a multi-line answer" in {
-        correctJsonMultiLineAnswer.as[NrsAnswer] shouldBe correctModelMultiLineAnswer
+        correctJsonMultiLineAnswer.as[Answer] shouldBe correctModelMultiLineAnswer
       }
     }
     "parse correctly to json" when {

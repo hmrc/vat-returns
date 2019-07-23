@@ -1,0 +1,272 @@
+{
+  "$id": "https://www.tax.service.gov.uk/nrs-submission",
+  "type": "object",
+  "properties": {
+    "payload": {
+      "$id": "/properties/payload",
+      "type": "string",
+      "title": "The Payload Schema ",
+      "default": "",
+      "examples": [
+        "XXX-base64-CheckYourAnswersHTML-XXX"
+      ]
+    },
+    "metadata": {
+      "$id": "/properties/metadata",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "$id": "/properties/metadata/properties/businessId",
+          "type": "string",
+          "title": "The Businessid Schema ",
+          "default": "",
+          "examples": [
+            "vat"
+          ]
+        },
+        "notableEvent": {
+          "$id": "/properties/metadata/properties/notableEvent",
+          "type": "string",
+          "title": "The Notableevent Schema ",
+          "default": "",
+          "examples": [
+            "vat-registration"
+          ]
+        },
+        "payloadContentType": {
+          "$id": "/properties/metadata/properties/payloadContentType",
+          "type": "string",
+          "enum": [
+            "application/json",
+            "application/xml",
+            "text/html"
+          ],
+          "title": "The Payloadcontenttype Schema ",
+          "default": "",
+          "examples": [
+            "text/html"
+          ]
+        },
+        "payloadSha256Checksum": {
+          "$id": "/properties/metadata/properties/payloadSha256Checksum",
+          "type": "string",
+          "title": "The Payloadsha256checksum Schema ",
+          "default": "",
+          "examples": [
+            "426a1c28<snip>d6d363"
+          ]
+        },
+        "nrSubmissionId": {
+          "$id": "/properties/metadata/properties/nrSubmissionId",
+          "type": "string",
+          "title": "The Nrsubmissionid Schema ",
+          "default": "",
+          "examples": [
+            "2dd537bc-4244-4ebf-bac9-96321be13cdc"
+          ]
+        },
+        "userSubmissionTimestamp": {
+          "$id": "/properties/metadata/properties/userSubmissionTimestamp",
+          "type": "string",
+          "title": "The Usersubmissiontimestamp Schema ",
+          "default": "",
+          "examples": [
+            "2018-04-07T12:13:25.156Z"
+          ]
+        },
+        "identityData": {
+          "$id": "/properties/metadata/properties/identityData",
+          "type": "object"
+        },
+        "userAuthToken": {
+          "$id": "/properties/metadata/properties/userAuthToken",
+          "type": "string",
+          "title": "The Userauthtoken Schema ",
+          "default": "",
+          "examples": [
+            "AbCdEf123456"
+          ]
+        },
+        "headerData": {
+          "$id": "/properties/metadata/properties/headerData",
+          "type": "object"
+        },
+        "searchKeys": {
+          "$id": "/properties/metadata/properties/searchKeys",
+          "type": "object"
+        },
+        "receiptData": {
+          "$id": "/properties/metadata/properties/receiptData",
+          "type": "object",
+          "properties": {
+            "language": {
+              "$id": "/properties/metadata/properties/receiptData/properties/language",
+              "type": "string",
+              "enum": ["en", "cy"],
+              "title": "The Language Schema",
+              "default": "",
+              "examples": [
+                "en"
+              ]
+            },
+            "checkYourAnswersSections": {
+              "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections",
+              "type": "array",
+              "items": {
+                "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items",
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/title",
+                    "type": "string",
+                    "title": "The Title Schema ",
+                    "default": "",
+                    "examples": [
+                      "VAT details"
+                    ]
+                  },
+                  "data": {
+                    "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/data",
+                    "type": "array",
+                    "items": {
+                      "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/data/items",
+                      "type": "object",
+                      "properties": {
+                        "questionId": {
+                          "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/data/items/properties/questionId",
+                          "type": "string",
+                          "title": "The Questionid Schema ",
+                          "default": "",
+                          "examples": [
+                            "fooVatDetails1"
+                          ]
+                        },
+                        "question": {
+                          "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/data/items/properties/question",
+                          "type": "string",
+                          "title": "The Question Schema ",
+                          "default": "",
+                          "examples": [
+                            "VAT taxable sales ..."
+                          ]
+                        },
+                        "answer": {
+                          "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/data/items/properties/answer",
+                          "type": "string",
+                          "title": "The Answer Schema ",
+                          "default": "",
+                          "examples": [
+                            "Yes"
+                          ]
+                        },
+                        "answers": {
+                          "$id": "/properties/metadata/properties/receiptData/properties/checkYourAnswersSections/items/properties/data/items/properties/answers",
+                          "type": "array",
+                          "title": "The Answers Schema",
+                          "default": "",
+                          "examples": [
+                            [
+                              "1 North Street",
+                              "Town",
+                              "AB1 2CD"
+                            ]
+                          ]
+                        }
+                      },
+                      "oneOf": [
+                        {
+                          "required": [
+                            "answer"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "answers"
+                          ]
+                        }
+                      ],
+                      "required": [
+                        "questionId",
+                        "question"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "title",
+                  "data"
+                ]
+              }
+            },
+            "declaration": {
+              "$id": "/properties/metadata/properties/receiptData/properties/declaration",
+              "type": "object",
+              "properties": {
+                "declarationText": {
+                  "$id": "/properties/metadata/properties/receiptData/properties/declaration/properties/declarationText",
+                  "type": "string",
+                  "title": "The Declarationtext Schema ",
+                  "default": "",
+                  "examples": [
+                    "I confirm the data ...."
+                  ]
+                },
+                "declarationName": {
+                  "$id": "/properties/metadata/properties/receiptData/properties/declaration/properties/declarationName",
+                  "type": "string",
+                  "title": "The Declarationname Schema ",
+                  "default": "",
+                  "examples": [
+                    "John Smith"
+                  ]
+                },
+                "declarationRole": {
+                  "$id": "/properties/metadata/properties/receiptData/properties/declaration/properties/declarationRole",
+                  "type": "string",
+                  "title": "The Declarationrole Schema ",
+                  "default": "",
+                  "examples": [
+                    "Finance Director"
+                  ]
+                },
+                "declarationConsent": {
+                  "$id": "/properties/metadata/properties/receiptData/properties/declaration/properties/declarationConsent",
+                  "type": "boolean",
+                  "title": "The Declarationconsent Schema ",
+                  "default": false,
+                  "examples": [
+                    true
+                  ]
+                }
+              },
+              "required": [
+                "declarationText",
+                "declarationName",
+                "declarationConsent"
+              ]
+            }
+          },
+          "required": [
+            "language",
+            "checkYourAnswersSections",
+            "declaration"
+          ]
+        }
+      },
+      "required": [
+        "businessId",
+        "notableEvent",
+        "payloadContentType",
+        "userSubmissionTimestamp",
+        "identityData",
+        "userAuthToken",
+        "headerData",
+        "searchKeys"
+      ]
+    }
+  },
+  "required": [
+    "payload",
+    "metadata"
+  ]
+}

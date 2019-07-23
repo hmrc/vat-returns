@@ -18,24 +18,20 @@ package models.nrs
 
 import base.SpecBase
 import play.api.libs.json.Json
+import utils.JsonSchemaValidator
+import utils.NrsTestData.FullRequestTestData._
 
-class PayloadContentTypeSpec extends SpecBase {
-
-  val jsonToModelMap = Map(
-    Json.toJson(TextHtml.contentType) -> TextHtml,
-    Json.toJson(AppXml.contentType) -> AppXml,
-    Json.toJson(AppJson.contentType) -> AppJson
-  )
+class RequestModelSpec extends SpecBase {
 
   "Formats" should {
-    jsonToModelMap.foreach { case (correctJson, correctModel) =>
-      s"parse ${correctModel.contentType} correctly from json" in {
-        correctJson.as[PayloadContentType] shouldBe correctModel
-      }
-
-      s"parse ${correctModel.contentType} correctly into json" in {
-        Json.toJson(correctModel) shouldBe correctJson
-      }
+    "parse correctly from json" in {
+      correctJson.as[RequestModel] shouldBe correctModel
+    }
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+    "pass a schema check" in {
+      JsonSchemaValidator.validateJsonAgainstSchema(Json.toJson(correctModel))
     }
   }
 }

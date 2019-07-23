@@ -18,16 +18,23 @@ package models.nrs
 
 import base.SpecBase
 import play.api.libs.json.Json
-import utils.NrsTestData.Receipt._
 
-class NrsReceiptDataSpec extends SpecBase {
+class LanguageSpec extends SpecBase {
+
+  val jsonModelMap = Map(
+    Json.toJson(EN.languageCode) -> EN,
+    Json.toJson(CY.languageCode) -> CY
+  )
 
   "Formats" should {
-    "parse correctly from json" in {
-      correctJson.as[NrsReceiptData] shouldBe correctModel
-    }
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
+    jsonModelMap.foreach { case (correctJson, correctModel) =>
+      s"parse ${correctModel.languageCode} correctly into a model" in {
+        correctJson.as[Language] shouldBe correctModel
+      }
+
+      s"parse ${correctModel.languageCode} correctly into json" in {
+          Json.toJson(correctModel) shouldBe correctJson
+      }
     }
   }
 }

@@ -16,25 +16,13 @@
 
 package models.nrs
 
-import play.api.libs.json.{JsObject, Json}
-import base.SpecBase
+import play.api.libs.json.{Json, OFormat}
 
-class NrsLanguageSpec extends SpecBase {
+case class Answers(
+                       title: String,
+                       data: Seq[Answer]
+                     )
 
-  val jsonModelMap = Map(
-    Json.toJson(EN.languageCode) -> EN,
-    Json.toJson(CY.languageCode) -> CY
-  )
-
-  "Formats" should {
-    jsonModelMap.foreach { case (correctJson, correctModel) =>
-      s"parse ${correctModel.languageCode} correctly into a model" in {
-        correctJson.as[NrsLanguage] shouldBe correctModel
-      }
-
-      s"parse ${correctModel.languageCode} correctly into json" in {
-          Json.toJson(correctModel) shouldBe correctJson
-      }
-    }
-  }
+object Answers {
+  implicit val formats: OFormat[Answers] = Json.format[Answers]
 }

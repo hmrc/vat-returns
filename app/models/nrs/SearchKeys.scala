@@ -18,12 +18,12 @@ package models.nrs
 
 import play.api.libs.json.{Json, OFormat}
 
-case class NrsReceiptData(
-                           language: NrsLanguage,
-                           checkYourAnswersSections: Seq[NrsAnswers],
-                           declaration: NrsDeclaration
-                         )
+case class SearchKeys(
+                       vrn: String,
+                       periodKey: String,
+                       arn: Option[String]
+                     )
 
-object NrsReceiptData {
-  implicit val formats: OFormat[NrsReceiptData] = Json.format[NrsReceiptData]
+object SearchKeys {
+  implicit val formats: OFormat[SearchKeys] = Json.format[SearchKeys]
 }

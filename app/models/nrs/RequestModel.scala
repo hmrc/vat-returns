@@ -16,24 +16,13 @@
 
 package models.nrs
 
-import play.api.libs.json._
+import play.api.libs.json.{Json, OFormat}
 
-case class NrsLanguage(languageCode: String)
+case class RequestModel(
+                            payload: String,
+                            metadata: Metadata
+                          )
 
-object EN extends NrsLanguage("en")
-object CY extends NrsLanguage("cy")
-
-object NrsLanguage {
-  implicit val reads: Reads[NrsLanguage] = for {
-    languageString <- JsPath.read[String]
-  } yield {
-    languageString match {
-      case EN.languageCode => EN
-      case CY.languageCode => CY
-    }
-  }
-
-  implicit val writes: Writes[NrsLanguage] = Writes { model =>
-    Json.toJson(model.languageCode)
-  }
+object RequestModel {
+  implicit val formats: OFormat[RequestModel] = Json.format[RequestModel]
 }

@@ -16,15 +16,24 @@
 
 package models.nrs
 
+import play.api.libs.json.{JsObject, Json}
 import base.SpecBase
-import play.api.libs.json.Json
-import utils.NrsTestData.Declaration._
 
-class NrsDeclarationSpec extends SpecBase {
+class SearchKeysSpec extends SpecBase {
+
+  val correctJson: JsObject = Json.obj(
+    "vrn" -> "virn",
+    "periodKey" -> "likeAnAmericanDrama",
+    "arn" -> "oooowhatugannasaaaaaaaay"
+  )
+
+  val correctModel: SearchKeys = SearchKeys(
+    "virn", "likeAnAmericanDrama", Some("oooowhatugannasaaaaaaaay")
+  )
 
   "Formats" should {
     "parse correctly from json" in {
-      correctJson.as[NrsDeclaration] shouldBe correctModel
+      correctJson.as[SearchKeys] shouldBe correctModel
     }
     "parse correctly to json" in {
       Json.toJson(correctModel) shouldBe correctJson

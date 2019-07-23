@@ -21,29 +21,29 @@ import java.time.LocalDate
 import models.nrs.identityData._
 import play.api.libs.json.{Json, OFormat}
 
-case class NrsIdentityData(
-                            internalId: String,
-                            externalId: String,
-                            agentCode: String,
+case class IdentityData(
+                            internalId: Option[String] = None,
+                            externalId: Option[String] = None,
+                            agentCode: Option[String] = None,
                             credentials: IdentityCredentials,
                             confidenceLevel: Int,
-                            nino: String,
-                            saUtr: String,
+                            nino: Option[String] = None,
+                            saUtr: Option[String] = None,
                             name: IdentityName,
-                            dateOfBirth: LocalDate,
-                            email: String,
+                            dateOfBirth: Option[LocalDate] = None,
+                            email: Option[String] = None,
                             agentInformation: IdentityAgentInformation,
-                            groupIdentifier: String,
-                            credentialRole: String,
-                            mdtpInformation: IdentityMdtpInformation,
+                            groupIdentifier: Option[String] = None,
+                            credentialRole: Option[String] = None,
+                            mdtpInformation: Option[IdentityMdtpInformation] = None,
                             itmpName: IdentityItmpName,
-                            itmpDateOfBirth: LocalDate,
+                            itmpDateOfBirth: Option[LocalDate] = None,
                             itmpAddress: IdentityItmpAddress,
-                            affinityGroup: String,
-                            credentialStrength: String,
+                            affinityGroup: Option[String] = None,
+                            credentialStrength: Option[String] = None,
                             loginTimes: IdentityLoginTimes
                           )
 
-object NrsIdentityData {
-  implicit val formats: OFormat[NrsIdentityData] = Json.format[NrsIdentityData]
+object IdentityData {
+  implicit val formats: OFormat[IdentityData] = Json.format[IdentityData]
 }

@@ -18,24 +18,15 @@ package models.nrs
 
 import base.SpecBase
 import play.api.libs.json.Json
+import utils.NrsTestData.MetadataTestData._
 
-class PayloadContentTypeSpec extends SpecBase {
-
-  val jsonToModelMap = Map(
-    Json.toJson(TextHtml.contentType) -> TextHtml,
-    Json.toJson(AppXml.contentType) -> AppXml,
-    Json.toJson(AppJson.contentType) -> AppJson
-  )
-
+class MetadataSpec extends SpecBase {
   "Formats" should {
-    jsonToModelMap.foreach { case (correctJson, correctModel) =>
-      s"parse ${correctModel.contentType} correctly from json" in {
-        correctJson.as[PayloadContentType] shouldBe correctModel
-      }
-
-      s"parse ${correctModel.contentType} correctly into json" in {
-        Json.toJson(correctModel) shouldBe correctJson
-      }
+    "parse correctly from json" in {
+      correctJson.as[Metadata] shouldBe correctModel
+    }
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
     }
   }
 }

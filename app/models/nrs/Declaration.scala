@@ -16,17 +16,15 @@
 
 package models.nrs
 
-import base.SpecBase
-import play.api.libs.json.Json
-import utils.NrsTestData.Metadata._
+import play.api.libs.json.{Json, OFormat}
 
-class NrsMetadataSpec extends SpecBase {
-  "Formats" should {
-    "parse correctly from json" in {
-      correctJson.as[NrsMetadata] shouldBe correctModel
-    }
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
-    }
-  }
+case class Declaration(
+                           declarationText: String,
+                           declarationName: String,
+                           declarationRole: String,
+                           declarationConsent: Boolean
+                         )
+
+object Declaration {
+  implicit val formats: OFormat[Declaration] = Json.format[Declaration]
 }

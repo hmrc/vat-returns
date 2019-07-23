@@ -59,14 +59,15 @@ val compile = Seq(
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-25" % scope,
-  "org.scalatest" %% "scalatest" % "3.0.8" % scope,
-  "org.pegdown" % "pegdown" % "1.6.0" % scope,
-  "com.github.tomakehurst" % "wiremock" % "2.23.2" % scope,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % scope,
-  "org.mockito" % "mockito-core" % "2.28.2" % scope,
-  "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
-)
+  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-25",
+  "org.scalatest" %% "scalatest" % "3.0.8",
+  "org.pegdown" % "pegdown" % "1.6.0",
+  "com.github.tomakehurst" % "wiremock" % "2.23.2",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1",
+  "org.mockito" % "mockito-core" % "2.28.2",
+  "com.typesafe.play" %% "play-test" % PlayVersion.current,
+  "com.github.fge" % "json-schema-validator" % "2.2.6"
+).map(_ % scope)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
   test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name, "-Dlogger.resource=logback-test.xml"))))

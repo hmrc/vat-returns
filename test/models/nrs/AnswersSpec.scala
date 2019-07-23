@@ -16,15 +16,18 @@
 
 package models.nrs
 
-import play.api.libs.json.{Json, OFormat}
+import base.SpecBase
+import play.api.libs.json.Json
+import utils.NrsTestData.AnswersTestData._
 
-case class NrsDeclaration(
-                           declarationText: String,
-                           declarationName: String,
-                           declarationRole: String,
-                           declarationConsent: Boolean
-                         )
+class AnswersSpec extends SpecBase {
 
-object NrsDeclaration {
-  implicit val formats: OFormat[NrsDeclaration] = Json.format[NrsDeclaration]
+  "Formats" should {
+    "parse correctly from json" in {
+      correctJson.as[Answers] shouldBe correctModel
+    }
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
 }

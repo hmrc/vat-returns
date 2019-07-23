@@ -18,12 +18,13 @@ package models.nrs
 
 import base.SpecBase
 import play.api.libs.json.Json
-import utils.NrsTestData.IdentityData._
+import utils.NrsTestData.ReceiptTestData._
 
-class NrsIdentityDataSpec extends SpecBase {
+class ReceiptDataSpec extends SpecBase {
+
   "Formats" should {
     "parse correctly from json" in {
-      correctJson.as[NrsIdentityData] shouldBe correctModel
+      correctJson.as[ReceiptData] shouldBe correctModel
     }
     "parse correctly to json" in {
       Json.toJson(correctModel) shouldBe correctJson

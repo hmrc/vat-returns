@@ -21,21 +21,21 @@ import java.time.format.DateTimeFormatter
 
 import play.api.libs.json._
 
-case class NrsMetadata(
+case class Metadata(
                         businessId: String,
                         notableEvent: String,
                         payloadContentType: PayloadContentType,
                         payloadSha256Checksum: Option[String],
                         nrSubmissionId: Option[String],
                         userSubmissionTimestamp: LocalDateTime,
-                        identityData: NrsIdentityData,
+                        identityData: IdentityData,
                         userAuthToken: String,
                         headerData: Map[String, String],
-                        searchKeys: Map[String, String],
-                        receiptData: NrsReceiptData
+                        searchKeys: SearchKeys,
+                        receiptData: Option[ReceiptData]
                       )
 
-object NrsMetadata {
+object Metadata {
   implicit val dateToString: Writes[LocalDateTime] = Writes { date =>
     Json.toJson(date.format(
       DateTimeFormatter
@@ -44,5 +44,5 @@ object NrsMetadata {
     ))
   }
 
-  implicit val formats: OFormat[NrsMetadata] = Json.format[NrsMetadata]
+  implicit val formats: OFormat[Metadata] = Json.format[Metadata]
 }
