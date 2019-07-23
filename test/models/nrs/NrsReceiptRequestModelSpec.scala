@@ -21,11 +21,11 @@ import play.api.libs.json.Json
 import utils.JsonSchemaValidator
 import utils.NrsTestData.FullRequestTestData._
 
-class RequestModelSpec extends SpecBase {
+class NrsReceiptRequestModelSpec extends SpecBase {
 
   "Formats" should {
     "parse correctly from json" in {
-      correctJson.as[RequestModel] shouldBe correctModel
+      correctJson.as[NrsReceiptRequestModel] shouldBe correctModel
     }
     "parse correctly to json" in {
       Json.toJson(correctModel) shouldBe correctJson

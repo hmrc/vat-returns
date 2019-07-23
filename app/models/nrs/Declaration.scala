@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 case class Declaration(
                            declarationText: String,
                            declarationName: String,
-                           declarationRole: String,
+                           declarationRole: Option[String],
                            declarationConsent: Boolean
                          )
 

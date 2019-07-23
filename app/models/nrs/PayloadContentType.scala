@@ -29,6 +29,8 @@ object AppXml extends PayloadContentType("application/xml")
 object TextHtml extends PayloadContentType("text/html")
 
 object PayloadContentType {
+  implicit def asString: PayloadContentType => String = payload => payload.contentType
+
   implicit val writes: Writes[PayloadContentType] = Writes { payloadContentType =>
     Json.toJson(
       payloadContentType.contentType

@@ -16,13 +16,25 @@
 
 package models.nrs
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsObject, Json}
+import base.SpecBase
 
-case class RequestModel(
-                            payload: String,
-                            metadata: Metadata
-                          )
+class NrsReceiptSuccessfulModelSpec extends SpecBase {
 
-object RequestModel {
-  implicit val formats: OFormat[RequestModel] = Json.format[RequestModel]
+  val correctJson: JsObject = Json.obj(
+    "nrSubmissionId" -> "some-id"
+  )
+
+  val correctModel: NrsReceiptSuccessModel = NrsReceiptSuccessModel(
+    "some-id"
+  )
+
+  "Formats" should {
+    "parse correctly from json" in {
+      correctJson.as[NrsReceiptSuccessModel] shouldBe correctModel
+    }
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
 }

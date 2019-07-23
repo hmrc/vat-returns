@@ -23,12 +23,11 @@ class SearchKeysSpec extends SpecBase {
 
   val correctJson: JsObject = Json.obj(
     "vrn" -> "virn",
-    "periodKey" -> "likeAnAmericanDrama",
-    "arn" -> "oooowhatugannasaaaaaaaay"
+    "periodKey" -> "likeAnAmericanDrama"
   )
 
   val correctModel: SearchKeys = SearchKeys(
-    "virn", "likeAnAmericanDrama", Some("oooowhatugannasaaaaaaaay")
+    "virn", "likeAnAmericanDrama"
   )
 
   "Formats" should {
