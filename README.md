@@ -53,6 +53,8 @@ Status | Error codes
 400    |INVALID_VRN, INVALID_PERIODKEY
 403    |NOT_FOUND_VRN, INVALID_IDENTIFIER, INVALID_INPUTDATA
 404    |NOT_FOUND
+500    |SERVER_ERROR
+503    |SERVICE_UNAVAILABLE
 
 
 ### POST /returns/vrn/:vrn
@@ -96,8 +98,10 @@ Where:
 Status | Error codes
 :---:|:---:
 400    |INVALID_VRN, INVALID_PAYLOAD, INVALID_SUBMISSION, INVALID_PERIODKEY
-403    |TAX_PERIOD_NOT_ENDED
+403    |TAX_PERIOD_NOT_ENDED, NOT_FOUND_VRN
 409    |DUPLICATE_SUBMISSION
+500    |SERVER_ERROR
+503    |SERVICE_UNAVAILABLE
 
 ### POST /submission
 
@@ -179,21 +183,30 @@ Status | Error codes
                       },
         "receiptData": {
             "language": "en",
-            "checkYourAnswersSections": {
-                "title": "VAT details",
-                "data": [
-                    {
-                        "questionId": "VatDetails1",
-                        "question": "VAT taxable sales this quarter",
-                        "answer": "£1,392,483.20"
-                    },
-                    {
-                        "questionId": "VatDetails2",
-                        "question": "VAT start date",
-                        "answer": "20 July 2016"
-                    }
-                ]
-            },
+            "checkYourAnswersSections": [
+                {
+                    "title": "VAT details",
+                    "data": [
+                        {
+                            "questionId": "VatDetails1",
+                            "question": "VAT taxable sales this quarter",
+                            "answer": "£1,392,483.20"
+                        },
+                        {
+                            "questionId": "VatDetails2",
+                            "question": "Address",
+                            "answers": [
+                                {
+                                    "98 Limbrick Lane",
+                                      "Goring-by-sea",
+                                      "Worthing",
+                                      "BN12 6AG"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
             "declaration": {
                 "declarationText": "I confirm the data..."
                 "declarationName": "John Smith",
@@ -204,7 +217,39 @@ Status | Error codes
     }
 }
 ```
+**Field descriptions**:
+* **payload** - base64 encoded string of the data items sent across
+* metadata.**businessId** - identifier for the name of the tax regime
+* metadata.**notableEvent** - a human-readable name for the type of submission
+* metadata.**payloadContentType** - the content type of the unencoded payload
+* metadata.**payloadSha256Checksum** - the SHA-256 checksum of the original payload prior to encoding
+* metadata.**nrSubmissionId** - globally unique identifier for this NRS submission
+* metadata.**userSubmissionTimestamp** - the date and time the user submitted the information
+* metadata.**identityData** - the identity of the individual making the submission
+* metadata.**userAuthToken** - OAuth2 bearer token used by the calling service to retrieve the user's identityData
+* metadata.**headerData** - the content of the header sent by the user with the payload
+* metadata.**searchKeys** - set of data items searchable by HMRC users of NRS
+* metadata.receiptData.**language** - the language used in the UI journey
+* metadata.receiptData.checkYourAnswersSections[n].**title** - the title of this section of the Check Your Answers page
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**questionId** - unique identifier for the question
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**question** - the label shown to the user for this question
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**answer** - single-line answer provided by or calculated for the user
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**answers** - multiple-line answer provided by or calculated for the user
+* metadata.receiptData.declaration.**declarationText** - the declaration wording as shown to and agreed by the user
+* metadata.receiptData.declaration.**declarationName** - the name of the user that agreed to the declaration
+* metadata.receiptData.declaration.**declarationRole** - the role of the user that agreed to the declaration
+* metadata.receiptData.declaration.**declarationConsent** - the value of the explicit consent checkbox
 
+
+**Optional fields:**
+* metadata.**payloadSha256Checksum**
+* metadata.**nrSubmissionId**
+* metadata.**receiptData**
+* metadata.receiptData.checkYourAnswersSections[n].data.**questionId**
+* metadata.receiptData.declaration.**declarationRole**
+
+Only one of 'metadata.receiptData.checkYourAnswersSections[n].data.**answer**/**answers**'
+ is required
 
 #### Success Response
 
@@ -221,11 +266,12 @@ Status | Error codes
 
 Status | Error
 :---:|:---:
-400    |Bad Request
+400    |Bad Request (details of error provided in response body)
 401    |Unauthorised
-404    |Not Found
 419    |Checksum Failed
+5xx and 404 errors may also be returned. In these cases the service will continue as normal without NRS.
 
+Checksum Failed is returned if **payloadSha256Checksum** doesn't match the SHA-256 checksum of the unencoded payload.
 
 
 ### Requirements
