@@ -2,3 +2,5 @@
 
 GET     /returns/vrn/:vrn    @controllers.VatReturnsController.getVatReturns(vrn: String, filters: models.VatReturnFilters)
 POST    /returns/vrn/:vrn    @controllers.SubmitVatReturnController.submitVatReturn(vrn: String)
+
+POST    /submission          @controllers.NRSController.submitNRS()
