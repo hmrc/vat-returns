@@ -103,7 +103,7 @@ Status | Error codes
 500    |SERVER_ERROR
 503    |SERVICE_UNAVAILABLE
 
-### POST /submission
+### POST /nrs/submission
 
 #### Example Request
 ```
