@@ -26,7 +26,6 @@ object ConfigKeys {
   private val nrsBase: String = "microservice.services.nrs."
   val nrsReceiptsHost: String = nrsBase + "receipts.host"
   val nrsReceiptsPort: String = nrsBase + "receipts.port"
-  val nrsReceiptsTimeout: String = "ws.timeout.request"
   val nrsSubmissionEndpoint: String = nrsBase + "receipts.submission-endpoint"
   val nrsApiKey: String = nrsBase + "apiKey"
 }

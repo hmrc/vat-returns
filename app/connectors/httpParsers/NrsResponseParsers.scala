@@ -35,7 +35,7 @@ object NrsResponseParsers extends ResponseHttpParsers {
       case CHECKSUM_FAILED => Left(Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum."))
       case unknown500ErrorOr404 if unknown500ErrorOr404 == NOT_FOUND || (unknown500ErrorOr404 >= 500 && unknown500ErrorOr404 < 600) =>
         Left(Error(unknown500ErrorOr404, "Returning response body:\n" + input.json))
-      case unknownReturnCode@_ => Left(Error(unknownReturnCode, "Unexpected return code, returning response body:\n" + input.json))
+      case unknownReturnCode => Left(Error(unknownReturnCode, "Unexpected return code, returning response body:\n" + input.json))
     }
   }
 

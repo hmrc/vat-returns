@@ -31,7 +31,6 @@ trait AppConfig extends ServicesConfig {
   val desSubmitVatReturnPath: String
   val features: Features
   val nrsSubmissionEndpoint: String
-  val nrsSubmissionTimeout: Int
   val nrsApiKey: String
 }
 
@@ -53,7 +52,6 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, implicit val
 
   override val nrsSubmissionEndpoint: String =
     s"${getString(Keys.nrsReceiptsHost)}:${getString(Keys.nrsReceiptsPort)}${getString(Keys.nrsSubmissionEndpoint)}"
-  override val nrsSubmissionTimeout: Int = getInt(Keys.nrsReceiptsTimeout)
   override val nrsApiKey: String = getString(Keys.nrsApiKey)
 
   override val features = new Features
