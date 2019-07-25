@@ -165,6 +165,7 @@ Status | Error codes
         },
         "userAuthToken": "Bearer AbCdEf123456...",
         "headerData": {
+                        "OriginatorID": "VATUI",
                         "Gov-Client-Public-IP": "198.51.100.0",
                         "Gov-Client-Public-Port": "12345",
                         "Gov-Client-Device-ID": "beec798b-b366-47fa-b1f8-92cede14a1ce",
