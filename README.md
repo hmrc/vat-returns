@@ -218,33 +218,42 @@ Status | Error codes
 }
 ```
 **Field descriptions**:
-* **payload** - base64 encoded string of the data items sent across
-* metadata.**businessId** - identifier for the name of the tax regime
-* metadata.**notableEvent** - a human-readable name for the type of submission
-* metadata.**payloadContentType** - the content type of the unencoded payload
-* metadata.**payloadSha256Checksum** - the SHA-256 checksum of the original payload prior to encoding
-* metadata.**nrSubmissionId** - globally unique identifier for this NRS submission
-* metadata.**userSubmissionTimestamp** - the date and time the user submitted the information
-* metadata.**identityData** - the identity of the individual making the submission
-* metadata.**userAuthToken** - OAuth2 bearer token used by the calling service to retrieve the user's identityData
-* metadata.**headerData** - the content of the header sent by the user with the payload
-* metadata.**searchKeys** - set of data items searchable by HMRC users of NRS
-* metadata.receiptData.**language** - the language used in the UI journey
-* metadata.receiptData.checkYourAnswersSections[n].**title** - the title of this section of the Check Your Answers page
-* metadata.receiptData.checkYourAnswersSections[n].data[x].**questionId** - unique identifier for the question
-* metadata.receiptData.checkYourAnswersSections[n].data[x].**question** - the label shown to the user for this question
-* metadata.receiptData.checkYourAnswersSections[n].data[x].**answer** - single-line answer provided by or calculated for the user
-* metadata.receiptData.checkYourAnswersSections[n].data[x].**answers** - multiple-line answer provided by or calculated for the user
-* metadata.receiptData.declaration.**declarationText** - the declaration wording as shown to and agreed by the user
-* metadata.receiptData.declaration.**declarationName** - the name of the user that agreed to the declaration
-* metadata.receiptData.declaration.**declarationRole** - the role of the user that agreed to the declaration
-* metadata.receiptData.declaration.**declarationConsent** - the value of the explicit consent checkbox
+* **payload** (Base 64 String) - base64 encoded string of the data items sent across
+* metadata.**businessId** (String) - identifier for the name of the tax regime
+* metadata.**notableEvent** (String) - a human-readable name for the type of submission
+* metadata.**payloadContentType** (one of application/json, application/xml or text/html) - the content type of the unencoded payload
+* metadata.**payloadSha256Checksum** (String) - the SHA-256 checksum of the original payload prior to encoding
+* metadata.**nrSubmissionId** (v4 UUID) - globally unique identifier for this NRS submission
+* metadata.**userSubmissionTimestamp** (JSON timestamp format "YYYY-MM-ddTHH:mm:ss.SSSZ") - the date and time the user submitted the information
+* metadata.**identityData** (JSON object) - the identity of the individual making the submission. The mandatory fields within **identityData** are:
+    * credentials
+    * confidenceLevel
+    * name
+    * agentInformation
+    * itmpName
+    * itmpAddress
+    * loginTimes
+* metadata.**userAuthToken** (String) - OAuth2 bearer token used by the calling service to retrieve the user's identityData
+* metadata.**headerData** (JSON object with String fields) - the content of the header sent by the user with the payload
+* metadata.**searchKeys** (JSON object with String fields) - set of data items searchable by HMRC users of NRS
+* metadata.receiptData.**language** (ISO 639-1 language code) - the language used in the UI journey
+* metadata.receiptData.checkYourAnswersSections[n].**title** (String) - the title of this section of the Check Your Answers page
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**questionId** (String) - unique identifier for the question
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**question** (String) - the label shown to the user for this question
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**answer** (String) - single-line answer provided by or calculated for the user
+* metadata.receiptData.checkYourAnswersSections[n].data[x].**answers** (String array) - multiple-line answer provided by or calculated for the user
+* metadata.receiptData.declaration.**declarationText** (String) - the declaration wording as shown to and agreed by the user
+* metadata.receiptData.declaration.**declarationName** (String) - the name of the user that agreed to the declaration
+* metadata.receiptData.declaration.**declarationRole** (String) - the role of the user that agreed to the declaration
+* metadata.receiptData.declaration.**declarationConsent** (String) - the value of the explicit consent checkbox
 
 
 **Optional fields:**
 * metadata.**payloadSha256Checksum**
 * metadata.**nrSubmissionId**
 * metadata.**receiptData**
+
+If **recepitData** is included then the following fields within receiptData are optional:
 * metadata.receiptData.checkYourAnswersSections[n].data.**questionId**
 * metadata.receiptData.declaration.**declarationRole**
 
