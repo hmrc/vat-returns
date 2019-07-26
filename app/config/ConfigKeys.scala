@@ -22,4 +22,10 @@ object ConfigKeys {
   val desSubmitVatReturnPath: String = "microservice.services.des.endpoints.submitVatReturn"
   val desEnvironment: String = "microservice.services.des.environment"
   val desToken: String = "microservice.services.des.authorization-token"
+
+  private val nrsBase: String = "microservice.services.nrs."
+  val nrsReceiptsHost: String = nrsBase + "receipts.host"
+  val nrsReceiptsPort: String = nrsBase + "receipts.port"
+  val nrsSubmissionEndpoint: String = nrsBase + "receipts.submission-endpoint"
+  val nrsApiKey: String = nrsBase + "apiKey"
 }

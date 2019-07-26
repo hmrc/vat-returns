@@ -108,7 +108,7 @@ object NrsTestData {
     val correctModel: Declaration = Declaration(
       "I confirm the data...",
       "Scarlett Flamberg",
-      "Warrior of Light",
+      Some("Warrior of Light"),
       declarationConsent = true
     )
   }
@@ -263,7 +263,7 @@ object NrsTestData {
     val correctModel: Metadata = Metadata(
       "vat", "vat-registration", TextHtml, Some("426a1c28<snip>d6d363"), None,
       LocalDateTime.ofInstant(Instant.parse("2018-04-07T12:13:25.156Z"), ZoneId.of("UTC")), IdentityDataTestData.correctModel,
-      "Bearer AbCdEf123456...", Map("..." -> "..."), SearchKeys("123456789", "18AA", None),
+      "Bearer AbCdEf123456...", Map("..." -> "..."), SearchKeys("123456789", "18AA"),
       Some(ReceiptData(
         EN, Seq(
           Answers(
@@ -298,7 +298,7 @@ object NrsTestData {
         Declaration(
           "I confirm the data ....",
           "John Smith",
-          "Finance Director",
+          Some("Finance Director"),
           declarationConsent = true
         )
       ))
@@ -311,7 +311,7 @@ object NrsTestData {
       "metadata" -> MetadataTestData.correctJson
     )
 
-    val correctModel: RequestModel = RequestModel(
+    val correctModel: NrsReceiptRequestModel = NrsReceiptRequestModel(
       "XXX-base64-CheckYourAnswersHTML-XXX", MetadataTestData.correctModel
     )
   }

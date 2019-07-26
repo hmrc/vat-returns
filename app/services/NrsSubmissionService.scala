@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package models.nrs
+package services
 
-import play.api.libs.json.{Json, OFormat}
+import connectors.NrsConnector
+import connectors.httpParsers.NrsResponseParsers.SubmissionResult
+import javax.inject.Inject
+import models.nrs.NrsReceiptRequestModel
+import uk.gov.hmrc.http.HeaderCarrier
 
-case class SearchKeys(
-                       vrn: String,
-                       periodKey: String
-                     )
+import scala.concurrent.{ExecutionContext, Future}
 
-object SearchKeys {
-  implicit val formats: OFormat[SearchKeys] = Json.format[SearchKeys]
+class NrsSubmissionService @Inject()(connector: NrsConnector) {
+  def nrsReceiptSubmission(data: NrsReceiptRequestModel)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
+    connector.nrsReceiptSubmission(data)
+  }
 }
