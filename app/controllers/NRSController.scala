@@ -18,10 +18,10 @@ package controllers
 
 import controllers.actions.AuthorisedSubmitVatReturn
 import javax.inject.{Inject, Singleton}
-import models.nrs.RequestModel
+import models.nrs.NrsReceiptRequestModel
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.http.HeaderCarrier
+import services.NrsSubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,27 +32,18 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
                              (implicit ec: ExecutionContext) extends BaseController {
 
   def submitNRS(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
-    val requestAsJson: Option[RequestModel] = request.body.asJson match {
-      case Some(validJson) => validJson.asOpt[RequestModel]
+    val requestAsJson: Option[NrsReceiptRequestModel] = request.body.asJson match {
+      case Some(validJson) => validJson.asOpt[NrsReceiptRequestModel]
       case None => None
     }
 
     requestAsJson match {
       case Some(model) => nrsSubmissionService.nrsReceiptSubmission(model) map {
         case Right(successModel) => Ok(Json.toJson(successModel))
-        case Left(error) => InternalServerError(error)
+        case Left(_) => BadRequest(request.body.toString)
       }
+      case None => Future.successful(InternalServerError(request.body.toString))
     }
-
-
   }
-
 }
 
-trait NrsReceiptSuccessModel {
-  val nrsSubmissionId: String
-}
-
-trait NrsSubmissionService {
-  def nrsReceiptSubmission(data: RequestModel)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[Error, NrsReceiptSuccessModel]]
-}
