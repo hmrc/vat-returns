@@ -21,9 +21,10 @@ import javax.inject.{Inject, Singleton}
 import models.nrs.NrsReceiptRequestModel
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import services.NrsSubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import models.Error
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,15 +42,32 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
     requestAsJson match {
       case Some(model) => nrsSubmissionService.nrsReceiptSubmission(model) map {
         case Right(successModel) => Ok(Json.toJson(successModel))
-        case Left(_) =>
+        case Left(error) =>
           Logger.debug(s"[NRSController][submitNRS] - request body contains incorrect model. Body: ${request.body}")
           Logger.warn("[NRSController][submitNRS] - request body contains incorrect model")
-          BadRequest(request.body.toString)
+          handleError(error)
       }
       case None =>
         Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to Json. Body: ${request.body}")
         Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to Json")
-        Future.successful(InternalServerError(request.body.toString))
+        Future.successful(BadRequest("Request body from submit-vat-return-frontend cannot be parsed."))
+    }
+  }
+
+  private def handleError(error: Error): Result = {
+    val CHECKSUM_FAILED = 419
+
+    try {
+      error.code.toInt match {
+        case BAD_REQUEST => BadRequest(error.reason)
+        case UNAUTHORIZED => Unauthorized(error.reason)
+        case CHECKSUM_FAILED => BadRequest(error.reason)
+        case unknown500ErrorOr404 if unknown500ErrorOr404 == NOT_FOUND || (unknown500ErrorOr404 >= 500 && unknown500ErrorOr404 < 600) =>
+          Status(unknown500ErrorOr404)(error.reason)
+        case _ => BadRequest(error.toJson)
+      }
+    } catch {
+      case _: Throwable => BadRequest(error.toJson)
     }
   }
 }

@@ -18,6 +18,7 @@ package connectors.httpParsers
 
 import models.Error
 import models.nrs.NrsReceiptSuccessModel
+import play.api.Logger
 import play.api.http.Status._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
@@ -29,6 +30,7 @@ object NrsResponseParsers extends ResponseHttpParsers {
   private implicit def intToString: Int => String = _.toString
 
   def handleErrorCodes(input: HttpResponse): Left[Error, Nothing] = {
+    Logger.warn(s"[NrsResponseParsers][handleErrorCodes] Error returned from NRS: ${input.status}. Return body: ${input.body}")
     input.status match {
       case BAD_REQUEST => Left(Error(BAD_REQUEST, "Request parameters are invalid"))
       case UNAUTHORIZED => Left(Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing."))

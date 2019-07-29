@@ -43,7 +43,7 @@ class NrsConnector @Inject()(http: HttpClient, appConfig: MicroserviceAppConfig)
   }.recover {
     case _: GatewayTimeoutException => Left(Error(GATEWAY_TIMEOUT.toString, "Request to NRS timed out."))
     case error: Throwable =>
-      Logger.error("[NrsConnector][nrsReceiptSubmission] Unexpected exception returned from NRS", error)
+      Logger.warn("[NrsConnector][nrsReceiptSubmission] Unexpected exception returned from NRS", error)
       Left(Error("UNEXPECTED_EXCEPTION", error.getMessage))
   }
 }
