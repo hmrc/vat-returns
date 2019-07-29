@@ -33,7 +33,6 @@ object NrsModelAssets {
 
   val genericTime = LocalDateTime.of(1986, Month.APRIL, 8, 12, 30)
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm")
-//  val genericTime: LocalDateTime = LocalDateTime.parse("2018-08-01T17:30", formatter)
 
   val credentials = IdentityCredentials("providerId", "providerType")
   val name = IdentityName("Bob", "Raccoon")

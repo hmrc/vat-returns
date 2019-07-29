@@ -19,6 +19,7 @@ package controllers
 import controllers.actions.AuthorisedSubmitVatReturn
 import javax.inject.{Inject, Singleton}
 import models.nrs.NrsReceiptRequestModel
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import services.NrsSubmissionService
@@ -40,9 +41,15 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
     requestAsJson match {
       case Some(model) => nrsSubmissionService.nrsReceiptSubmission(model) map {
         case Right(successModel) => Ok(Json.toJson(successModel))
-        case Left(_) => BadRequest(request.body.toString)
+        case Left(_) =>
+          Logger.debug(s"[NRSController][submitNRS] - request body contains incorrect model. Body: ${request.body}")
+          Logger.warn("[NRSController][submitNRS] - request body contains incorrect model")
+          BadRequest(request.body.toString)
       }
-      case None => Future.successful(InternalServerError(request.body.toString))
+      case None =>
+        Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to Json. Body: ${request.body}")
+        Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to Json")
+        Future.successful(InternalServerError(request.body.toString))
     }
   }
 }
