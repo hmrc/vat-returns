@@ -65,9 +65,9 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         lazy val result: Result = await(TestNRSController.submitNRS("999999999")(fakeRequest))
 
-        "return a status of 500 (ISE)" in {
+        "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+          status(result) shouldBe Status.BAD_REQUEST
         }
       }
 
@@ -75,9 +75,9 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         lazy val result: Result = await(TestNRSController.submitNRS("999999999")(FakeRequest().withJsonBody(Json.toJson(incorrectModel))))
 
-        "return a status of 500 (ISE)" in {
+        "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+          status(result) shouldBe Status.BAD_REQUEST
         }
       }
 
@@ -85,7 +85,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         lazy val result: Result = await(TestNRSController.submitNRS("999999999")(FakeRequest().withJsonBody(Json.toJson(correctModel))))
 
-        "return a status of 500 (ISE)" in {
+        "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
           setupMockNrsReceiptSubmission(correctModel)(Left(Error("bad code", "bad reason")))
           status(result) shouldBe Status.BAD_REQUEST
