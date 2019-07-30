@@ -36,7 +36,7 @@ class NrsSubmissionServiceSpec extends SpecBase with MockitoSugar {
       "anId", "anEvent", AppJson, None, None, LocalDateTime.now(), IdentityData(
         credentials = IdentityCredentials("someId", "someType"), confidenceLevel = 200, name = IdentityName("Dovah", "Kin"),
         agentInformation = IdentityAgentInformation("asdf", "Dragon Born", "FusRohDah"), itmpName = IdentityItmpName("Never ganna", "give you", "up"),
-        itmpAddress = IdentityItmpAddress("WOAH", "WH04NOWS", "WHERE", "WH"), loginTimes = IdentityLoginTimes(LocalDateTime.now(), LocalDateTime.now())
+        itmpAddress = IdentityItmpAddress("WOAH", "WH04NOWS", "WHERE", "WH"), loginTimes = IdentityLoginTimes(LocalDateTime.now(), Some(LocalDateTime.now()))
       ), "someToken", Map(), SearchKeys("asdf", "Renaissance"), None
     )
   )

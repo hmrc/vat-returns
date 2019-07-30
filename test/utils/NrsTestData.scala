@@ -181,7 +181,7 @@ object NrsTestData {
       IdentityItmpAddress("Line 1", "NW94HD", "United Kingdom", "UK"), Some("Agent"), Some("strong"),
       IdentityLoginTimes(
         LocalDateTime.ofInstant(Instant.parse("2016-11-27T09:00:00.000Z"), ZoneId.of("UTC")),
-        LocalDateTime.ofInstant(Instant.parse("2016-11-01T12:00:00.000Z"), ZoneId.of("UTC"))
+        Some(LocalDateTime.ofInstant(Instant.parse("2016-11-01T12:00:00.000Z"), ZoneId.of("UTC")))
       )
     )
   }

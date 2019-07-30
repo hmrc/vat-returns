@@ -31,7 +31,7 @@ object NrsModelAssets {
   val payloadContentType = PayloadContentType("text/html")
   val nrSubmissionId = "2dd537bc-4244-4ebf-bac9-96321be13cdc"
 
-  val genericTime = LocalDateTime.of(1986, Month.APRIL, 8, 12, 30)
+  val genericTime: LocalDateTime = LocalDateTime.of(1986, Month.APRIL, 8, 12, 30)
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm")
 
   val credentials = IdentityCredentials("providerId", "providerType")
@@ -39,7 +39,7 @@ object NrsModelAssets {
   val identityAgentInfo = IdentityAgentInformation("TZRXXV", "Bob the Raccoon and pals", "BDGL")
   val itmpName = IdentityItmpName("Bob", "The", "Raccoon")
   val itmpAddress = IdentityItmpAddress("Burglarton", "RC1 0ON", "USA", "US")
-  val loginTimes = IdentityLoginTimes(genericTime, genericTime)
+  val loginTimes = IdentityLoginTimes(genericTime, Some(genericTime))
 
   val identityData: IdentityData = IdentityData(
     None,

@@ -36,7 +36,7 @@ class IdentityLoginTimesSpec extends SpecBase {
 
   val correctModel: IdentityLoginTimes = IdentityLoginTimes(
     currentDateTimeToUse,
-    previousDateTimeToUse
+    Some(previousDateTimeToUse)
   )
 
   "Formats" should {
