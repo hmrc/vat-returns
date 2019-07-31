@@ -41,7 +41,7 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
 
     requestAsJson match {
       case Some(model) => nrsSubmissionService.nrsReceiptSubmission(model) map {
-        case Right(successModel) => Ok(Json.toJson(successModel))
+        case Right(successModel) => Accepted(Json.toJson(successModel))
         case Left(error) =>
           Logger.debug(s"[NRSController][submitNRS] - request body contains incorrect model. Body: ${request.body}")
           Logger.warn("[NRSController][submitNRS] - request body contains incorrect model")
