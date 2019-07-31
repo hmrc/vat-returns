@@ -50,10 +50,10 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         lazy val result = await(TestNRSController.submitNRS("999999999")(FakeRequest().withJsonBody(Json.toJson(correctModel))))
 
-        "return a status of 200 (OK)" in {
+        "return a status of 202 (ACCEPTED)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
           setupMockNrsReceiptSubmission(correctModel)(Right(NrsReceiptSuccessModel("1234")))
-          status(result) shouldBe Status.OK
+          status(result) shouldBe Status.ACCEPTED
         }
 
         "return a json body with the transformed des return data" in {
