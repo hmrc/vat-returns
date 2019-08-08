@@ -35,10 +35,11 @@ object NrsModelAssets {
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm")
 
   val credentials = IdentityCredentials("providerId", "providerType")
-  val name = IdentityName("Bob", "Raccoon")
-  val identityAgentInfo = IdentityAgentInformation("TZRXXV", "Bob the Raccoon and pals", "BDGL")
-  val itmpName = IdentityItmpName("Bob", "The", "Raccoon")
-  val itmpAddress = IdentityItmpAddress("Burglarton", "RC1 0ON", "USA", "US")
+  val name = IdentityName(Some("Test"), Some("Name"))
+  val identityAgentInfo = IdentityAgentInformation(
+    agentCode = Some("TZRXXV"), agentFriendlyName = Some("Agent Name"), agentId = Some("BDGL"))
+  val itmpName = IdentityItmpName(givenName = Some("Bob"), middleName = Some("Middle Name"), familyName = Some("Last Name"))
+  val itmpAddress = IdentityItmpAddress(line1 = Some("Burglarton"), postCode = Some("RC1 0ON"), countryName = Some("USA"), countryCode = Some("US"))
   val loginTimes = IdentityLoginTimes(genericTime, Some(genericTime))
 
   val identityData: IdentityData = IdentityData(

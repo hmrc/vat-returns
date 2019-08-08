@@ -19,8 +19,8 @@ package models.nrs.identityData
 import play.api.libs.json.{Json, OFormat}
 
 case class IdentityName(
-                         name: String,
-                         lastName: String
+                         name: Option[String] = None,
+                         lastName: Option[String] = None
                        )
 
 object IdentityName {

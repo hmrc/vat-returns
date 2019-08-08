@@ -19,10 +19,10 @@ package models.nrs.identityData
 import play.api.libs.json.{Json, OFormat}
 
 case class IdentityItmpAddress(
-                                line1: String,
-                                postCode: String,
-                                countryName: String,
-                                countryCode: String
+                                line1: Option[String] = None,
+                                postCode: Option[String] = None,
+                                countryName: Option[String] = None,
+                                countryCode: Option[String] = None
                               )
 
 object IdentityItmpAddress {

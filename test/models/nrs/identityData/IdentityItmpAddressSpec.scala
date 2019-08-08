@@ -22,17 +22,17 @@ import base.SpecBase
 class IdentityItmpAddressSpec extends SpecBase {
 
   val correctJson: JsObject = Json.obj(
-    "line1" -> "Ishguard",
+    "line1" -> "123 Test Lane",
     "postCode" -> "CW00F",
-    "countryName" -> "Coerthas",
-    "countryCode" -> "ISH"
+    "countryName" -> "England",
+    "countryCode" -> "EN"
   )
 
   val correctModel: IdentityItmpAddress = IdentityItmpAddress(
-    "Ishguard",
-    "CW00F",
-    "Coerthas",
-    "ISH"
+    line1 = Some("123 Test Lane"),
+    postCode = Some("CW00F"),
+    countryName = Some("England"),
+    countryCode = Some("EN")
   )
 
   "Formats" should {

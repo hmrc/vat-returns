@@ -19,9 +19,9 @@ package models.nrs
 import play.api.libs.json.{Json, OFormat}
 
 case class NrsReceiptRequestModel(
-                            payload: String,
-                            metadata: Metadata
-                          )
+                                   payload: String,
+                                   metadata: Metadata
+                                 )
 
 object NrsReceiptRequestModel {
   implicit val formats: OFormat[NrsReceiptRequestModel] = Json.format[NrsReceiptRequestModel]

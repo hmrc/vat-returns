@@ -22,11 +22,11 @@ import play.api.libs.json.{JsObject, Json}
 class IdentityNameSpec extends SpecBase {
 
   val correctJson: JsObject = Json.obj(
-    "name" -> "Warrior",
-    "lastName" -> "Light"
+    "name" -> "First",
+    "lastName" -> "Last"
   )
 
-  val correctModel = IdentityName("Warrior", "Light")
+  val correctModel = IdentityName(name = Some("First"), lastName = Some("Last"))
 
   "Formats" should {
     "correctly parse from json" in {

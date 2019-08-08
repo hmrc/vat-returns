@@ -31,13 +31,40 @@ import scala.concurrent.Future
 
 class NrsSubmissionServiceSpec extends SpecBase with MockitoSugar {
   val requestModel: NrsReceiptRequestModel = NrsReceiptRequestModel(
-    "aString",
-    Metadata(
-      "anId", "anEvent", AppJson, None, None, LocalDateTime.now(), IdentityData(
-        credentials = IdentityCredentials("someId", "someType"), confidenceLevel = 200, name = IdentityName("Dovah", "Kin"),
-        agentInformation = IdentityAgentInformation("asdf", "Dragon Born", "FusRohDah"), itmpName = IdentityItmpName("Never ganna", "give you", "up"),
-        itmpAddress = IdentityItmpAddress("WOAH", "WH04NOWS", "WHERE", "WH"), loginTimes = IdentityLoginTimes(LocalDateTime.now(), Some(LocalDateTime.now()))
-      ), "someToken", Map(), SearchKeys("asdf", "Renaissance"), None
+    payload = "aString",
+    metadata = Metadata(
+      businessId = "anId",
+      notableEvent = "anEvent",
+      payloadContentType = AppJson,
+      payloadSha256Checksum = None,
+      nrSubmissionId = None,
+      userSubmissionTimestamp = LocalDateTime.now(),
+      identityData = IdentityData(
+        credentials = IdentityCredentials("someId", "someType"),
+        confidenceLevel = 200,
+        name = IdentityName(Some("First"), Some("Last")),
+        agentInformation = IdentityAgentInformation(
+          agentCode = Some("Agent Code"),
+          agentFriendlyName = Some("Agent Name"),
+          agentId = Some("AGNT")
+        ),
+        itmpName = IdentityItmpName(
+          givenName = Some("Given"),
+          middleName = Some("Middle"),
+          familyName = Some("Last")
+        ),
+        itmpAddress = IdentityItmpAddress(
+          line1 = Some("Line 1"),
+          postCode = Some("LN11NE"),
+          countryName = Some("ENGLAND"),
+          countryCode = Some("EN")
+        ),
+        loginTimes = IdentityLoginTimes(LocalDateTime.now(), Some(LocalDateTime.now()))
+      ),
+      userAuthToken = "someToken",
+      headerData = Map(),
+      searchKeys = SearchKeys("VRN", "123456789"),
+      receiptData = None
     )
   )
 

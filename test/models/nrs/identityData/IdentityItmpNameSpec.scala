@@ -22,15 +22,15 @@ import base.SpecBase
 class IdentityItmpNameSpec extends SpecBase {
 
   val correctJson: JsObject = Json.obj(
-    "givenName" -> "Minfillia",
-    "middleName" -> "Lyse",
-    "familyName" -> "plOx"
+    "givenName" -> "First",
+    "middleName" -> "Middle",
+    "familyName" -> "Last"
   )
 
   val correctModel: IdentityItmpName = IdentityItmpName(
-    "Minfillia",
-    "Lyse",
-    "plOx"
+    givenName = Some("First"),
+    middleName = Some("Middle"),
+    familyName = Some("Last")
   )
 
   "Formats" should {
