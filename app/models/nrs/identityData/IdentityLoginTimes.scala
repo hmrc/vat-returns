@@ -23,7 +23,7 @@ import play.api.libs.json._
 
 case class IdentityLoginTimes(
                                currentLogin: LocalDateTime,
-                               previousLogin: LocalDateTime
+                               previousLogin: Option[LocalDateTime]
                              )
 
 object IdentityLoginTimes {
@@ -40,8 +40,11 @@ object IdentityLoginTimes {
 
   implicit val writes: Writes[IdentityLoginTimes] = Writes[IdentityLoginTimes] { model =>
     Json.obj(
-      "currentLogin" -> parseDatesAsString(model.currentLogin),
-      "previousLogin" -> parseDatesAsString(model.previousLogin)
+      "currentLogin" -> parseDatesAsString(model.currentLogin)
+    ) ++ model.previousLogin.fold(
+      Json.obj()
+    )(
+      result => Json.obj("previousLogin" -> parseDatesAsString(result))
     )
   }
 
@@ -50,10 +53,12 @@ object IdentityLoginTimes {
 
   implicit val reads: Reads[IdentityLoginTimes] = for {
     currentLoginString <- currentLoginPath.read[String]
-    previousLoginString <- previousLoginPath.read[String]
+    previousLoginString <- previousLoginPath.readNullable[String]
   } yield {
     val currentLogin = LocalDateTime.ofInstant(Instant.parse(currentLoginString), zoneId)
-    val previousLogin = LocalDateTime.ofInstant(Instant.parse(previousLoginString), zoneId)
+    val previousLogin = previousLoginString.map { dateString =>
+      LocalDateTime.ofInstant(Instant.parse(dateString), zoneId)
+    }
 
     IdentityLoginTimes(currentLogin, previousLogin)
   }
