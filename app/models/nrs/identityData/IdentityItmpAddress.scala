@@ -20,6 +20,10 @@ import play.api.libs.json.{Json, OFormat}
 
 case class IdentityItmpAddress(
                                 line1: Option[String] = None,
+                                line2: Option[String] = None,
+                                line3: Option[String] = None,
+                                line4: Option[String] = None,
+                                line5: Option[String] = None,
                                 postCode: Option[String] = None,
                                 countryName: Option[String] = None,
                                 countryCode: Option[String] = None

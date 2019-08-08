@@ -40,9 +40,9 @@ class NrsSubmissionServiceSpec extends SpecBase with MockitoSugar {
       nrSubmissionId = None,
       userSubmissionTimestamp = LocalDateTime.now(),
       identityData = IdentityData(
-        credentials = IdentityCredentials("someId", "someType"),
+        credentials = Some(IdentityCredentials("someId", "someType")),
         confidenceLevel = 200,
-        name = IdentityName(Some("First"), Some("Last")),
+        name = Some(IdentityName(Some("First"), Some("Last"))),
         agentInformation = IdentityAgentInformation(
           agentCode = Some("Agent Code"),
           agentFriendlyName = Some("Agent Name"),

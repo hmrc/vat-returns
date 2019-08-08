@@ -169,17 +169,17 @@ object NrsTestData {
       internalId = Some("some-id"),
       externalId = Some("some-id"),
       agentCode = Some("TZRXXV"),
-      credentials = IdentityCredentials(
+      credentials = Some(IdentityCredentials(
         providerId = "12345-credId",
         providerType = "GovernmentGateway"
-      ),
+      )),
       confidenceLevel = 200,
       nino = Some("DH00475D"),
       saUtr = Some("Utr"),
-      name = IdentityName(
+      name = Some(IdentityName(
         name = Some("test"),
         lastName = Some("test")
-      ),
+      )),
       dateOfBirth = Some(LocalDate.parse("1985-01-01")),
       email = Some("test@test.com"),
       agentInformation = IdentityAgentInformation(

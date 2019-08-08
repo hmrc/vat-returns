@@ -228,9 +228,7 @@ Status | Error codes
 * metadata.**nrSubmissionId** (v4 UUID) - globally unique identifier for this NRS submission
 * metadata.**userSubmissionTimestamp** (JSON timestamp format "YYYY-MM-ddTHH:mm:ss.SSSZ") - the date and time the user submitted the information
 * metadata.**identityData** (JSON object) - the identity of the individual making the submission. The mandatory fields within **identityData** are:
-    * credentials
     * confidenceLevel
-    * name
     * agentInformation
     * itmpName
     * itmpAddress

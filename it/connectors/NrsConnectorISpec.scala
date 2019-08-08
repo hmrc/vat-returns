@@ -18,23 +18,23 @@ package connectors
 
 import java.time.LocalDateTime
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import config.{AppConfig, MicroserviceAppConfig}
-import helpers.{ComponentSpecBase, WireMockHelper}
+import config.MicroserviceAppConfig
 import helpers.servicemocks.NrsStub._
+import helpers.{ComponentSpecBase, WireMockHelper}
 import javax.inject.Inject
 import models.Error
 import models.nrs._
 import models.nrs.identityData._
-import play.api.{Configuration, Environment}
 import play.api.http.Status._
 import play.api.libs.json.Json
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MockAppConfig @Inject()(override val environment: Environment, implicit val configuration: Configuration)
   extends MicroserviceAppConfig(environment, configuration) {
+
   import WireMockHelper._
 
   override val nrsSubmissionEndpoint: String = s"$url/submission"
@@ -53,9 +53,9 @@ class NrsConnectorISpec extends ComponentSpecBase {
       nrSubmissionId = None,
       userSubmissionTimestamp = LocalDateTime.now(),
       identityData = IdentityData(
-        credentials = IdentityCredentials("someId", "someType"),
+        credentials = Some(IdentityCredentials("someId", "someType")),
         confidenceLevel = 200,
-        name = IdentityName(Some("First"), Some("Last")),
+        name = Some(IdentityName(Some("First"), Some("Last"))),
         agentInformation = IdentityAgentInformation(
           agentCode = Some("Agent Code"),
           agentFriendlyName = Some("Agent Name"),
@@ -76,7 +76,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       ),
       userAuthToken = "someToken",
       headerData = Map(),
-      searchKeys = SearchKeys("VRN", "123456789"),
+      searchKeys = SearchKeys("123456789", "18AA"),
       receiptData = None
     )
   )
@@ -153,8 +153,10 @@ class NrsConnectorISpec extends ComponentSpecBase {
         result shouldBe Left(expectedResponse)
       }
       "a 5xx is received" in {
-        val expectedResponse = Error(INTERNAL_SERVER_ERROR, s"Returning response body:\n${Json.toJson(Error(CHECKSUM_FAILED,
-          "This model doesn't really matter here"))}")
+        val expectedResponse = Error(INTERNAL_SERVER_ERROR, s"Returning response body:\n${
+          Json.toJson(Error(CHECKSUM_FAILED,
+            "This model doesn't really matter here"))
+        }")
 
         stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), "not-a-key")
 
@@ -166,8 +168,10 @@ class NrsConnectorISpec extends ComponentSpecBase {
         result shouldBe Left(expectedResponse)
       }
       "any other code is received" in {
-        val expectedResponse = Error(GONE, s"Unexpected return code, returning response body:\n${Json.toJson(Error(SEE_OTHER,
-          "Where did they come from, where did they go?"))}")
+        val expectedResponse = Error(GONE, s"Unexpected return code, returning response body:\n${
+          Json.toJson(Error(SEE_OTHER,
+            "Where did they come from, where did they go?"))
+        }")
 
         stubSubmissionResponse(GONE, Left(Error(SEE_OTHER, "Where did they come from, where did they go?")), "not-a-key")
 
@@ -206,7 +210,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "all values are valid" in {
         val successResponse: NrsReceiptSuccessModel = NrsReceiptSuccessModel("submission successful")
 
-        stubSubmissionResponse(ACCEPTED, Right(successResponse), "not-a-key", vrn = Some("asdf"))
+        stubSubmissionResponse(ACCEPTED, Right(successResponse), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
@@ -221,7 +225,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the request parameters are invalid (BAD_REQUEST)" in {
         val expectedResponse = Error(BAD_REQUEST, "Request parameters are invalid")
 
-        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "This model doesn't really matter here")), "not-a-key", vrn = Some("asdf"))
+        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "Bad Request")), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
@@ -230,10 +234,11 @@ class NrsConnectorISpec extends ComponentSpecBase {
 
         result shouldBe Left(expectedResponse)
       }
+
       "the API key is wrong (UNAUTHORIZED)" in {
         val expectedResponse = Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing.")
 
-        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "This model doesn't really matter here")), "not-a-key", vrn = Some("asdf"))
+        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "Unauthorized")), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
@@ -242,10 +247,11 @@ class NrsConnectorISpec extends ComponentSpecBase {
 
         result shouldBe Left(expectedResponse)
       }
+
       "NRS is not available (NOT_FOUND)" in {
-        val expectedResponse = Error(NOT_FOUND, s"Returning response body:\n${Json.toJson(Error(NOT_FOUND, "This model doesn't really matter here"))}")
+        val expectedResponse = Error(NOT_FOUND, s"Returning response body:\n${Json.toJson(Error(NOT_FOUND, "Not Found"))}")
 
-        stubSubmissionResponse(NOT_FOUND, Left(Error(NOT_FOUND, "This model doesn't really matter here")), "not-a-key", vrn = Some("asdf"))
+        stubSubmissionResponse(NOT_FOUND, Left(Error(NOT_FOUND, "Not Found")), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
@@ -254,10 +260,11 @@ class NrsConnectorISpec extends ComponentSpecBase {
 
         result shouldBe Left(expectedResponse)
       }
+
       "the checksum fails (Custom 419)" in {
         val expectedResponse = Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum.")
 
-        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), "not-a-key", vrn = Some("asdf"))
+        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "Checksum failure")), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
@@ -266,11 +273,15 @@ class NrsConnectorISpec extends ComponentSpecBase {
 
         result shouldBe Left(expectedResponse)
       }
+
       "a 5xx is received" in {
-        val expectedResponse = Error(INTERNAL_SERVER_ERROR, s"Returning response body:\n${Json.toJson(Error(CHECKSUM_FAILED,
-          "This model doesn't really matter here"))}")
+        val expectedResponse = Error(INTERNAL_SERVER_ERROR, s"Returning response body:\n${
+          Json.toJson(Error(CHECKSUM_FAILED,
+            "Checksum failure"))
+        }")
 
-        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), "not-a-key", vrn = Some("asdf"))
+        stubSubmissionResponse(INTERNAL_SERVER_ERROR,
+          Left(Error(CHECKSUM_FAILED, "Checksum failure")), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
@@ -279,11 +290,14 @@ class NrsConnectorISpec extends ComponentSpecBase {
 
         result shouldBe Left(expectedResponse)
       }
-      "any other code is received" in {
-        val expectedResponse = Error(GONE, s"Unexpected return code, returning response body:\n${Json.toJson(Error(SEE_OTHER,
-          "Where did they come from, where did they go?"))}")
 
-        stubSubmissionResponse(GONE, Left(Error(SEE_OTHER, "Where did they come from, where did they go?")), "not-a-key", vrn = Some("asdf"))
+      "any other code is received" in {
+        val expectedResponse = Error(GONE, s"Unexpected return code, returning response body:\n${
+          Json.toJson(Error(SEE_OTHER,
+            "Redirection Error"))
+        }")
+
+        stubSubmissionResponse(GONE, Left(Error(SEE_OTHER, "Redirection Error")), "not-a-key", vrn = Some("123456789"))
 
         val result = {
           mockConfig.features.useStubFeature(true)
