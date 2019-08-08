@@ -254,6 +254,7 @@ Status | Error codes
 * metadata.**payloadSha256Checksum**
 * metadata.**nrSubmissionId**
 * metadata.**receiptData**
+* metadata.identityData.loginTimes.**previousLogin**
 
 If **recepitData** is included then the following fields within receiptData are optional:
 * metadata.receiptData.checkYourAnswersSections[n].data.**questionId**
