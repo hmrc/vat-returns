@@ -22,13 +22,13 @@ import play.api.libs.json.{JsObject, Json}
 class IdentityMdtpInformationSpec extends SpecBase {
 
   val correctJson: JsObject = Json.obj(
-    "deviceId" -> "WATEVENISTHIS",
-    "sessionId" -> "667573726F68646168"
+    "deviceId" -> "deviceId",
+    "sessionId" -> "sessionId"
   )
 
   val correctModel = IdentityMdtpInformation(
-    "WATEVENISTHIS",
-    "667573726F68646168"
+    deviceId = "deviceId",
+    sessionId = "sessionId"
   )
 
   "Formats" should {

@@ -23,14 +23,14 @@ class IdentityAgentInformationSpec extends SpecBase {
 
   val correctJson: JsObject = Json.obj(
     "agentCode" -> "SOT7D",
-    "agentFriendlyName" -> "Scions of the Seventh Dawn",
+    "agentFriendlyName" -> "ID Agent Name",
     "agentId" -> "SOEZ"
   )
 
   val correctModel = IdentityAgentInformation(
-    "SOT7D",
-    "Scions of the Seventh Dawn",
-    "SOEZ"
+    agentCode = Some("SOT7D"),
+    agentFriendlyName = Some("ID Agent Name"),
+    agentId = Some("SOEZ")
   )
 
   "Formats" should {

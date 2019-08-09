@@ -30,38 +30,34 @@ object NrsTestData {
     object MockJson {
       val correctJsonSingleLineAnswer: JsObject = Json.obj(
         "questionId" -> "00192IIO",
-        "question" -> "WHERE ARE THEY!?!?!",
-        "answer" -> "WAHOO WAHAHAHAHA You have nothing, nothing to threaten me with"
+        "question" -> "What is your name?",
+        "answer" -> "Test User"
       )
 
       val correctJsonMultiLineAnswer: JsObject = Json.obj(
         "questionId" -> "00192IID",
-        "question" -> "What's your name, traveller?",
+        "question" -> "Where are you from?",
         "answers" -> Json.arr(
-          "Hang on, let me choose my race",
-          "And then my gender",
-          "I suppose I'll change my entire facial structure",
-          "Oh, and my name is..."
+          "Hang on, let me just think",
+          "Oh, I'm from Test Lane"
         )
       )
     }
 
     object Models {
       val correctModelSingleLineAnswer: Answer = Answer(
-        "00192IIO",
-        "WHERE ARE THEY!?!?!",
-        Some("WAHOO WAHAHAHAHA You have nothing, nothing to threaten me with")
+        questionId = "00192IIO",
+        question = "What is your name?",
+        answer = Some("Test User")
       )
 
       val correctModelMultiLineAnswer: Answer = Answer(
-        "00192IID",
-        "What's your name, traveller?",
-        None,
-        Some(Seq(
-          "Hang on, let me choose my race",
-          "And then my gender",
-          "I suppose I'll change my entire facial structure",
-          "Oh, and my name is..."
+        questionId = "00192IID",
+        question = "Where are you from?",
+        answer = None,
+        answers = Some(Seq(
+          "Hang on, let me just think",
+          "Oh, I'm from Test Lane"
         ))
       )
     }
@@ -70,25 +66,25 @@ object NrsTestData {
 
   object AnswersTestData {
     val correctJson: JsObject = Json.obj(
-      "title" -> "Things Batman says and does",
+      "title" -> "Test Title",
       "data" -> Json.arr(
         AnswerTestData.MockJson.correctJsonSingleLineAnswer,
         Json.obj(
           "questionId" -> "00192IIP",
-          "question" -> "Who are y-",
-          "answer" -> "I'M BATAMAAAAAAAAAAAN!!!!!!!"
+          "question" -> "Who are you?",
+          "answer" -> "Test User 2"
         )
       )
     )
 
     val correctModel: Answers = Answers(
-      "Things Batman says and does",
-      Seq(
+      title = "Test Title",
+      data = Seq(
         AnswerTestData.Models.correctModelSingleLineAnswer,
         Answer(
-          "00192IIP",
-          "Who are y-",
-          Some("I'M BATAMAAAAAAAAAAAN!!!!!!!")
+          questionId = "00192IIP",
+          question = "Who are you?",
+          answer = Some("Test User 2")
         )
       )
     )
@@ -99,16 +95,16 @@ object NrsTestData {
       """
         |{
         | "declarationText": "I confirm the data...",
-        | "declarationName": "Scarlett Flamberg",
-        | "declarationRole": "Warrior of Light",
+        | "declarationName": "Test User",
+        | "declarationRole": "Financial Director",
         | "declarationConsent": true
         |}
       """.stripMargin)
 
     val correctModel: Declaration = Declaration(
-      "I confirm the data...",
-      "Scarlett Flamberg",
-      Some("Warrior of Light"),
+      declarationText = "I confirm the data...",
+      declarationName = "Test User",
+      declarationRole = Some("Financial Director"),
       declarationConsent = true
     )
   }
@@ -170,16 +166,49 @@ object NrsTestData {
         |}""".stripMargin)
 
     val correctModel: IdentityData = IdentityData(
-      Some("some-id"), Some("some-id"), Some("TZRXXV"),
-      IdentityCredentials("12345-credId", "GovernmentGateway"),
-      200, Some("DH00475D"), Some("Utr"),
-      IdentityName("test", "test"),
-      Some(LocalDate.parse("1985-01-01")), Some("test@test.com"),
-      IdentityAgentInformation("TZRXXV", "Bodgitt & Legget LLP", "BDGL"), Some("GroupId"), Some("admin"),
-      Some(IdentityMdtpInformation("DeviceId", "SessionId")),
-      IdentityItmpName("test", "test", "test"), Some(LocalDate.parse("1985-01-01")),
-      IdentityItmpAddress("Line 1", "NW94HD", "United Kingdom", "UK"), Some("Agent"), Some("strong"),
-      IdentityLoginTimes(
+      internalId = Some("some-id"),
+      externalId = Some("some-id"),
+      agentCode = Some("TZRXXV"),
+      credentials = Some(IdentityCredentials(
+        providerId = "12345-credId",
+        providerType = "GovernmentGateway"
+      )),
+      confidenceLevel = 200,
+      nino = Some("DH00475D"),
+      saUtr = Some("Utr"),
+      name = Some(IdentityName(
+        name = Some("test"),
+        lastName = Some("test")
+      )),
+      dateOfBirth = Some(LocalDate.parse("1985-01-01")),
+      email = Some("test@test.com"),
+      agentInformation = IdentityAgentInformation(
+        agentCode = Some("TZRXXV"),
+        agentFriendlyName = Some("Bodgitt & Legget LLP"),
+        agentId = Some("BDGL")
+      ),
+      groupIdentifier = Some("GroupId"),
+      credentialRole = Some("admin"),
+      mdtpInformation = Some(
+        IdentityMdtpInformation(
+          deviceId = "DeviceId",
+          sessionId = "SessionId")
+      ),
+      itmpName = IdentityItmpName(
+        givenName = Some("test"),
+        middleName = Some("test"),
+        familyName = Some("test")
+      ),
+      itmpDateOfBirth = Some(LocalDate.parse("1985-01-01")),
+      itmpAddress = IdentityItmpAddress(
+        line1 = Some("Line 1"),
+        postCode = Some("NW94HD"),
+        countryName = Some("United Kingdom"),
+        countryCode = Some("UK")
+      ),
+      affinityGroup = Some("Agent"),
+      credentialStrength = Some("strong"),
+      loginTimes = IdentityLoginTimes(
         LocalDateTime.ofInstant(Instant.parse("2016-11-27T09:00:00.000Z"), ZoneId.of("UTC")),
         Some(LocalDateTime.ofInstant(Instant.parse("2016-11-01T12:00:00.000Z"), ZoneId.of("UTC")))
       )

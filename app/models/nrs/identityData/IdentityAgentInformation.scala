@@ -19,9 +19,9 @@ package models.nrs.identityData
 import play.api.libs.json.{Json, OFormat}
 
 case class IdentityAgentInformation(
-                                     agentCode: String,
-                                     agentFriendlyName: String,
-                                     agentId: String
+                                     agentCode: Option[String] = None,
+                                     agentFriendlyName: Option[String] = None,
+                                     agentId: Option[String] = None
                                    )
 
 object IdentityAgentInformation {
