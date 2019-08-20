@@ -18,13 +18,13 @@ package controllers
 
 import controllers.actions.AuthorisedSubmitVatReturn
 import javax.inject.{Inject, Singleton}
+import models.Error
 import models.nrs.NrsReceiptRequestModel
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, AnyContent, Result}
 import services.NrsSubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
-import models.Error
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,25 +34,29 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
                              (implicit ec: ExecutionContext) extends BaseController {
 
   def submitNRS(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
-    val requestAsJson: Option[NrsReceiptRequestModel] = request.body.asJson match {
-      case Some(validJson) => validJson.asOpt[NrsReceiptRequestModel]
-      case None => None
-    }
 
-    requestAsJson match {
-      case Some(model) => nrsSubmissionService.nrsReceiptSubmission(model) map {
-        case Right(successModel) =>
-          Logger.debug("[NRSController][submitNRS] - successful post to NRS")
-          Accepted(Json.toJson(successModel))
-        case Left(error) =>
-          Logger.debug(s"[NRSController][submitNRS] - request body contains incorrect model. Body: ${request.body}")
-          Logger.warn("[NRSController][submitNRS] - request body contains incorrect model")
-          handleError(error)
-      }
+    request.body.asJson match {
+      case Some(json) =>
+        json.validate[NrsReceiptRequestModel] match {
+          case JsSuccess(model, _) =>
+            nrsSubmissionService.nrsReceiptSubmission(model) map {
+              case Right(successModel) =>
+                Logger.debug("[NRSController][submitNRS] - successful post to NRS")
+                Accepted(Json.toJson(successModel))
+              case Left(error) =>
+                Logger.debug(s"[NRSController][submitNRS] - request body to NRS contains incorrect JSON. Request body: ${request.body}")
+                Logger.warn("[NRSController][submitNRS] - request body to NRS contains incorrect JSON")
+                handleError(error)
+            }
+          case JsError(error) =>
+            Logger.debug(s"[NRSController][submitNRS] - request body from submit-vat-return-frontend does not pass validation: $error")
+            Logger.warn(s"[NRSController][submitNRS] - request body from submit-vat-return-frontend does not pass validation")
+            Future.successful(BadRequest("Request body from submit-vat-return-frontend does not pass validation"))
+        }
       case None =>
-        Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to Json. Body: ${request.body}")
-        Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to Json")
-        Future.successful(BadRequest("Request body from submit-vat-return-frontend cannot be parsed."))
+        Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to JSON. Body: ${request.body}")
+        Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to JSON")
+        Future.successful(BadRequest("Request body from submit-vat-return-frontend cannot be parsed to JSON."))
     }
   }
 

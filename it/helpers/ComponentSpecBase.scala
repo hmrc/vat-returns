@@ -17,13 +17,12 @@
 package helpers
 
 import akka.stream.Materializer
-import binders.VatReturnsBinders
-import models.VatReturnFilters
+import config.MicroserviceAppConfig
 import org.scalatest._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Writes}
+import play.api.libs.json.JsValue
 import play.api.libs.ws.WSResponse
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -42,6 +41,7 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val mat: Materializer = app.injector.instanceOf[Materializer]
+  lazy val mockAppConfig: MicroserviceAppConfig = app.injector.instanceOf[MicroserviceAppConfig]
 
   def config: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
@@ -50,7 +50,9 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
     "microservice.services.des.endpoints.vatReturnsUrlStart" -> mockEndpointStart,
     "microservice.services.des.endpoints.submitVatReturn" -> mockSubmitVatReturn,
     "microservice.services.des.environment" -> mockEnvironment,
-    "microservice.services.des.authorization-token" -> mockToken
+    "microservice.services.des.authorization-token" -> mockToken,
+    "microservice.services.nrs.receipts.host" -> s"http://$mockHost",
+    "microservice.services.nrs.receipts.port" -> mockPort
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
@@ -60,6 +62,7 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    mockAppConfig.features.useStubFeature(true)
     startWireMock()
   }
 

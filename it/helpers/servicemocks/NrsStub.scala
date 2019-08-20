@@ -26,9 +26,11 @@ import play.api.http.Status.ACCEPTED
 import play.api.libs.json.Json
 
 object NrsStub extends WireMockMethods {
-  private def uri(vrn: Option[String]) = "/submission" + vrn.fold("")(vrnValue => s"/$vrnValue")
 
-  def stubSubmissionResponse(status: Int, response: Either[Error, NrsReceiptSuccessModel], apiKey: String, vrn: Option[String] = None): StubMapping = {
+  private val vrn = "123456789"
+  private def uri(vrn: String) = s"/submission/$vrn"
+
+  def stubSubmissionResponse(status: Int, response: Either[Error, NrsReceiptSuccessModel], apiKey: String, vrn: String = vrn): StubMapping = {
     when(POST, uri(vrn), Map(
       "Content-Type" -> AppJson,
       "X-API-Key" -> apiKey
@@ -37,7 +39,7 @@ object NrsStub extends WireMockMethods {
     )
   }
 
-  def stubTimeoutResponse(vrn: Option[String] = None): StubMapping = {
+  def stubTimeoutResponse(vrn: String = vrn): StubMapping = {
     stubFor(
       post(uri(vrn)).willReturn(
         aResponse()
@@ -48,7 +50,7 @@ object NrsStub extends WireMockMethods {
     )
   }
 
-  def stubExceptionResponse(vrn: Option[String] = None): StubMapping = {
+  def stubExceptionResponse(vrn: String = vrn): StubMapping = {
     stubFor(
       post(uri(vrn)).willReturn(
         aResponse()
@@ -56,5 +58,4 @@ object NrsStub extends WireMockMethods {
       )
     )
   }
-
 }

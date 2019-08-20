@@ -30,14 +30,18 @@ object NrsResponseParsers extends ResponseHttpParsers {
   private implicit def intToString: Int => String = _.toString
 
   def handleErrorCodes(input: HttpResponse): Left[Error, Nothing] = {
-    Logger.warn(s"[NrsResponseParsers][handleErrorCodes] Error returned from NRS: ${input.status}. Return body: ${input.body}")
+    Logger.debug(s"[NrsResponseParsers][handleErrorCodes] NRS returned ${input.status}. Body: ${input.body}")
+    Logger.warn(s"[NrsResponseParsers][handleErrorCodes] NRS returned ${input.status}.")
+
     input.status match {
-      case BAD_REQUEST => Left(Error(BAD_REQUEST, "Request parameters are invalid"))
-      case UNAUTHORIZED => Left(Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing."))
-      case CHECKSUM_FAILED => Left(Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum."))
-      case unknown500ErrorOr404 if unknown500ErrorOr404 == NOT_FOUND || (unknown500ErrorOr404 >= 500 && unknown500ErrorOr404 < 600) =>
-        Left(Error(unknown500ErrorOr404, "Returning response body:\n" + input.json))
-      case unknownReturnCode => Left(Error(unknownReturnCode, "Unexpected return code, returning response body:\n" + input.json))
+      case BAD_REQUEST =>
+        Left(Error(BAD_REQUEST, "Request parameters are invalid"))
+      case UNAUTHORIZED =>
+        Left(Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing."))
+      case CHECKSUM_FAILED =>
+        Left(Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum."))
+      case status =>
+        Left(Error(status, input.body))
     }
   }
 
