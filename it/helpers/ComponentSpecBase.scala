@@ -21,6 +21,7 @@ import config.MicroserviceAppConfig
 import org.scalatest._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.http.Writeable
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSResponse
@@ -71,7 +72,7 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
     super.afterAll()
   }
 
-  def post(path: String, headers: Map[String, String] = Map.empty)(body: JsValue): WSResponse =
+  def post[T](path: String, headers: Map[String, String] = Map.empty)(body: T)(implicit wrt: Writeable[T]): WSResponse =
     await(buildClient(path, headers).post(body))
 
   def get(uri: String): WSResponse = {

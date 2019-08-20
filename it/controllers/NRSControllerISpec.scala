@@ -17,7 +17,9 @@
 package controllers
 
 import helpers.ComponentSpecBase
+import helpers.servicemocks.AuthStub.{authResponse, otherEnrolment}
 import helpers.servicemocks.{AuthStub, NrsStub}
+import models.Error
 import models.nrs._
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -125,16 +127,45 @@ class NRSControllerISpec extends ComponentSpecBase {
 
         "NRS submission is unsuccessful" should {
 
-          "return error status code" in {
+          "return the original error status code and body returned from NRS" in {
 
+            AuthStub.stubResponse()
+            NrsStub.stubSubmissionResponse(SERVICE_UNAVAILABLE, Left(Error("503", "Error body")), "not-a-key")
+
+            val response = await(post("/nrs/submission/999999999")(validJson))
+
+            val expectedResponse = """"{"code":"503","reason":"Error body"}""""
+
+            response.status shouldBe 503
+
+            response.json.toString().replace("""\""", "") shouldBe expectedResponse
           }
         }
       }
 
-      "request body is invalid" should {
+      "request body cannot be parsed to JSON" should {
 
         "return BAD_REQUEST" in {
 
+          AuthStub.stubResponse()
+
+          val response = await(post("/nrs/submission/999999999")("just a string"))
+
+          response.status shouldBe 400
+          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body from submit-vat-return-frontend cannot be parsed to JSON.")
+        }
+      }
+
+      "request body is not valid as per spec" should {
+
+        "return BAD_REQUEST" in {
+
+          AuthStub.stubResponse()
+
+          val response = await(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid")))
+
+          response.status shouldBe 400
+          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body from submit-vat-return-frontend does not pass validation")
         }
       }
     }
@@ -143,6 +174,11 @@ class NRSControllerISpec extends ComponentSpecBase {
 
       "return UNAUTHORIZED" in {
 
+        AuthStub.stubResponse(OK, authResponse(otherEnrolment))
+
+        val response = await(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid")))
+
+        response.status shouldBe FORBIDDEN
       }
     }
   }

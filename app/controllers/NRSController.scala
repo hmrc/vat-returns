@@ -44,36 +44,19 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
                 Logger.debug("[NRSController][submitNRS] - successful post to NRS")
                 Accepted(Json.toJson(successModel))
               case Left(error) =>
-                Logger.debug(s"[NRSController][submitNRS] - request body to NRS contains incorrect JSON. Request body: ${request.body}")
-                Logger.warn("[NRSController][submitNRS] - request body to NRS contains incorrect JSON")
-                handleError(error)
+                Logger.debug(s"[NRSController][submitNRS] - NRS submission failed. Response body: ${error.reason}")
+                Logger.warn("[NRSController][submitNRS] - NRS submission failed.")
+                Status(error.code.toInt)(Json.toJson(error.reason))
             }
           case JsError(error) =>
             Logger.debug(s"[NRSController][submitNRS] - request body from submit-vat-return-frontend does not pass validation: $error")
             Logger.warn(s"[NRSController][submitNRS] - request body from submit-vat-return-frontend does not pass validation")
-            Future.successful(BadRequest("Request body from submit-vat-return-frontend does not pass validation"))
+            Future.successful(BadRequest(Json.toJson(Error("400", "Request body from submit-vat-return-frontend does not pass validation"))))
         }
       case None =>
         Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to JSON. Body: ${request.body}")
         Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to JSON")
-        Future.successful(BadRequest("Request body from submit-vat-return-frontend cannot be parsed to JSON."))
-    }
-  }
-
-  private def handleError(error: Error): Result = {
-    val CHECKSUM_FAILED = 419
-
-    try {
-      error.code.toInt match {
-        case BAD_REQUEST => BadRequest(error.reason)
-        case UNAUTHORIZED => Unauthorized(error.reason)
-        case CHECKSUM_FAILED => BadRequest(error.reason)
-        case unknown500ErrorOr404 if unknown500ErrorOr404 == NOT_FOUND || (unknown500ErrorOr404 >= 500 && unknown500ErrorOr404 < 600) =>
-          Status(unknown500ErrorOr404)(error.reason)
-        case _ => BadRequest(error.toJson)
-      }
-    } catch {
-      case _: Throwable => BadRequest(error.toJson)
+        Future.successful(BadRequest(Json.toJson(Error("400", "Request body from submit-vat-return-frontend cannot be parsed to JSON."))))
     }
   }
 }

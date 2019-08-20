@@ -20,6 +20,7 @@ import models.Error
 import models.nrs.NrsReceiptSuccessModel
 import play.api.Logger
 import play.api.http.Status._
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object NrsResponseParsers extends ResponseHttpParsers {
@@ -41,7 +42,7 @@ object NrsResponseParsers extends ResponseHttpParsers {
       case CHECKSUM_FAILED =>
         Left(Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum."))
       case status =>
-        Left(Error(status, input.body))
+        Left(Error(status, Json.stringify(input.json)))
     }
   }
 
