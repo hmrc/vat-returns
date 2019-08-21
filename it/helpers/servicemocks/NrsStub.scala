@@ -16,46 +16,25 @@
 
 package helpers.servicemocks
 
-import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
 import models.Error
 import models.nrs.{AppJson, NrsReceiptSuccessModel}
-import play.api.http.Status.ACCEPTED
 import play.api.libs.json.Json
 
 object NrsStub extends WireMockMethods {
 
-  private val vrn = "123456789"
-  private def uri(vrn: String) = s"/submission/$vrn"
+  private val defaultVrn = "123456789"
+  private def uri(vrn: Option[String]) = "/submission" + vrn.fold("")(vrnValue => s"/$vrnValue")
 
-  def stubSubmissionResponse(status: Int, response: Either[Error, NrsReceiptSuccessModel], apiKey: String, vrn: String = vrn): StubMapping = {
+  def stubSubmissionResponse(status: Int,
+                             response: Either[Error, NrsReceiptSuccessModel],
+                             vrn: Option[String] = Some(defaultVrn)): StubMapping = {
     when(POST, uri(vrn), Map(
       "Content-Type" -> AppJson,
-      "X-API-Key" -> apiKey
+      "X-API-Key" -> "not-a-key"
     )).thenReturn(
       status = status, body = response.fold(Json.toJson(_), Json.toJson(_))
-    )
-  }
-
-  def stubTimeoutResponse(vrn: String = vrn): StubMapping = {
-    stubFor(
-      post(uri(vrn)).willReturn(
-        aResponse()
-          .withFixedDelay(2000)
-          .withBody(Json.toJson(NrsReceiptSuccessModel("some-return")).toString())
-          .withStatus(ACCEPTED)
-      )
-    )
-  }
-
-  def stubExceptionResponse(vrn: String = vrn): StubMapping = {
-    stubFor(
-      post(uri(vrn)).willReturn(
-        aResponse()
-          .withFault(Fault.MALFORMED_RESPONSE_CHUNK)
-      )
     )
   }
 }

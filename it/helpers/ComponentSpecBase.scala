@@ -23,7 +23,6 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.http.Writeable
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.JsValue
 import play.api.libs.ws.WSResponse
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -63,13 +62,17 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    mockAppConfig.features.useStubFeature(true)
     startWireMock()
   }
 
   override def afterAll(): Unit = {
     stopWireMock()
     super.afterAll()
+  }
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    mockAppConfig.features.useStubFeature(true)
   }
 
   def post[T](path: String, headers: Map[String, String] = Map.empty)(body: T)(implicit wrt: Writeable[T]): WSResponse =

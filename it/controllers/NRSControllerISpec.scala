@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ class NRSControllerISpec extends ComponentSpecBase {
           "return ACCEPTED" in {
 
             AuthStub.stubResponse()
-            NrsStub.stubSubmissionResponse(ACCEPTED, Right(NrsReceiptSuccessModel("12345")), "not-a-key")
+            NrsStub.stubSubmissionResponse(ACCEPTED, Right(NrsReceiptSuccessModel("12345")))
 
             val response = await(post("/nrs/submission/999999999")(validJson))
 
@@ -130,7 +130,7 @@ class NRSControllerISpec extends ComponentSpecBase {
           "return the original error status code and body returned from NRS" in {
 
             AuthStub.stubResponse()
-            NrsStub.stubSubmissionResponse(SERVICE_UNAVAILABLE, Left(Error("503", "Error body")), "not-a-key")
+            NrsStub.stubSubmissionResponse(SERVICE_UNAVAILABLE, Left(Error("503", "Error body")))
 
             val response = await(post("/nrs/submission/999999999")(validJson))
 
@@ -152,7 +152,7 @@ class NRSControllerISpec extends ComponentSpecBase {
           val response = await(post("/nrs/submission/999999999")("just a string"))
 
           response.status shouldBe 400
-          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body from submit-vat-return-frontend cannot be parsed to JSON.")
+          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body cannot be parsed to JSON.")
         }
       }
 
@@ -165,7 +165,7 @@ class NRSControllerISpec extends ComponentSpecBase {
           val response = await(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid")))
 
           response.status shouldBe 400
-          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body from submit-vat-return-frontend does not pass validation")
+          response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body does not pass validation")
         }
       }
     }

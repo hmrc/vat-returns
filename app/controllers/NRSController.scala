@@ -22,7 +22,7 @@ import models.Error
 import models.nrs.NrsReceiptRequestModel
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent}
 import services.NrsSubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
@@ -49,14 +49,14 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
                 Status(error.code.toInt)(Json.toJson(error.reason))
             }
           case JsError(error) =>
-            Logger.debug(s"[NRSController][submitNRS] - request body from submit-vat-return-frontend does not pass validation: $error")
-            Logger.warn(s"[NRSController][submitNRS] - request body from submit-vat-return-frontend does not pass validation")
-            Future.successful(BadRequest(Json.toJson(Error("400", "Request body from submit-vat-return-frontend does not pass validation"))))
+            Logger.debug(s"[NRSController][submitNRS] - request body does not pass validation: $error")
+            Logger.warn(s"[NRSController][submitNRS] - request body does not pass validation")
+            Future.successful(BadRequest(Json.toJson(Error("400", "Request body does not pass validation"))))
         }
       case None =>
         Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to JSON. Body: ${request.body}")
         Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to JSON")
-        Future.successful(BadRequest(Json.toJson(Error("400", "Request body from submit-vat-return-frontend cannot be parsed to JSON."))))
+        Future.successful(BadRequest(Json.toJson(Error("400", "Request body cannot be parsed to JSON."))))
     }
   }
 }

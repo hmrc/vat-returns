@@ -82,9 +82,12 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "all values are valid" in {
         val successResponse: NrsReceiptSuccessModel = NrsReceiptSuccessModel("submission successful")
 
-        stubSubmissionResponse(ACCEPTED, Right(successResponse), "not-a-key")
+        stubSubmissionResponse(ACCEPTED, Right(successResponse), vrn = None)
 
-        val result = await(connector.nrsReceiptSubmission(requestModel))
+        val result = {
+          mockAppConfig.features.useStubFeature(false)
+          await(connector.nrsReceiptSubmission(requestModel))
+        }
 
         result shouldBe Right(successResponse)
       }
@@ -95,9 +98,12 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the request parameters are invalid (BAD_REQUEST)" in {
         val expectedResponse = Error(BAD_REQUEST, "Request parameters are invalid")
 
-        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "This model doesn't really matter here")), "not-a-key")
+        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "This model doesn't really matter here")), vrn = None)
 
-        val result = await(connector.nrsReceiptSubmission(requestModel))
+        val result = {
+          mockAppConfig.features.useStubFeature(false)
+          await(connector.nrsReceiptSubmission(requestModel))
+        }
 
         result shouldBe Left(expectedResponse)
       }
@@ -105,9 +111,12 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the API key is wrong (UNAUTHORIZED)" in {
         val expectedResponse = Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing.")
 
-        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "This model doesn't really matter here")), "not-a-key")
+        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "This model doesn't really matter here")), vrn = None)
 
-        val result = await(connector.nrsReceiptSubmission(requestModel))
+        val result = {
+          mockAppConfig.features.useStubFeature(false)
+          await(connector.nrsReceiptSubmission(requestModel))
+        }
 
         result shouldBe Left(expectedResponse)
       }
@@ -115,9 +124,12 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the checksum fails (Custom 419)" in {
         val expectedResponse = Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum.")
 
-        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), "not-a-key")
+        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), vrn = None)
 
-        val result = await(connector.nrsReceiptSubmission(requestModel))
+        val result = {
+          mockAppConfig.features.useStubFeature(false)
+          await(connector.nrsReceiptSubmission(requestModel))
+        }
 
         result shouldBe Left(expectedResponse)
       }
@@ -125,9 +137,12 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "any other code is received" in {
         val expectedResponse = Error(INTERNAL_SERVER_ERROR, Json.toJson(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")).toString())
 
-        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")), "not-a-key")
+        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")), vrn = None)
 
-        val result = await(connector.nrsReceiptSubmission(requestModel))
+        val result = {
+          mockAppConfig.features.useStubFeature(false)
+          await(connector.nrsReceiptSubmission(requestModel))
+        }
 
         result shouldBe Left(expectedResponse)
       }
@@ -141,7 +156,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "all values are valid" in {
         val successResponse: NrsReceiptSuccessModel = NrsReceiptSuccessModel("submission successful")
 
-        stubSubmissionResponse(ACCEPTED, Right(successResponse), "not-a-key")
+        stubSubmissionResponse(ACCEPTED, Right(successResponse))
 
         val result = await(connector.nrsReceiptSubmission(requestModel))
 
@@ -154,7 +169,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the request parameters are invalid (BAD_REQUEST)" in {
         val expectedResponse = Error(BAD_REQUEST, "Request parameters are invalid")
 
-        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "Bad Request")), "not-a-key")
+        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "Bad Request")))
 
         val result = await(connector.nrsReceiptSubmission(requestModel))
 
@@ -164,7 +179,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the API key is wrong (UNAUTHORIZED)" in {
         val expectedResponse = Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing.")
 
-        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "Unauthorized")), "not-a-key")
+        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "Unauthorized")))
 
         val result = await(connector.nrsReceiptSubmission(requestModel))
 
@@ -174,7 +189,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the checksum fails (Custom 419)" in {
         val expectedResponse = Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum.")
 
-        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "Checksum failure")), "not-a-key")
+        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "Checksum failure")))
 
         val result = await(connector.nrsReceiptSubmission(requestModel))
 
@@ -184,7 +199,7 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "any other code is received" in {
         val expectedResponse = Error(INTERNAL_SERVER_ERROR, Json.toJson(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")).toString())
 
-        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")), "not-a-key")
+        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")))
 
         val result = await(connector.nrsReceiptSubmission(requestModel))
 
