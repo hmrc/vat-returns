@@ -18,27 +18,16 @@ package connectors
 
 import java.time.LocalDateTime
 
-import config.MicroserviceAppConfig
+import helpers.ComponentSpecBase
 import helpers.servicemocks.NrsStub._
-import helpers.{ComponentSpecBase, WireMockHelper}
-import javax.inject.Inject
 import models.Error
 import models.nrs._
 import models.nrs.identityData._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
-class MockAppConfig @Inject()(override val environment: Environment, implicit val configuration: Configuration)
-  extends MicroserviceAppConfig(environment, configuration) {
-
-  import WireMockHelper._
-
-  override val nrsSubmissionEndpoint: String = s"$url/submission"
-}
 
 class NrsConnectorISpec extends ComponentSpecBase {
   implicit def intToString: Int => String = _.toString
@@ -83,19 +72,20 @@ class NrsConnectorISpec extends ComponentSpecBase {
 
   private val CHECKSUM_FAILED = 419
 
-  val mockConfig: MockAppConfig = app.injector.instanceOf[MockAppConfig]
   val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
-  val connector: NrsConnector = new NrsConnector(httpClient, mockConfig)
+  val connector: NrsConnector = new NrsConnector(httpClient, mockAppConfig)
 
   "nrsReceiptSubmission is called and the feature switch is off" should {
+    
     "return success" when {
+      
       "all values are valid" in {
         val successResponse: NrsReceiptSuccessModel = NrsReceiptSuccessModel("submission successful")
 
-        stubSubmissionResponse(ACCEPTED, Right(successResponse), "not-a-key")
+        stubSubmissionResponse(ACCEPTED, Right(successResponse), vrn = None)
 
         val result = {
-          mockConfig.features.useStubFeature(false)
+          mockAppConfig.features.useStubFeature(false)
           await(connector.nrsReceiptSubmission(requestModel))
         }
 
@@ -104,133 +94,84 @@ class NrsConnectorISpec extends ComponentSpecBase {
     }
 
     "return an error" when {
+
       "the request parameters are invalid (BAD_REQUEST)" in {
         val expectedResponse = Error(BAD_REQUEST, "Request parameters are invalid")
 
-        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "This model doesn't really matter here")), "not-a-key")
+        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "This model doesn't really matter here")), vrn = None)
 
         val result = {
-          mockConfig.features.useStubFeature(false)
+          mockAppConfig.features.useStubFeature(false)
           await(connector.nrsReceiptSubmission(requestModel))
         }
 
         result shouldBe Left(expectedResponse)
       }
+
       "the API key is wrong (UNAUTHORIZED)" in {
         val expectedResponse = Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing.")
 
-        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "This model doesn't really matter here")), "not-a-key")
+        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "This model doesn't really matter here")), vrn = None)
 
         val result = {
-          mockConfig.features.useStubFeature(false)
+          mockAppConfig.features.useStubFeature(false)
           await(connector.nrsReceiptSubmission(requestModel))
         }
 
         result shouldBe Left(expectedResponse)
       }
-      "NRS is not available (NOT_FOUND)" in {
-        val expectedResponse = Error(NOT_FOUND, s"Returning response body:\n${Json.toJson(Error(NOT_FOUND, "This model doesn't really matter here"))}")
 
-        stubSubmissionResponse(NOT_FOUND, Left(Error(NOT_FOUND, "This model doesn't really matter here")), "not-a-key")
-
-        val result = {
-          mockConfig.features.useStubFeature(false)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
-
-        result shouldBe Left(expectedResponse)
-      }
       "the checksum fails (Custom 419)" in {
         val expectedResponse = Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum.")
 
-        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), "not-a-key")
+        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), vrn = None)
 
         val result = {
-          mockConfig.features.useStubFeature(false)
+          mockAppConfig.features.useStubFeature(false)
           await(connector.nrsReceiptSubmission(requestModel))
         }
 
         result shouldBe Left(expectedResponse)
       }
-      "a 5xx is received" in {
-        val expectedResponse = Error(INTERNAL_SERVER_ERROR, s"Returning response body:\n${
-          Json.toJson(Error(CHECKSUM_FAILED,
-            "This model doesn't really matter here"))
-        }")
 
-        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(CHECKSUM_FAILED, "This model doesn't really matter here")), "not-a-key")
-
-        val result = {
-          mockConfig.features.useStubFeature(false)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
-
-        result shouldBe Left(expectedResponse)
-      }
       "any other code is received" in {
-        val expectedResponse = Error(GONE, s"Unexpected return code, returning response body:\n${
-          Json.toJson(Error(SEE_OTHER,
-            "Where did they come from, where did they go?"))
-        }")
+        val expectedResponse = Error(INTERNAL_SERVER_ERROR, Json.toJson(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")).toString())
 
-        stubSubmissionResponse(GONE, Left(Error(SEE_OTHER, "Where did they come from, where did they go?")), "not-a-key")
+        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")), vrn = None)
 
         val result = {
-          mockConfig.features.useStubFeature(false)
+          mockAppConfig.features.useStubFeature(false)
           await(connector.nrsReceiptSubmission(requestModel))
         }
 
         result shouldBe Left(expectedResponse)
-      }
-      "there is a timeout" in {
-        stubTimeoutResponse()
-
-        val result = {
-          mockConfig.features.useStubFeature(false)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
-
-        result shouldBe Left(Error(GATEWAY_TIMEOUT, "Request to NRS timed out."))
-      }
-      "there is an unexpected exception" in {
-        stubExceptionResponse()
-
-        val result = {
-          mockConfig.features.useStubFeature(false)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
-
-        result shouldBe Left(Error("UNEXPECTED_EXCEPTION", "Remotely closed"))
       }
     }
   }
 
   "nrsReceiptSubmission is called and the feature switch is on" should {
+
     "return success" when {
+
       "all values are valid" in {
         val successResponse: NrsReceiptSuccessModel = NrsReceiptSuccessModel("submission successful")
 
-        stubSubmissionResponse(ACCEPTED, Right(successResponse), "not-a-key", vrn = Some("123456789"))
+        stubSubmissionResponse(ACCEPTED, Right(successResponse))
 
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
+        val result = await(connector.nrsReceiptSubmission(requestModel))
 
         result shouldBe Right(successResponse)
       }
     }
 
     "return an error" when {
+
       "the request parameters are invalid (BAD_REQUEST)" in {
         val expectedResponse = Error(BAD_REQUEST, "Request parameters are invalid")
 
-        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "Bad Request")), "not-a-key", vrn = Some("123456789"))
+        stubSubmissionResponse(BAD_REQUEST, Left(Error(BAD_REQUEST, "Bad Request")))
 
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
+        val result = await(connector.nrsReceiptSubmission(requestModel))
 
         result shouldBe Left(expectedResponse)
       }
@@ -238,25 +179,9 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the API key is wrong (UNAUTHORIZED)" in {
         val expectedResponse = Error(UNAUTHORIZED, "X-API-Key is either invalid, or missing.")
 
-        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "Unauthorized")), "not-a-key", vrn = Some("123456789"))
+        stubSubmissionResponse(UNAUTHORIZED, Left(Error(UNAUTHORIZED, "Unauthorized")))
 
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
-
-        result shouldBe Left(expectedResponse)
-      }
-
-      "NRS is not available (NOT_FOUND)" in {
-        val expectedResponse = Error(NOT_FOUND, s"Returning response body:\n${Json.toJson(Error(NOT_FOUND, "Not Found"))}")
-
-        stubSubmissionResponse(NOT_FOUND, Left(Error(NOT_FOUND, "Not Found")), "not-a-key", vrn = Some("123456789"))
-
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
+        val result = await(connector.nrsReceiptSubmission(requestModel))
 
         result shouldBe Left(expectedResponse)
       }
@@ -264,45 +189,19 @@ class NrsConnectorISpec extends ComponentSpecBase {
       "the checksum fails (Custom 419)" in {
         val expectedResponse = Error(CHECKSUM_FAILED, "The provided Sha256Checksum provided does not match the decoded payload Sha256Checksum.")
 
-        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "Checksum failure")), "not-a-key", vrn = Some("123456789"))
+        stubSubmissionResponse(CHECKSUM_FAILED, Left(Error(CHECKSUM_FAILED, "Checksum failure")))
 
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
-
-        result shouldBe Left(expectedResponse)
-      }
-
-      "a 5xx is received" in {
-        val expectedResponse = Error(INTERNAL_SERVER_ERROR, s"Returning response body:\n${
-          Json.toJson(Error(CHECKSUM_FAILED,
-            "Checksum failure"))
-        }")
-
-        stubSubmissionResponse(INTERNAL_SERVER_ERROR,
-          Left(Error(CHECKSUM_FAILED, "Checksum failure")), "not-a-key", vrn = Some("123456789"))
-
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
+        val result = await(connector.nrsReceiptSubmission(requestModel))
 
         result shouldBe Left(expectedResponse)
       }
 
       "any other code is received" in {
-        val expectedResponse = Error(GONE, s"Unexpected return code, returning response body:\n${
-          Json.toJson(Error(SEE_OTHER,
-            "Redirection Error"))
-        }")
+        val expectedResponse = Error(INTERNAL_SERVER_ERROR, Json.toJson(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")).toString())
 
-        stubSubmissionResponse(GONE, Left(Error(SEE_OTHER, "Redirection Error")), "not-a-key", vrn = Some("123456789"))
+        stubSubmissionResponse(INTERNAL_SERVER_ERROR, Left(Error(INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR")))
 
-        val result = {
-          mockConfig.features.useStubFeature(true)
-          await(connector.nrsReceiptSubmission(requestModel))
-        }
+        val result = await(connector.nrsReceiptSubmission(requestModel))
 
         result shouldBe Left(expectedResponse)
       }

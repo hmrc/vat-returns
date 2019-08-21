@@ -87,7 +87,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
-          setupMockNrsReceiptSubmission(correctModel)(Left(Error("bad code", "bad reason")))
+          setupMockNrsReceiptSubmission(correctModel)(Left(Error("400", "bad reason")))
           status(result) shouldBe Status.BAD_REQUEST
         }
       }

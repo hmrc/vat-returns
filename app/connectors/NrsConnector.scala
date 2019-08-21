@@ -19,12 +19,9 @@ package connectors
 import config.MicroserviceAppConfig
 import connectors.httpParsers.NrsResponseParsers._
 import javax.inject.Inject
-import models.Error
 import models.nrs.{AppJson, NrsReceiptRequestModel}
-import play.api.Logger
-import uk.gov.hmrc.http.{GatewayTimeoutException, HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import play.api.http.Status.GATEWAY_TIMEOUT
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,10 +37,5 @@ class NrsConnector @Inject()(http: HttpClient, appConfig: MicroserviceAppConfig)
         "X-API-Key" -> appConfig.nrsApiKey
       )
     )
-  }.recover {
-    case _: GatewayTimeoutException => Left(Error(GATEWAY_TIMEOUT.toString, "Request to NRS timed out."))
-    case error: Throwable =>
-      Logger.warn("[NrsConnector][nrsReceiptSubmission] Unexpected exception returned from NRS", error)
-      Left(Error("UNEXPECTED_EXCEPTION", error.getMessage))
   }
 }
