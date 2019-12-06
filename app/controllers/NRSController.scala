@@ -22,16 +22,17 @@ import models.Error
 import models.nrs.NrsReceiptRequestModel
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.NrsSubmissionService
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
-                              nrsSubmissionService: NrsSubmissionService)
-                             (implicit ec: ExecutionContext) extends BaseController {
+                              nrsSubmissionService: NrsSubmissionService,
+                              cc: ControllerComponents)
+                             (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def submitNRS(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
 

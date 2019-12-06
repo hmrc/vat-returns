@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
 
-  object TestAuthorisedSubmitVatReturn extends AuthorisedSubmitVatReturn(mockAuthConnector)
+  object TestAuthorisedSubmitVatReturn extends AuthorisedSubmitVatReturn(mockAuthConnector, controllerComponents)
 
   def action(vrn: String): Future[Result] = TestAuthorisedSubmitVatReturn.async(vrn) {
     implicit request =>

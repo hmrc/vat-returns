@@ -18,6 +18,7 @@ package testOnly.controllers
 
 import base.SpecBase
 import config.featureSwitch.FeatureSwitchModel
+import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.Result
@@ -27,9 +28,13 @@ import testonly.controllers.FeatureSwitchController
 
 import scala.concurrent.Future
 
-class FeatureSwitchControllerSpec extends SpecBase {
+class FeatureSwitchControllerSpec extends SpecBase with BeforeAndAfterEach {
 
-  private lazy val target = new FeatureSwitchController(mockAppConfig)
+  private lazy val target = new FeatureSwitchController(mockAppConfig, controllerComponents)
+
+  override def beforeEach() {
+    mockAppConfig.features.useStubFeature(true)
+  }
 
   "Calling the .get action" should {
 
@@ -55,7 +60,9 @@ class FeatureSwitchControllerSpec extends SpecBase {
       useStubFeature = false)
     )
 
-    val result = call(target.update(), FakeRequest(POST, "")
+//    val result = target.update()(FakeRequest(POST, "").withHeaders((CONTENT_TYPE, "application/json")).withJsonBody(body)).run()
+
+    val result: Future[Result] = call(target.update(), FakeRequest(POST, "")
       .withHeaders((CONTENT_TYPE, "application/json"))
       .withJsonBody(body))
 

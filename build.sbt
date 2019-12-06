@@ -55,18 +55,19 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "5.0.0"
+  "uk.gov.hmrc" %% "bootstrap-play-26" % "1.3.0",
+  "com.typesafe.play" %% "play-json-joda" % "2.6.10"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-25",
   "org.scalatest" %% "scalatest" % "3.0.8",
   "org.pegdown" % "pegdown" % "1.6.0",
-  "com.github.tomakehurst" % "wiremock" % "2.23.2",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2",
   "org.mockito" % "mockito-core" % "2.28.2",
   "com.typesafe.play" %% "play-test" % PlayVersion.current,
-  "com.github.fge" % "json-schema-validator" % "2.2.6"
+  "com.github.fge" % "json-schema-validator" % "2.2.6",
+  "com.github.tomakehurst" % "wiremock-jre8" % "2.21.0"
 ).map(_ % scope)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
@@ -87,8 +88,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    routesImport += "binders.VatReturnsBinders._",
-    routesGenerator := InjectedRoutesGenerator
+    routesImport += "binders.VatReturnsBinders._"
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)

@@ -21,9 +21,9 @@ import javax.inject.{Inject, Singleton}
 import config.{ConfigKeys => Keys}
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-trait AppConfig extends ServicesConfig {
+trait AppConfig {
   val desEnvironment: String
   val desToken: String
   val desServiceUrl: String
@@ -35,24 +35,21 @@ trait AppConfig extends ServicesConfig {
 }
 
 @Singleton
-class MicroserviceAppConfig @Inject()(val environment: Environment, implicit val conf: Configuration) extends AppConfig {
+class MicroserviceAppConfig @Inject()(val environment: Environment, implicit val conf: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
 
-  override protected def runModeConfiguration: Configuration = conf
-  override protected def mode: Mode = environment.mode
-  private def loadConfig(key: String) = runModeConfiguration.getString(key)
-    .getOrElse(throw new Exception(s"Missing configuration key: $key"))
+  private def loadConfig(key: String) = servicesConfig.getString(key)
 
   lazy val appName: String = loadConfig("appName")
 
-  override lazy val desEnvironment: String = getString(Keys.desEnvironment)
-  override lazy val desToken: String = getString(Keys.desToken)
+  override lazy val desEnvironment: String = servicesConfig.getString(Keys.desEnvironment)
+  override lazy val desToken: String = servicesConfig.getString(Keys.desToken)
   override lazy val desServiceUrl: String = loadConfig(Keys.desServiceUrl)
   override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
   override lazy val desSubmitVatReturnPath: String = loadConfig(Keys.desSubmitVatReturnPath)
 
   override val nrsSubmissionEndpoint: String =
-    s"${getString(Keys.nrsReceiptsHost)}:${getString(Keys.nrsReceiptsPort)}${getString(Keys.nrsSubmissionEndpoint)}"
-  override val nrsApiKey: String = getString(Keys.nrsApiKey)
+    s"${servicesConfig.getString(Keys.nrsReceiptsHost)}:${servicesConfig.getString(Keys.nrsReceiptsPort)}${servicesConfig.getString(Keys.nrsSubmissionEndpoint)}"
+  override val nrsApiKey: String = servicesConfig.getString(Keys.nrsApiKey)
 
   override val features = new Features
 }

@@ -42,7 +42,9 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
     "called by an authenticated user" when {
 
-      object TestNRSController extends NRSController(new AuthorisedSubmitVatReturn(mockAuthConnector), mockNrsSubmissionService)
+      val authorisedSubmitVatReturn = new AuthorisedSubmitVatReturn(mockAuthConnector, controllerComponents)
+
+      object TestNRSController extends NRSController(authorisedSubmitVatReturn, mockNrsSubmissionService, controllerComponents)
 
       val enrolments = Enrolments(Set(Enrolment("HMRC-MTD-VAT").withIdentifier("VRN", "999999999")))
 
