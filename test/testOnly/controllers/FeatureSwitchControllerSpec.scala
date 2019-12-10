@@ -60,8 +60,6 @@ class FeatureSwitchControllerSpec extends SpecBase with BeforeAndAfterEach {
       useStubFeature = false)
     )
 
-//    val result = target.update()(FakeRequest(POST, "").withHeaders((CONTENT_TYPE, "application/json")).withJsonBody(body)).run()
-
     val result: Future[Result] = call(target.update(), FakeRequest(POST, "")
       .withHeaders((CONTENT_TYPE, "application/json"))
       .withJsonBody(body))
