@@ -22,17 +22,18 @@ import models.Error._
 import models._
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.VatReturnsService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService,
-                                          authorisedAction: AuthorisedSubmitVatReturn)
-                                         (implicit ec: ExecutionContext) extends BaseController {
+                                          authorisedAction: AuthorisedSubmitVatReturn,
+                                          cc: ControllerComponents)
+                                         (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def submitVatReturn(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
     val requestAsJson: Option[VatReturnDetail] = request.body.asJson match {

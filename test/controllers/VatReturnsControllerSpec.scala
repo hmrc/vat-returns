@@ -69,12 +69,13 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
   val badRequestMultiError: Either[ErrorResponse, Nothing] = Left(ErrorResponse(Status.BAD_REQUEST, multiError))
   val testVrn: String = "555555555"
   val badVrn: String = "55"
+  val authActionImpl = new AuthActionImpl(mockAuth, controllerComponents)
 
   "The GET VatReturnsController.getVatReturns method" when {
 
     "called by an authenticated user" which {
 
-      object TestVatReturnsController extends VatReturnsController(new AuthActionImpl(mockAuth), mockVatReturnsService)
+      object TestVatReturnsController extends VatReturnsController(authActionImpl, mockVatReturnsService, controllerComponents)
 
       "is requesting VAT details" should {
 
@@ -195,7 +196,7 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
 
     "called by an unauthenticated user" should {
 
-      object TestVatReturnsController extends VatReturnsController(new AuthActionImpl(mockAuth), mockVatReturnsService)
+      object TestVatReturnsController extends VatReturnsController(authActionImpl, mockVatReturnsService, controllerComponents)
 
       "Return an UNAUTHORISED response" which {
 

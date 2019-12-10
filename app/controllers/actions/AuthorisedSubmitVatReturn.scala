@@ -20,15 +20,16 @@ import javax.inject.Inject
 import models.Error
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import auth.AuthEnrolmentKeys._
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector) extends BaseController with AuthorisedFunctions {
+class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
 
   def async(vrn: String)(block: Request[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
     implicit request =>

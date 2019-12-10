@@ -17,8 +17,8 @@
 package handlers
 
 import base.SpecBase
+import config.MicroserviceAppConfig
 import models.{Error, VatReturnDetail}
-import play.api.Configuration
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 class ErrorHandlerSpec extends SpecBase {
 
-  object TestErrorHandler extends ErrorHandler(injector.instanceOf[Configuration], injector.instanceOf[AuditConnector])
+  object TestErrorHandler extends ErrorHandler(inject[MicroserviceAppConfig], inject[AuditConnector])
 
   "The ErrorHandler.onClientError method" when {
 

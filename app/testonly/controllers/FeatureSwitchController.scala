@@ -20,10 +20,10 @@ import config.AppConfig
 import config.featureSwitch.FeatureSwitchModel
 import javax.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
-class FeatureSwitchController @Inject()(appConfig: AppConfig) extends BaseController {
+class FeatureSwitchController @Inject()(appConfig: AppConfig, cc: ControllerComponents) extends BackendController(cc) {
 
   def get: Action[AnyContent] = Action { implicit request => result }
 

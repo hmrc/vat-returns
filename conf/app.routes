@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET     /returns/vrn/:vrn    @controllers.VatReturnsController.getVatReturns(vrn: String, filters: models.VatReturnFilters)
-POST    /returns/vrn/:vrn    @controllers.SubmitVatReturnController.submitVatReturn(vrn: String)
+GET     /returns/vrn/:vrn               controllers.VatReturnsController.getVatReturns(vrn: String, filters: models.VatReturnFilters)
+POST    /returns/vrn/:vrn               controllers.SubmitVatReturnController.submitVatReturn(vrn: String)
 
-POST    /nrs/submission/:vrn          @controllers.NRSController.submitNRS(vrn: String)
+POST    /nrs/submission/:vrn            controllers.NRSController.submitNRS(vrn: String)
