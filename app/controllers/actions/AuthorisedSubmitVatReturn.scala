@@ -23,9 +23,10 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import auth.AuthEnrolmentKeys._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
 import scala.concurrent.{ExecutionContext, Future}
 
