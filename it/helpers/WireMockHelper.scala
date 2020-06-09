@@ -57,5 +57,5 @@ trait WireMockHelper {
   def buildClient(path: String, headers: Map[String, String] = Map.empty): WSRequest =
     ws.url(s"http://localhost:$port$appRouteContext$path")
       .withFollowRedirects(false)
-      .withHeaders(headers.toSeq: _*)
+      .withHttpHeaders(headers.toSeq: _*)
 }
