@@ -35,6 +35,8 @@ lazy val coverageSettings: Seq[Setting[_]] = {
   val excludedPackages = Seq(
     "<empty>",
     "Reverse.*",
+    "com.kenshoo.play.metrics.*",
+    "controllers..*Reverse.*",
     ".*standardError*.*",
     ".*govuk_wrapper*.*",
     ".*main_template*.*",
@@ -55,7 +57,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-play-26" % "1.3.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "2.24.0",
   "com.typesafe.play" %% "play-json-joda" % "2.6.14"
 )
 
@@ -67,11 +69,13 @@ def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "org.mockito" % "mockito-core" % "3.2.0",
   "com.typesafe.play" %% "play-test" % PlayVersion.current,
   "com.github.fge" % "json-schema-validator" % "2.2.6",
-  "com.github.tomakehurst" % "wiremock-jre8" % "2.25.1"
+  "com.github.tomakehurst" % "wiremock-jre8" % "2.27.1"
 ).map(_ % scope)
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
-  test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name, "-Dlogger.resource=logback-test.xml"))))
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
+  tests.map { test =>
+    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
+  }
 }
 
 lazy val microservice = Project(appName, file("."))
@@ -84,7 +88,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.11.11",
+    scalaVersion := "2.12.11",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),

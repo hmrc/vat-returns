@@ -22,8 +22,6 @@ import play.api.mvc.Results._
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AuthActionImplSpec extends SpecBase with MockMicroserviceAuthorisedFunctions {
