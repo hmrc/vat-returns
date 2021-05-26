@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.AuthAction
+
 import javax.inject.{Inject, Singleton}
 import models._
 import play.api.Logger
@@ -24,8 +25,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.VatReturnsService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
-
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

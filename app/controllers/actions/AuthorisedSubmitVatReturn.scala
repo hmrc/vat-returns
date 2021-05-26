@@ -24,10 +24,9 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import auth.AuthEnrolmentKeys._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {

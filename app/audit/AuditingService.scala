@@ -17,7 +17,6 @@
 package audit
 
 import javax.inject.{Inject, Singleton}
-
 import audit.models.{AuditModel, ExtendedAuditModel}
 import config.MicroserviceAppConfig
 import play.api.Logger
@@ -28,9 +27,6 @@ import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -92,5 +88,5 @@ class AuditingService @Inject()(appConfig: MicroserviceAppConfig, auditConnector
     )
   }
 
-  private def path(implicit hc: HeaderCarrier) = hc.headers.find(_._1 == REFERER).map(_._2).getOrElse("-")
+  private def path(implicit hc: HeaderCarrier) = hc.extraHeaders.find(_._1 == REFERER).map(_._2).getOrElse("-")
 }

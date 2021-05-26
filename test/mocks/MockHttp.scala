@@ -17,14 +17,13 @@
 package mocks
 
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.{HttpClient, HttpResponse}
 import uk.gov.hmrc.play.test.UnitSpec
-
 import scala.concurrent.Future
 
 trait MockHttp extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
@@ -37,15 +36,13 @@ trait MockHttp extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
   }
 
   def setupMockHttpGet[A](url: String)(response: A): OngoingStubbing[Future[A]] =
-    when(mockHttpGet.GET[A](ArgumentMatchers.eq(url))(ArgumentMatchers.any(), ArgumentMatchers.any(),
-      ArgumentMatchers.any())).thenReturn(Future.successful(response))
+    when(mockHttpGet.GET[A](ArgumentMatchers.eq(url), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(response))
 
   def setupMockHttpGet[A](url: String, queryParams: Seq[(String, String)])(response: A): OngoingStubbing[Future[A]] =
-    when(mockHttpGet.GET[A](ArgumentMatchers.eq(url),
-      ArgumentMatchers.eq(queryParams))(ArgumentMatchers.any(), ArgumentMatchers.any(),
-      ArgumentMatchers.any())).thenReturn(Future.successful(response))
+    when(mockHttpGet.GET[A](ArgumentMatchers.eq(url), ArgumentMatchers.eq(queryParams), any())(any(),
+      any(), any())).thenReturn(Future.successful(response))
 
   def setupMockFailedHttpGet[A](url: String)(response: HttpResponse): OngoingStubbing[Future[A]] =
-    when(mockHttpGet.GET[A](ArgumentMatchers.eq(url))(ArgumentMatchers.any(),
-      ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.failed(new Exception))
+    when(mockHttpGet.GET[A](ArgumentMatchers.eq(url))(any(), any(), any())).thenReturn(Future.failed(new Exception))
 }

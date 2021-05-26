@@ -22,10 +22,7 @@ import javax.inject.Inject
 import models.{SuccessModel, VatReturnSubmission}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
-import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: MicroserviceAppConfig) {
@@ -41,10 +38,10 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
         "Environment" -> appConfig.desEnvironment,
         "OriginatorID" -> originatorID
       )
-      .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
+      .copy(authorization = None)
 
     Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: ${desVatReturnsUrl(vrn)}. Body: ${Json.toJson(model)}")
-    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: ${hc.headers}")
+    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: ${hc.extraHeaders}")
     http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model)(
       implicitly[Writes[VatReturnSubmission]],
       implicitly[HttpReads[HttpGetResult[SuccessModel]]],
