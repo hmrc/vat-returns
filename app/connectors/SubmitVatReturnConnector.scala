@@ -38,7 +38,7 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
     val hc = headerCarrier.copy(authorization = None)
 
     Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: ${desVatReturnsUrl(vrn)}. Body: ${Json.toJson(model)}")
-    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: ${hc.extraHeaders}")
+    Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: $desHeaders")
     http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model, desHeaders)(
       implicitly[Writes[VatReturnSubmission]],
       implicitly[HttpReads[HttpGetResult[SuccessModel]]],

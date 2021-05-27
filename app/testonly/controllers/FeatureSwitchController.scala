@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 class FeatureSwitchController @Inject()(appConfig: AppConfig, cc: ControllerComponents) extends BackendController(cc) {
 
-  def get: Action[AnyContent] = Action { implicit request => result }
+  def get: Action[AnyContent] = Action { _ => result }
 
   def update: Action[FeatureSwitchModel] = Action(parse.json[FeatureSwitchModel]) { req =>
     appConfig.features.useStubFeature(req.body.useStubFeature)

@@ -18,7 +18,7 @@ package helpers
 
 import org.scalatest._
 import org.scalatest.matchers._
-import play.api.libs.json.{JsValue, Reads}
+import play.api.libs.json.Reads
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.play.test.UnitSpec
 
