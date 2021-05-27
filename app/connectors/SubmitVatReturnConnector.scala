@@ -32,17 +32,14 @@ class SubmitVatReturnConnector @Inject()(val http: HttpClient, val appConfig: Mi
   def submitVatReturn(vrn: String, model: VatReturnSubmission, originatorID: String)
                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[SuccessModel]] = {
 
-    implicit val hc: HeaderCarrier = headerCarrier
-      .withExtraHeaders(
-        "Content-Type" -> "application/json",
-        "Environment" -> appConfig.desEnvironment,
-        "OriginatorID" -> originatorID
-      )
-      .copy(authorization = None)
+    val desHeaders = Seq("Authorization" -> s"Bearer ${appConfig.desToken}", "Content-Type" -> "application/json",
+      "Environment" -> appConfig.desEnvironment, "OriginatorID" -> originatorID)
+
+    val hc = headerCarrier.copy(authorization = None)
 
     Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Submitting VAT Return to URL: ${desVatReturnsUrl(vrn)}. Body: ${Json.toJson(model)}")
     Logger.debug(s"[SubmitVatReturnConnector][submitVatReturn] Headers: ${hc.extraHeaders}")
-    http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model)(
+    http.POST[VatReturnSubmission, HttpGetResult[SuccessModel]](desVatReturnsUrl(vrn), model, desHeaders)(
       implicitly[Writes[VatReturnSubmission]],
       implicitly[HttpReads[HttpGetResult[SuccessModel]]],
       hc,
