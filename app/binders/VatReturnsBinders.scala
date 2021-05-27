@@ -23,7 +23,7 @@ import play.api.mvc.QueryStringBindable
 
 object VatReturnsBinders {
 
-  implicit def vatReturnsQueryBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[VatReturnFilters] = {
+  implicit def vatReturnsQueryBinder: QueryStringBindable[VatReturnFilters] = {
     new QueryStringBindable[VatReturnFilters] {
       override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, VatReturnFilters]] = {
         val boundPeriodKey = bindPeriodKey(periodKeyValue, params)

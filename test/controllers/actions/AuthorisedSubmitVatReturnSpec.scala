@@ -25,7 +25,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
-
 import scala.concurrent.Future
 
 class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
@@ -33,7 +32,7 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
   object TestAuthorisedSubmitVatReturn extends AuthorisedSubmitVatReturn(mockAuthConnector, controllerComponents)
 
   def action(vrn: String): Future[Result] = TestAuthorisedSubmitVatReturn.async(vrn) {
-    implicit request =>
+    _ =>
       Future.successful(Ok)
   } (ec)(fakeRequest)
 

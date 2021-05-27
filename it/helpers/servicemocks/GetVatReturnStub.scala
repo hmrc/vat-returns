@@ -18,7 +18,6 @@ package helpers.servicemocks
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import play.api.http.Status.OK
 import play.api.libs.json.JsValue
 
 object GetVatReturnStub extends WireMockMethods {

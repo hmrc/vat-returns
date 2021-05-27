@@ -21,9 +21,7 @@ import connectors.httpParsers.VatReturnsHttpParser._
 import javax.inject.{Inject, Singleton}
 import models.{VatReturnDetail, VatReturnFilters}
 import play.api.Logger
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -32,15 +30,16 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
   private[connectors] def setupDesVatReturnsUrl(vrn: String): String = appConfig.desServiceUrl +
     appConfig.setupDesReturnsStartPath + vrn
 
+  val desHeaders = Seq("Authorization" -> s"Bearer ${appConfig.desToken}", "Environment" -> appConfig.desEnvironment)
+
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
                    (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnDetail]] = {
 
     val url = setupDesVatReturnsUrl(vrn)
-    val desHC = headerCarrier.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
-      .withExtraHeaders("Environment" -> appConfig.desEnvironment)
+    val hc = headerCarrier.copy(authorization = None)
 
-    Logger.debug(s"[VatReturnsConnector][getVatReturns] - Calling GET $url \nHeaders: $desHC\n QueryParams: $queryParameters")
-    http.GET(url, queryParameters.toSeqQueryParams)(VatReturnReads, desHC, ec).map {
+    Logger.debug(s"[VatReturnsConnector][getVatReturns] - Calling GET $url \nHeaders: $desHeaders\n QueryParams: $queryParameters")
+    http.GET(url, queryParameters.toSeqQueryParams, desHeaders)(VatReturnReads, hc, ec).map {
       case vatReturns@Right(_) => vatReturns
       case error@Left(message) =>
         Logger.warn("[VatReturnsConnector][getVatReturns] Error Received. Message: " + message)

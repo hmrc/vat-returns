@@ -17,7 +17,6 @@
 package connectors
 
 import java.time.LocalDateTime
-
 import helpers.ComponentSpecBase
 import helpers.servicemocks.NrsStub._
 import models.Error
@@ -25,8 +24,7 @@ import models.nrs._
 import models.nrs.identityData._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
+import uk.gov.hmrc.http.HttpClient
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class NrsConnectorISpec extends ComponentSpecBase {

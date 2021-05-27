@@ -17,15 +17,12 @@
 package connectors
 
 import java.time.LocalDateTime
-
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.ComponentSpecBase
 import helpers.servicemocks.SubmitVatReturnStub
 import models._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {

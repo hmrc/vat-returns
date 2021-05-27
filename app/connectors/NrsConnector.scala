@@ -20,9 +20,7 @@ import config.MicroserviceAppConfig
 import connectors.httpParsers.NrsResponseParsers._
 import javax.inject.Inject
 import models.nrs.{AppJson, NrsReceiptRequestModel}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import scala.concurrent.{ExecutionContext, Future}
 
 class NrsConnector @Inject()(http: HttpClient, appConfig: MicroserviceAppConfig) {
@@ -33,7 +31,7 @@ class NrsConnector @Inject()(http: HttpClient, appConfig: MicroserviceAppConfig)
       urlToUse(data.metadata.searchKeys.vrn),
       data,
       Seq(
-        "Content-Type" -> AppJson,
+        "Content-Type" -> AppJson.toString,
         "X-API-Key" -> appConfig.nrsApiKey
       )
     )

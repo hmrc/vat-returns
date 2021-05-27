@@ -19,7 +19,6 @@ package config
 import config.featureSwitch.Features
 import javax.inject.{Inject, Singleton}
 import config.{ConfigKeys => Keys}
-import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 

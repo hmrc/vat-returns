@@ -23,7 +23,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.BearerTokenExpired
-import uk.gov.hmrc.http.{JsValidationException, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{JsValidationException, NotFoundException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 class ErrorHandlerSpec extends SpecBase {
@@ -164,7 +164,7 @@ class ErrorHandlerSpec extends SpecBase {
       "Return an Upstream4xxResponse result" which {
 
         val request = FakeRequest("","/test/path")
-        val error = Upstream4xxResponse("Upstream  400 Error", Status.BAD_REQUEST, Status.BAD_REQUEST)
+        val error = UpstreamErrorResponse("Upstream  400 Error", Status.BAD_REQUEST, Status.BAD_REQUEST)
         lazy val result = await(TestErrorHandler.onServerError(request, error))
 
         "has the status BAD_REQUEST (400)" in {
@@ -182,7 +182,7 @@ class ErrorHandlerSpec extends SpecBase {
       "Return an Upstream5xxResponse result" which {
 
         val request = FakeRequest("","/test/path")
-        val error = Upstream5xxResponse("Upstream  500 Error", Status.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR)
+        val error = UpstreamErrorResponse("Upstream  500 Error", Status.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR)
         lazy val result = await(TestErrorHandler.onServerError(request, error))
 
         "has the status BAD_REQUEST (400)" in {

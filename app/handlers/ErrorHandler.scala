@@ -24,13 +24,12 @@ import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.libs.json.Json
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.bootstrap.config.{AppName, HttpAuditEvent}
-
+import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -45,7 +44,7 @@ class ErrorHandler @Inject()(val appConfig: MicroserviceAppConfig, auditConnecto
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
 
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     statusCode match {
       case play.mvc.Http.Status.NOT_FOUND =>
@@ -61,7 +60,7 @@ class ErrorHandler @Inject()(val appConfig: MicroserviceAppConfig, auditConnecto
   }
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     Logger.error(s"! Internal server error, for (${request.method}) [${request.uri}] -> ", ex)
 
