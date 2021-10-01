@@ -23,6 +23,9 @@ import models.Error
 import models.nrs._
 import play.api.http.Status._
 import play.api.libs.json.Json
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
+
+import scala.concurrent.Future
 
 class NRSControllerISpec extends ComponentSpecBase {
 
@@ -118,7 +121,7 @@ class NRSControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             NrsStub.stubSubmissionResponse(ACCEPTED, Right(NrsReceiptSuccessModel("12345")))
 
-            val response = await(post("/nrs/submission/999999999")(validJson))
+            val response = await(Future.successful(post("/nrs/submission/999999999")(validJson)))
 
             response.status shouldBe 202
             response.json shouldBe Json.obj("nrSubmissionId" -> "12345")
@@ -132,7 +135,7 @@ class NRSControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             NrsStub.stubSubmissionResponse(SERVICE_UNAVAILABLE, Left(Error("503", "Error body")))
 
-            val response = await(post("/nrs/submission/999999999")(validJson))
+            val response = await(Future.successful(post("/nrs/submission/999999999")(validJson)))
 
             val expectedResponse = """"{"code":"503","reason":"Error body"}""""
 
@@ -149,7 +152,7 @@ class NRSControllerISpec extends ComponentSpecBase {
 
           AuthStub.stubResponse()
 
-          val response = await(post("/nrs/submission/999999999")("just a string"))
+          val response = await(Future.successful(post("/nrs/submission/999999999")("just a string")))
 
           response.status shouldBe 400
           response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body cannot be parsed to JSON.")
@@ -162,7 +165,7 @@ class NRSControllerISpec extends ComponentSpecBase {
 
           AuthStub.stubResponse()
 
-          val response = await(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid")))
+          val response = await(Future.successful(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid"))))
 
           response.status shouldBe 400
           response.json shouldBe Json.obj("code" -> "400", "reason" -> "Request body does not pass validation")
@@ -176,7 +179,7 @@ class NRSControllerISpec extends ComponentSpecBase {
 
         AuthStub.stubResponse(OK, authResponse(otherEnrolment))
 
-        val response = await(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid")))
+        val response = await(Future.successful(post("/nrs/submission/999999999")(Json.obj("not-valid" -> "not-valid"))))
 
         response.status shouldBe FORBIDDEN
       }

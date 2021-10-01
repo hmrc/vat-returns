@@ -17,28 +17,28 @@
 package connectors.httpParsers
 
 import models._
-import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpResponse
+import utils.LoggerUtil
 
 import scala.util.{Failure, Success, Try}
 
-trait ResponseHttpParsers {
+trait ResponseHttpParsers extends LoggerUtil {
 
   type HttpGetResult[T] = Either[ErrorResponse, T]
 
   protected def handleErrorResponse(httpResponse: HttpResponse): Left[ErrorResponse, Nothing] = {
-    Logger.debug(s"[ResponseHttpParsers][handleErrorResponse] Body received: ${httpResponse.body}")
+    logger.debug(s"[ResponseHttpParsers][handleErrorResponse] Body received: ${httpResponse.body}")
 
     Left(Try(Json.parse(httpResponse.body)) match {
       case Success(json) => json.asOpt[MultiError].orElse(json.asOpt[Error]) match {
         case Some(error) => ErrorResponse(httpResponse.status, error)
         case _ =>
-          Logger.warn(s"[ResponseHttpParsers][handleErrorResponse] Unexpected JSON response: ${httpResponse.body}")
+          logger.warn(s"[ResponseHttpParsers][handleErrorResponse] Unexpected JSON response: ${httpResponse.body}")
           UnexpectedJsonFormat
       }
       case Failure(_) =>
-        Logger.warn(s"[ResponseHttpParsers][handleErrorResponse] Invalid JSON response: ${httpResponse.body}")
+        logger.warn(s"[ResponseHttpParsers][handleErrorResponse] Invalid JSON response: ${httpResponse.body}")
         InvalidJsonResponse
     })
   }

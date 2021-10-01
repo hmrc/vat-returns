@@ -33,7 +33,7 @@ object AuthStub extends WireMockMethods {
 
   def authResponse(enrolments: JsObject*): JsObject = {
     Json.obj(
-      "affinityGroup" -> Individual,
+      "affinityGroup" -> Individual.toString,
       "allEnrolments" -> enrolments
     )
   }

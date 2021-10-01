@@ -18,14 +18,16 @@ package connectors
 
 import config.MicroserviceAppConfig
 import connectors.httpParsers.VatReturnsHttpParser._
+
 import javax.inject.{Inject, Singleton}
 import models.{VatReturnDetail, VatReturnFilters}
-import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import utils.LoggerUtil
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: MicroserviceAppConfig) {
+class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: MicroserviceAppConfig) extends LoggerUtil {
 
   private[connectors] def setupDesVatReturnsUrl(vrn: String): String = appConfig.desServiceUrl +
     appConfig.setupDesReturnsStartPath + vrn
@@ -38,11 +40,11 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
     val url = setupDesVatReturnsUrl(vrn)
     val hc = headerCarrier.copy(authorization = None)
 
-    Logger.debug(s"[VatReturnsConnector][getVatReturns] - Calling GET $url \nHeaders: $desHeaders\n QueryParams: $queryParameters")
+    logger.debug(s"[VatReturnsConnector][getVatReturns] - Calling GET $url \nHeaders: $desHeaders\n QueryParams: $queryParameters")
     http.GET(url, queryParameters.toSeqQueryParams, desHeaders)(VatReturnReads, hc, ec).map {
       case vatReturns@Right(_) => vatReturns
       case error@Left(message) =>
-        Logger.warn("[VatReturnsConnector][getVatReturns] Error Received. Message: " + message)
+        logger.warn("[VatReturnsConnector][getVatReturns] Error Received. Message: " + message)
         error
     }
   }

@@ -17,7 +17,6 @@
 package connectors.httpParsers
 
 import models._
-import play.api.Logger
 import play.api.http.Status.OK
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
@@ -29,16 +28,16 @@ object SubmitVatReturnHttpParser extends ResponseHttpParsers {
       response.status match {
         case OK => response.json.validate[SuccessModel].fold(
           _ => {
-            Logger.warn("[SubmitVatReturnReads][read] DES response did not contain formBundleNumber")
+            logger.warn("[SubmitVatReturnReads][read] DES response did not contain formBundleNumber")
             Left(UnexpectedJsonFormat)
           },
           valid => {
-            Logger.debug(s"[SubmitVatReturnReads][read] Successful response from submission. Body: ${response.body}")
+            logger.debug(s"[SubmitVatReturnReads][read] Successful response from submission. Body: ${response.body}")
             Right(valid)
           }
         )
         case status =>
-          Logger.warn(s"[SubmitVatReturnReads][read] Unexpected Response. Status: $status. Body: ${response.body}")
+          logger.warn(s"[SubmitVatReturnReads][read] Unexpected Response. Status: $status. Body: ${response.body}")
           handleErrorResponse(response)
       }
     }

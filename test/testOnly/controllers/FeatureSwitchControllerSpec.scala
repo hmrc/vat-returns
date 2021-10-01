@@ -49,7 +49,7 @@ class FeatureSwitchControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
 
     "return feature switch configuration" in {
-      await(jsonBodyOf(result)) shouldEqual Json.toJson(
+      contentAsJson(result) shouldEqual Json.toJson(
         FeatureSwitchModel(useStubFeature = true))
     }
   }
@@ -69,7 +69,7 @@ class FeatureSwitchControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
 
     "return new feature switch configuration" in {
-      await(jsonBodyOf(result)) shouldEqual body
+      contentAsJson(result) shouldEqual body
     }
   }
 }

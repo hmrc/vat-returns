@@ -19,50 +19,51 @@ package audit
 import javax.inject.{Inject, Singleton}
 import audit.models.{AuditModel, ExtendedAuditModel}
 import config.MicroserviceAppConfig
-import play.api.Logger
 import play.api.http.HeaderNames.REFERER
-import play.api.libs.json.{JsObject, Json, Writes, JsValue}
+import play.api.libs.json.{JsObject, JsValue, Json, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
+import utils.LoggerUtil
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditingService @Inject()(appConfig: MicroserviceAppConfig, auditConnector: AuditConnector) {
+class AuditingService @Inject()(appConfig: MicroserviceAppConfig, auditConnector: AuditConnector) extends LoggerUtil {
 
   implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   implicit val extendedDataEventWrites: Writes[ExtendedDataEvent] = Json.writes[ExtendedDataEvent]
 
   def audit(auditModel: AuditModel)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuditResult] = {
     val dataEvent: DataEvent = toDataEvent(appConfig.appName, auditModel, path)
-    Logger.debug(s"Splunk Audit Event:\n\n${Json.toJson(dataEvent)}")
+    logger.debug(s"Splunk Audit Event:\n\n${Json.toJson(dataEvent)}")
     auditConnector.sendEvent(dataEvent).map {
       case Success =>
-        Logger.debug("Splunk Audit Successful")
+        logger.debug("Splunk Audit Successful")
         Success
       case Failure(err, _) =>
-        Logger.debug(s"Splunk Audit Error, message: $err")
+        logger.debug(s"Splunk Audit Error, message: $err")
         Failure(err)
       case Disabled =>
-        Logger.debug(s"Auditing Disabled")
+        logger.debug(s"Auditing Disabled")
         Disabled
     }
   }
 
   def audit(auditModel: ExtendedAuditModel)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuditResult] = {
     val extendedDataEvent: ExtendedDataEvent = toDataEvent(appConfig.appName, auditModel, path)
-    Logger.debug(s"Splunk Audit Event:\n\n${Json.toJson(extendedDataEvent)}")
+    logger.debug(s"Splunk Audit Event:\n\n${Json.toJson(extendedDataEvent)}")
     auditConnector.sendExtendedEvent(extendedDataEvent).map {
       case Success =>
-        Logger.debug("Splunk Audit Successful")
+        logger.debug("Splunk Audit Successful")
         Success
       case Failure(err, _) =>
-        Logger.debug(s"Splunk Audit Error, message: $err")
+        logger.debug(s"Splunk Audit Error, message: $err")
         Failure(err)
       case Disabled =>
-        Logger.debug(s"Auditing Disabled")
+        logger.debug(s"Auditing Disabled")
         Disabled
     }
   }
