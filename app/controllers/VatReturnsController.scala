@@ -20,23 +20,25 @@ import controllers.actions.AuthAction
 
 import javax.inject.{Inject, Singleton}
 import models._
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.VatReturnsService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.LoggerUtil
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class VatReturnsController @Inject()(val authenticate: AuthAction, val vatReturnsService: VatReturnsService, cc: ControllerComponents) extends BackendController(cc) {
+class VatReturnsController @Inject()(val authenticate: AuthAction, val vatReturnsService: VatReturnsService, cc: ControllerComponents)
+  extends BackendController(cc) with LoggerUtil {
 
   def getVatReturns(vrn: String, filters: VatReturnFilters): Action[AnyContent] =
     authenticate.async {
       implicit authorisedUser =>
         if (isInvalidVrn(vrn)) {
-          Logger.warn(s"[VatReturnsController][getVatReturns] Invalid VRN '$vrn' received in request.")
+          logger.warn(s"[VatReturnsController][getVatReturns] Invalid VRN '$vrn' received in request.")
           Future.successful(BadRequest(Json.toJson(InvalidVrn)))
         } else {
           retrieveVatReturns(vrn, filters)
@@ -44,7 +46,7 @@ class VatReturnsController @Inject()(val authenticate: AuthAction, val vatReturn
     }
 
   private def retrieveVatReturns(vrn: String, filters: VatReturnFilters)(implicit hc: HeaderCarrier) = {
-    Logger.debug(s"[VatReturnsController][retrieveVatReturns] Calling VatReturnsService.getVatReturns")
+    logger.debug(s"[VatReturnsController][retrieveVatReturns] Calling VatReturnsService.getVatReturns")
 
     vatReturnsService.getVatReturns(vrn, filters).map {
       case _@Right(vatReturns) => Ok(Json.toJson(vatReturns))

@@ -17,21 +17,23 @@
 package controllers
 
 import controllers.actions.AuthorisedSubmitVatReturn
+
 import javax.inject.{Inject, Singleton}
 import models.Error
 import models.nrs.NrsReceiptRequestModel
-import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.NrsSubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.LoggerUtil
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
                               nrsSubmissionService: NrsSubmissionService,
                               cc: ControllerComponents)
-                             (implicit ec: ExecutionContext) extends BackendController(cc) {
+                             (implicit ec: ExecutionContext) extends BackendController(cc) with LoggerUtil {
 
   def submitNRS(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
 
@@ -41,21 +43,21 @@ class NRSController @Inject()(authorisedAction: AuthorisedSubmitVatReturn,
           case JsSuccess(model, _) =>
             nrsSubmissionService.nrsReceiptSubmission(model) map {
               case Right(successModel) =>
-                Logger.debug("[NRSController][submitNRS] - successful post to NRS")
+                logger.debug("[NRSController][submitNRS] - successful post to NRS")
                 Accepted(Json.toJson(successModel))
               case Left(error) =>
-                Logger.debug(s"[NRSController][submitNRS] - NRS submission failed. Response body: ${error.reason}")
-                Logger.warn("[NRSController][submitNRS] - NRS submission failed.")
+                logger.debug(s"[NRSController][submitNRS] - NRS submission failed. Response body: ${error.reason}")
+                logger.warn("[NRSController][submitNRS] - NRS submission failed.")
                 Status(error.code.toInt)(Json.toJson(error.reason))
             }
           case JsError(error) =>
-            Logger.debug(s"[NRSController][submitNRS] - request body does not pass validation: $error")
-            Logger.warn(s"[NRSController][submitNRS] - request body does not pass validation")
+            logger.debug(s"[NRSController][submitNRS] - request body does not pass validation: $error")
+            logger.warn(s"[NRSController][submitNRS] - request body does not pass validation")
             Future.successful(BadRequest(Json.toJson(Error("400", "Request body does not pass validation"))))
         }
       case None =>
-        Logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to JSON. Body: ${request.body}")
-        Logger.warn("[NRSController][submitNRS] - request body cannot be parsed to JSON")
+        logger.debug(s"[NRSController][submitNRS] - request body cannot be parsed to JSON. Body: ${request.body}")
+        logger.warn("[NRSController][submitNRS] - request body cannot be parsed to JSON")
         Future.successful(BadRequest(Json.toJson(Error("400", "Request body cannot be parsed to JSON."))))
     }
   }

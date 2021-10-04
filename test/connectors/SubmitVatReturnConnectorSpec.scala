@@ -22,6 +22,8 @@ import mocks.MockHttp
 import models._
 import play.api.http.Status
 import models.VatReturnFilters._
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
+
 import scala.concurrent.Future
 
 class SubmitVatReturnConnectorSpec extends SpecBase with MockHttp {

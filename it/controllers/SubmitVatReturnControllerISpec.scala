@@ -22,6 +22,9 @@ import helpers.servicemocks.{AuthStub, SubmitVatReturnStub}
 import models.InvalidJsonResponse
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
+
+import scala.concurrent.Future
 
 class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
@@ -63,7 +66,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
           AuthStub.stubResponse()
           SubmitVatReturnStub.stubResponse("999999999")(OK, successReturnBody)
 
-          val response = await(post("/returns/vrn/999999999", headers)(validJson))
+          val response = await(Future.successful(post("/returns/vrn/999999999", headers)(validJson)))
 
           SubmitVatReturnStub.verifySubmissionHeaders("999999999")
           response.status shouldBe 200
@@ -80,7 +83,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(BAD_REQUEST, errorReturnBody("REEEEEEEEE"))
 
-            val response = await(post("/returns/vrn/999999999", headers)(validJson))
+            val response = await(Future.successful(post("/returns/vrn/999999999", headers)(validJson)))
 
             response.status shouldBe BAD_REQUEST
           }
@@ -90,7 +93,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(NOT_FOUND, errorReturnBody("REEEE"))
 
-            val response = await(post("/returns/vrn/999999999", headers)(validJson))
+            val response = await(Future.successful(post("/returns/vrn/999999999", headers)(validJson)))
 
             response.status shouldBe NOT_FOUND
           }
@@ -100,7 +103,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(INTERNAL_SERVER_ERROR, errorReturnBody("REEEE"))
 
-            val response = await(post("/returns/vrn/999999999", headers)(validJson))
+            val response = await(Future.successful(post("/returns/vrn/999999999", headers)(validJson)))
 
             response.status shouldBe INTERNAL_SERVER_ERROR
           }
@@ -110,7 +113,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
             AuthStub.stubResponse()
             SubmitVatReturnStub.stubResponse("999999999")(SERVICE_UNAVAILABLE, errorReturnBody("REEEE"))
 
-            val response = await(post("/returns/vrn/999999999", headers)(validJson))
+            val response = await(Future.successful(post("/returns/vrn/999999999", headers)(validJson)))
 
             response.status shouldBe SERVICE_UNAVAILABLE
           }
@@ -119,7 +122,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
         "the json cannot be parsed" in {
 
           AuthStub.stubResponse()
-          val response = await(post("/returns/vrn/999999999")(invalidJson))
+          val response = await(Future.successful(post("/returns/vrn/999999999")(invalidJson)))
 
           response.status shouldBe INTERNAL_SERVER_ERROR
           response.json shouldBe InvalidJsonResponse.toJson
@@ -128,7 +131,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
         "request does not have an OriginatorID in header" in {
 
           AuthStub.stubResponse()
-          val response = await(post("/returns/vrn/999999999")(validJson))
+          val response = await(Future.successful(post("/returns/vrn/999999999")(validJson)))
 
           response.status shouldBe BAD_REQUEST
           response.json shouldBe Json.obj("code" -> "400", "reason" -> "No OriginatorID found in header")
@@ -137,7 +140,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
         "OriginatorID in header is invalid" in {
 
           AuthStub.stubResponse()
-          val response = await(post("/returns/vrn/999999999", Map("OriginatorID" -> "Another channel"))(validJson))
+          val response = await(Future.successful(post("/returns/vrn/999999999", Map("OriginatorID" -> "Another channel"))(validJson)))
 
           response.status shouldBe BAD_REQUEST
           response.json shouldBe Json.obj("code" -> "400", "reason" -> "Invalid OriginatorID header value")
@@ -151,7 +154,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
         AuthStub.stubResponse()
 
-        val response = await(post("/returns/vrn/123123123")(validJson))
+        val response = await(Future.successful(post("/returns/vrn/123123123")(validJson)))
 
         response.status shouldBe FORBIDDEN
       }
@@ -163,7 +166,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
         AuthStub.stubResponse(OK, authResponse(otherEnrolment))
 
-        val response = await(post("/returns/vrn/999999999")(validJson))
+        val response = await(Future.successful(post("/returns/vrn/999999999")(validJson)))
 
         response.status shouldBe FORBIDDEN
       }

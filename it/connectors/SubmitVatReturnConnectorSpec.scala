@@ -24,6 +24,7 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 
 class SubmitVatReturnConnectorSpec extends ComponentSpecBase  {
 

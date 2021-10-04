@@ -18,7 +18,6 @@ package controllers.actions
 
 import javax.inject.Inject
 import models.Error
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
@@ -27,9 +26,12 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import auth.AuthEnrolmentKeys._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.LoggerUtil
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
+class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: ControllerComponents)
+  extends BackendController(cc) with AuthorisedFunctions with LoggerUtil {
 
   def async(vrn: String)(block: Request[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
     implicit request =>
@@ -47,7 +49,7 @@ class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: 
                                     block: Request[AnyContent] => Future[Result],
                                     requestedVrn: String)(implicit request: Request[AnyContent]): Future[Result] = {
     enrolments.enrolments.collectFirst {
-      case Enrolment(`vatEnrolmentId`, EnrolmentIdentifier(_, vrn) :: _, _, _) =>
+      case Enrolment(`vatEnrolmentId`, Seq(EnrolmentIdentifier(_, vrn)), _, _) =>
         if(requestedVrn == vrn) {
           block(request)
         } else {
@@ -68,19 +70,19 @@ class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: 
       .retrieve(Retrievals.allEnrolments) {
         enrolments =>
           enrolments.enrolments.collectFirst {
-            case Enrolment(`agentEnrolmentId`, _ :: _, _, _) => block(request)
+            case Enrolment(`agentEnrolmentId`, Seq(_), _, _) => block(request)
           } getOrElse Future.successful(forbiddenAction(s"User does not have $agentEnrolmentId enrolment"))
       } recover authExceptionAction
   }
 
   private def forbiddenAction(reason: String): Result = {
-    Logger.debug(s"[AuthorisedSubmitVatReturn][async] - Forbidden access to vat-returns service. $reason")
+    logger.debug(s"[AuthorisedSubmitVatReturn][async] - Forbidden access to vat-returns service. $reason")
     Forbidden(Json.toJson(Error(FORBIDDEN.toString, s"Forbidden access to vat-returns service. $reason")))
   }
 
   private def authExceptionAction: PartialFunction[Throwable, Result] = {
     case _: NoActiveSession =>
-      Logger.debug(s"[AuthorisedSubmitVatReturn][async] - User has no active session")
+      logger.debug(s"[AuthorisedSubmitVatReturn][async] - User has no active session")
       Unauthorized(Json.toJson(Error(UNAUTHORIZED.toString, "User has no active session")))
     case ex: AuthorisationException => forbiddenAction(ex.reason)
   }

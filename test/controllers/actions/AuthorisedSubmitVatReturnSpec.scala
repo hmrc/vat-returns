@@ -23,8 +23,10 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.mvc.Results.Ok
+import play.api.test.Helpers.{status, defaultAwaitTimeout, contentAsJson}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
+
 import scala.concurrent.Future
 
 class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
@@ -64,7 +66,7 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
           }
 
           "return a reason in JSON body" in {
-            jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+            contentAsJson(result) shouldBe Json.toJson(Error(
               "403",
               "Forbidden access to vat-returns service. Requested VRN does not match VRN in auth header")
             )
@@ -83,7 +85,7 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
         }
 
         "return a reason in JSON body" in {
-          jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+          contentAsJson(result) shouldBe Json.toJson(Error(
             "403",
             "Forbidden access to vat-returns service. User does not have HMRC-MTD-VAT enrolment")
           )
@@ -119,7 +121,7 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
           }
 
           "return a reason in JSON body" in {
-            jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+            contentAsJson(result) shouldBe Json.toJson(Error(
               "403",
               "Forbidden access to vat-returns service. Insufficient Enrolments")
             )
@@ -139,7 +141,7 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
         }
 
         "return a reason in JSON body" in {
-          jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+          contentAsJson(result) shouldBe Json.toJson(Error(
             "403",
             "Forbidden access to vat-returns service. User does not have HMRC-AS-AGENT enrolment")
           )
@@ -157,7 +159,7 @@ class AuthorisedSubmitVatReturnSpec extends SpecBase with MockAuthConnector {
       }
 
       "return a reason in JSON body" in {
-        jsonBodyOf(await(result)) shouldBe Json.toJson(Error(
+        contentAsJson(result) shouldBe Json.toJson(Error(
           "401",
           "User has no active session")
         )

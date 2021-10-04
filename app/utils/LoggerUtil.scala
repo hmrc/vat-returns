@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package auth
+package utils
 
-import com.google.inject.AbstractModule
-import controllers.actions.{AuthAction, AuthActionImpl}
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import org.slf4j.{Logger, LoggerFactory}
+import play.api.LoggerLike
 
-class AuthModule extends AbstractModule {
-  override def configure(): Unit = {
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
-    bind(classOf[AuthorisedFunctions]).to(classOf[MicroserviceAuthorisedFunctions])
-  }
+trait LoggerUtil extends LoggerLike {
+  override val logger: Logger = LoggerFactory.getLogger("application")
 }

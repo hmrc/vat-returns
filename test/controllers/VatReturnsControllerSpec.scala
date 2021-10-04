@@ -24,6 +24,9 @@ import models._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
+import play.api.test.Helpers.{await, contentAsJson, defaultAwaitTimeout, status}
+
+import scala.concurrent.Future
 
 class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with MockMicroserviceAuthorisedFunctions {
 
@@ -89,11 +92,11 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
             setupMockGetVatReturns(testVrn, VatReturnFilters(
               periodKey = "17AA"
             ))(successResponse)
-            status(result) shouldBe Status.OK
+            status(Future.successful(result)) shouldBe Status.OK
           }
 
           "return a json body with the transformed des return data" in {
-            jsonBodyOf(result) shouldBe transformedJson
+            contentAsJson(Future.successful(result)) shouldBe transformedJson
           }
         }
 
@@ -108,12 +111,12 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
               periodKey = "17AA"
             ))(badRequestSingleError)
 
-            status(result) shouldBe Status.BAD_REQUEST
+            status(Future.successful(result)) shouldBe Status.BAD_REQUEST
           }
 
           "return a json body with the single error message" in {
 
-            jsonBodyOf(result) shouldBe Json.toJson(singleError)
+            contentAsJson(Future.successful(result)) shouldBe Json.toJson(singleError)
           }
         }
 
@@ -124,11 +127,11 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
           ))(fakeRequest))
 
           "return a status of 400 (BAD_REQUEST)" in {
-            status(result) shouldBe Status.BAD_REQUEST
+            status(Future.successful(result)) shouldBe Status.BAD_REQUEST
           }
 
           "return a json body with the invalid vrn error message" in {
-            jsonBodyOf(result) shouldBe Json.toJson(InvalidVrn)
+            contentAsJson(Future.successful(result)) shouldBe Json.toJson(InvalidVrn)
           }
         }
 
@@ -143,11 +146,11 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
               periodKey = "17AA"
             ))(badRequestMultiError)
 
-            status(result) shouldBe Status.BAD_REQUEST
+            status(Future.successful(result)) shouldBe Status.BAD_REQUEST
           }
 
           "return a json body with the multiple error messages" in {
-            jsonBodyOf(result) shouldBe Json.toJson(multiError)
+            contentAsJson(Future.successful(result)) shouldBe Json.toJson(multiError)
           }
         }
 
@@ -164,12 +167,12 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
             periodKey = "17AA"
           ))(badRequestSingleError)
 
-          status(result) shouldBe Status.BAD_REQUEST
+          status(Future.successful(result)) shouldBe Status.BAD_REQUEST
         }
 
         "return a json body with the single error message" in {
 
-          jsonBodyOf(result) shouldBe Json.toJson(singleError)
+          contentAsJson(Future.successful(result)) shouldBe Json.toJson(singleError)
         }
       }
 
@@ -184,12 +187,12 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
             periodKey = "17AA"
           ))(badRequestMultiError)
 
-          status(result) shouldBe Status.BAD_REQUEST
+          status(Future.successful(result)) shouldBe Status.BAD_REQUEST
         }
 
         "return a json body with the multiple error messages" in {
 
-          jsonBodyOf(result) shouldBe Json.toJson(multiError)
+          contentAsJson(Future.successful(result)) shouldBe Json.toJson(multiError)
         }
       }
     }
@@ -206,7 +209,7 @@ class VatReturnsControllerSpec extends SpecBase with MockVatReturnsService with 
 
         "has status UNAUTHORISED (401)" in {
           setupMockAuthorisationException()
-          status(result) shouldBe Status.UNAUTHORIZED
+          status(Future.successful(result)) shouldBe Status.UNAUTHORIZED
         }
       }
     }

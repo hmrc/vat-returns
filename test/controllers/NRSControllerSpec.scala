@@ -27,6 +27,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{await, contentAsJson, defaultAwaitTimeout, status}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments}
 
@@ -50,7 +51,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
       "a valid NRSModel is passed in the request body" should {
 
-        lazy val result = await(TestNRSController.submitNRS("999999999")(FakeRequest().withJsonBody(Json.toJson(correctModel))))
+        lazy val result = TestNRSController.submitNRS("999999999")(FakeRequest().withJsonBody(Json.toJson(correctModel)))
 
         "return a status of 202 (ACCEPTED)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
@@ -59,7 +60,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
         }
 
         "return a json body with the transformed des return data" in {
-          jsonBodyOf(result) shouldBe Json.toJson(NrsReceiptSuccessModel("1234"))
+          contentAsJson(result) shouldBe Json.toJson(NrsReceiptSuccessModel("1234"))
         }
       }
 
@@ -69,7 +70,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
-          status(result) shouldBe Status.BAD_REQUEST
+          status(Future.successful(result)) shouldBe Status.BAD_REQUEST
         }
       }
 
@@ -79,7 +80,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
         "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
-          status(result) shouldBe Status.BAD_REQUEST
+          status(Future.successful(result)) shouldBe Status.BAD_REQUEST
         }
       }
 
@@ -90,7 +91,7 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
         "return a status of 400 (BAD_REQUEST)" in {
           mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
           setupMockNrsReceiptSubmission(correctModel)(Left(Error("400", "bad reason")))
-          status(result) shouldBe Status.BAD_REQUEST
+          status(Future.successful(result)) shouldBe Status.BAD_REQUEST
         }
       }
     }

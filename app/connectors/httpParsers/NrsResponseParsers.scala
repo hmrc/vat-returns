@@ -18,7 +18,6 @@ package connectors.httpParsers
 
 import models.Error
 import models.nrs.NrsReceiptSuccessModel
-import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
@@ -31,8 +30,8 @@ object NrsResponseParsers extends ResponseHttpParsers {
   private implicit def intToString: Int => String = _.toString
 
   def handleErrorCodes(input: HttpResponse): Left[Error, Nothing] = {
-    Logger.debug(s"[NrsResponseParsers][handleErrorCodes] NRS returned ${input.status}. Body: ${input.body}")
-    Logger.warn(s"[NrsResponseParsers][handleErrorCodes] NRS returned ${input.status}.")
+    logger.debug(s"[NrsResponseParsers][handleErrorCodes] NRS returned ${input.status}. Body: ${input.body}")
+    logger.warn(s"[NrsResponseParsers][handleErrorCodes] NRS returned ${input.status}.")
 
     input.status match {
       case BAD_REQUEST =>

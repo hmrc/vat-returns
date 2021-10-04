@@ -19,16 +19,17 @@ package mocks.audit
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockAuditingConnector extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockAuditingConnector extends AnyWordSpecLike with Matchers with OptionValues with MockitoSugar with BeforeAndAfterEach {
 
   override def beforeEach(): Unit = {
     super.beforeEach()

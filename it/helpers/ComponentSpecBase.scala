@@ -23,6 +23,7 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{BodyWritable, WSResponse}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 

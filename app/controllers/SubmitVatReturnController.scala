@@ -17,28 +17,30 @@
 package controllers
 
 import controllers.actions.AuthorisedSubmitVatReturn
+
 import javax.inject.{Inject, Singleton}
 import models._
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.VatReturnsService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.LoggerUtil
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService,
                                           authorisedAction: AuthorisedSubmitVatReturn,
                                           cc: ControllerComponents)
-                                         (implicit ec: ExecutionContext) extends BackendController(cc) {
+                                         (implicit ec: ExecutionContext) extends BackendController(cc) with LoggerUtil {
 
   def submitVatReturn(vrn: String): Action[AnyContent] = authorisedAction.async(vrn) { implicit request =>
     val requestAsJson: Option[VatReturnDetail] = request.body.asJson match {
       case Some(validJson) => validJson.asOpt[VatReturnDetail]
       case None =>
-        Logger.warn("[SubmitVatReturnController][submitVatReturn] Issue parsing body as json")
-        Logger.debug("[SubmitVatReturnController][submitVatReturn] The body provided in the request is not valid Json")
+        logger.warn("[SubmitVatReturnController][submitVatReturn] Issue parsing body as json")
+        logger.debug("[SubmitVatReturnController][submitVatReturn] The body provided in the request is not valid Json")
         None
     }
 
@@ -48,14 +50,14 @@ class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService,
           case Some(id) if (id == VATUI.id) || (id == MDTP.id) =>
             submission(vrn, vatReturnModel, id)
           case Some(invalid) =>
-            Logger.warn(s"[SubmitVatReturnsController][SubmitVatReturn] Invalid OriginatorID header value: $invalid")
+            logger.warn(s"[SubmitVatReturnsController][SubmitVatReturn] Invalid OriginatorID header value: $invalid")
             Future.successful(BadRequest(Error("400", "Invalid OriginatorID header value").toJson))
           case None =>
-            Logger.warn(s"[SubmitVatReturnsController][SubmitVatReturn] No OriginatorID found in header")
+            logger.warn(s"[SubmitVatReturnsController][SubmitVatReturn] No OriginatorID found in header")
             Future.successful(BadRequest(Error("400", "No OriginatorID found in header").toJson))
         }
       case None =>
-        Logger.debug("[SubmitVatReturnsController][SubmitVatReturn] An error occurred while trying to parse incoming Json")
+        logger.debug("[SubmitVatReturnsController][SubmitVatReturn] An error occurred while trying to parse incoming Json")
         Future.successful(InternalServerError(Json.toJson(InvalidJsonResponse.toJson)))
     }
   }
@@ -66,8 +68,8 @@ class SubmitVatReturnController @Inject()(vatReturnsService: VatReturnsService,
       case Right(responseModel) =>
         Ok(Json.toJson(responseModel))
       case Left(error) =>
-        Logger.warn("[SubmitVatReturnsController][submission] Error occurred while trying to submit return")
-        Logger.debug(
+        logger.warn("[SubmitVatReturnsController][submission] Error occurred while trying to submit return")
+        logger.debug(
           "[SubmitVatReturnsController][submission] The following error occurred while trying to submit a return:"
             + error.error.toJson
         )

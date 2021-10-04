@@ -21,14 +21,15 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.{reset, when}
 import org.mockito.stubbing.OngoingStubbing
 import models._
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 import services.VatReturnsService
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-trait MockVatReturnsService extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockVatReturnsService extends AnyWordSpecLike with Matchers with OptionValues with MockitoSugar with BeforeAndAfterEach {
 
   val mockVatReturnsService: VatReturnsService = mock[VatReturnsService]
 

@@ -26,6 +26,7 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpClient
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 
 class NrsConnectorISpec extends ComponentSpecBase {
   implicit def intToString: Int => String = _.toString

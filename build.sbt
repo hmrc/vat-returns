@@ -46,7 +46,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
+    ScoverageKeys.coverageMinimumStmtTotal := 95,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
@@ -54,19 +54,20 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "5.3.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.14.0",
   "com.typesafe.play" %% "play-json-joda" % "2.6.14"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-26",
-  "org.scalatest" %% "scalatest" % "3.0.8",
+  "org.scalatest" %% "scalatest" % "3.1.4",
   "org.pegdown" % "pegdown" % "1.6.0",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0",
   "org.mockito" % "mockito-core" % "3.2.0",
   "com.typesafe.play" %% "play-test" % PlayVersion.current,
   "com.github.fge" % "json-schema-validator" % "2.2.6",
-  "com.github.tomakehurst" % "wiremock-jre8" % "2.27.1"
+  "com.github.tomakehurst" % "wiremock-jre8" % "2.26.3",
+  "com.vladsch.flexmark" % "flexmark-all" % "0.36.8",
+  "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"
 ).map(_ % scope)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
@@ -85,7 +86,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.11",
+    scalaVersion := "2.12.14",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
