@@ -34,9 +34,18 @@ class IdentityLoginTimesSpec extends SpecBase {
     "previousLogin" -> previousDateTimeString
   )
 
+  val jsonWithoutPreviousLogin: JsObject = Json.obj(
+    "currentLogin" -> currentDateTimeString
+  )
+
   val correctModel: IdentityLoginTimes = IdentityLoginTimes(
     currentDateTimeToUse,
     Some(previousDateTimeToUse)
+  )
+
+  val modelWithoutPreviousLogin: IdentityLoginTimes = IdentityLoginTimes(
+    currentDateTimeToUse,
+    None
   )
 
   "Formats" should {
@@ -45,6 +54,9 @@ class IdentityLoginTimesSpec extends SpecBase {
     }
     "parse correctly to json" in {
       Json.toJson(correctModel) shouldBe correctJson
+    }
+    "parse correctly to json if previousLogin is None" in {
+      Json.toJson(modelWithoutPreviousLogin) shouldBe jsonWithoutPreviousLogin
     }
   }
 }

@@ -46,4 +46,14 @@ trait MockVatReturnsService extends AnyWordSpecLike with Matchers with OptionVal
         ArgumentMatchers.eq(queryParameters)
       )(ArgumentMatchers.any(), ArgumentMatchers.any())
     ).thenReturn(Future.successful(response))
+
+  def setupMockSubmitReturn(vrn: String, model: VatReturnDetail, originatorID: String)
+                           (response: HttpGetResult[SuccessModel]): OngoingStubbing[Future[HttpGetResult[SuccessModel]]] =
+    when(
+      mockVatReturnsService.submitVatReturn(
+        ArgumentMatchers.eq(vrn),
+        ArgumentMatchers.eq(model),
+        ArgumentMatchers.eq(originatorID)
+      )(ArgumentMatchers.any(), ArgumentMatchers.any())
+    ).thenReturn(Future.successful(response))
 }
