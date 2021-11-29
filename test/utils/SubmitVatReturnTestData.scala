@@ -21,6 +21,33 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 
 object SubmitVatReturnTestData {
 
+  val nonAgentVatReturnDetailReadJson: JsValue = Json.obj(
+    "periodKey" -> "periodKey",
+    "vatDueSales" -> 10000,
+    "vatDueAcquisitions" -> 2000,
+    "vatDueTotal" -> 12000,
+    "vatReclaimedCurrPeriod" -> 4000,
+    "vatDueNet" -> 8000,
+    "totalValueSalesExVAT" -> 250000,
+    "totalValuePurchasesExVAT" -> 120000,
+    "totalValueGoodsSuppliedExVAT" -> 160000,
+    "totalAllAcquisitionsExVAT" -> 25000
+  )
+
+  val agentVatReturnDetailReadJson: JsValue = Json.obj(
+    "periodKey" -> "periodKey",
+    "vatDueSales" -> 10000,
+    "vatDueAcquisitions" -> 2000,
+    "vatDueTotal" -> 12000,
+    "vatReclaimedCurrPeriod" -> 4000,
+    "vatDueNet" -> 8000,
+    "totalValueSalesExVAT" -> 250000,
+    "totalValuePurchasesExVAT" -> 120000,
+    "totalValueGoodsSuppliedExVAT" -> 160000,
+    "totalAllAcquisitionsExVAT" -> 25000,
+    "agentReferenceNumber" -> "Example ARN"
+  )
+
   val nonAgentVatReturnDetailModel: VatReturnDetail = VatReturnDetail(
     periodKey = "periodKey",
     vatDueSales = BigDecimal(10000),
@@ -46,7 +73,7 @@ object SubmitVatReturnTestData {
     totalValuePurchasesExVAT = BigDecimal(120000),
     totalValueGoodsSuppliedExVAT = BigDecimal(160000),
     totalAllAcquisitionsExVAT = BigDecimal(25000),
-    agentReferenceNumber = Some("123456789")
+    agentReferenceNumber = Some("Example ARN")
   )
 
   val validVatReturnIdentificationModel: VatReturnIdentification = VatReturnIdentification(idType = "MDTP", idValue = "idValue")

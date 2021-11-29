@@ -22,12 +22,11 @@ import mocks.auth.{MockAuthConnector, MockMicroserviceAuthorisedFunctions}
 import mocks.services.MockVatReturnsService
 import models.SuccessModel
 import play.api.http.Status
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments}
-import utils.SubmitVatReturnTestData.{nonAgentVatReturnDetailModel, validVatReturnIdentificationModel}
+import utils.SubmitVatReturnTestData._
 
 import scala.concurrent.Future
 
@@ -45,19 +44,75 @@ class SubmitVatReturnControllerSpec extends SpecBase with MockVatReturnsService 
 
       "the request is non-empty" when {
 
-        "the user has a valid originator ID" should {
+        "the user has a valid originator ID" when {
+
+          "the user is a non-agent" should {
+
+            lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest().withJsonBody(
+              nonAgentVatReturnDetailReadJson).withHeaders("OriginatorID" -> "MDTP")
+            )
+            val successResponse: Either[Nothing, SuccessModel] = Right(SuccessModel("200"))
+
+            "return status 200" in {
+
+              mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
+              setupMockSubmitReturn("999999999", nonAgentVatReturnDetailModel, validVatReturnIdentificationModel.idType)(successResponse)
+              status(result) shouldBe Status.OK
+            }
+          }
+
+          "the user is an agent" should {
+
+            lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest().withJsonBody(
+              agentVatReturnDetailReadJson).withHeaders("OriginatorID" -> "MDTP")
+            )
+            val successResponse: Either[Nothing, SuccessModel] = Right(SuccessModel("200"))
+
+            "return status 200" in {
+
+              mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
+              setupMockSubmitReturn("999999999", agentVatReturnDetailModel, validVatReturnIdentificationModel.idType)(successResponse)
+              status(result) shouldBe Status.OK
+            }
+          }
+        }
+
+        "the user has an invalid originator ID" should {
 
           lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest().withJsonBody(
-            Json.toJson(nonAgentVatReturnDetailModel)).withHeaders("OriginatorID" -> "MDTP")
+            nonAgentVatReturnDetailReadJson).withHeaders("OriginatorID" -> "Something invalid")
           )
-          val successResponse: Either[Nothing, SuccessModel] = Right(SuccessModel("200"))
 
-          "return status 200" in {
+          "return status 400" in {
 
             mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
-            setupMockSubmitReturn("999999999", nonAgentVatReturnDetailModel, validVatReturnIdentificationModel.idType)(successResponse)
-            status(result) shouldBe Status.OK
+            status(result) shouldBe Status.BAD_REQUEST
           }
+        }
+
+        "the user has no originator ID" should {
+
+          lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest().withJsonBody(
+            nonAgentVatReturnDetailReadJson)
+          )
+
+          "return status 400" in {
+
+            mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
+            status(result) shouldBe Status.BAD_REQUEST
+          }
+        }
+      }
+
+      "the request is empty" should {
+
+        lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest())
+
+        "return status 500" in {
+
+          mockAuthorise()(Future.successful(new ~(Some(AffinityGroup.Individual), enrolments)))
+          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
         }
       }
     }
