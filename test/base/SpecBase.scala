@@ -33,6 +33,7 @@ import scala.concurrent.ExecutionContext
 trait SpecBase extends AnyWordSpecLike with Matchers with OptionValues with GuiceOneAppPerSuite with MaterializerSupport with Injecting {
 
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+  def emptyFakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   lazy val mockAppConfig: MicroserviceAppConfig = inject[MicroserviceAppConfig]
 
