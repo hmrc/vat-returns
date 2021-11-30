@@ -16,8 +16,8 @@
 
 package utils
 
-import models.{VatReturn, VatReturnDetail, VatReturnIdentification}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import models.{VatReturnDetail, VatReturnIdentification}
+import play.api.libs.json.{JsValue, Json}
 
 object SubmitVatReturnTestData {
 

@@ -29,7 +29,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, contentAsJson, defaultAwaitTimeout, status}
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments}
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments, MissingBearerToken}
 
 import scala.concurrent.Future
 
@@ -39,13 +39,13 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
 
   val incorrectModel = "bad things"
 
+  val authorisedSubmitVatReturn = new AuthorisedSubmitVatReturn(mockAuthConnector, controllerComponents)
+
+  object TestNRSController extends NRSController(authorisedSubmitVatReturn, mockNrsSubmissionService, controllerComponents)
+
   "The POST NRSController.submitNRS method" when {
 
     "called by an authenticated user" when {
-
-      val authorisedSubmitVatReturn = new AuthorisedSubmitVatReturn(mockAuthConnector, controllerComponents)
-
-      object TestNRSController extends NRSController(authorisedSubmitVatReturn, mockNrsSubmissionService, controllerComponents)
 
       val enrolments = Enrolments(Set(Enrolment("HMRC-MTD-VAT").withIdentifier("VRN", "999999999")))
 
@@ -93,6 +93,17 @@ class NRSControllerSpec extends SpecBase with MockMicroserviceAuthorisedFunction
           setupMockNrsReceiptSubmission(correctModel)(Left(Error("400", "bad reason")))
           status(Future.successful(result)) shouldBe Status.BAD_REQUEST
         }
+      }
+    }
+
+    "called by an unauthenticated user" should {
+
+      lazy val result = await(TestNRSController.submitNRS("999999999")(FakeRequest().withJsonBody(Json.toJson(correctModel))))
+
+      "return UNAUTHORIZED status" in {
+
+        mockAuthorise()(Future.failed(MissingBearerToken()))
+        status(Future.successful(result)) shouldBe Status.UNAUTHORIZED
       }
     }
   }

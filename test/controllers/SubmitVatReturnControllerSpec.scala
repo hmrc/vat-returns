@@ -25,7 +25,7 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments}
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments, MissingBearerToken}
 import utils.SubmitVatReturnTestData._
 
 import scala.concurrent.Future
@@ -38,13 +38,13 @@ class SubmitVatReturnControllerSpec extends SpecBase with MockVatReturnsService 
 
   val enrolments = Enrolments(Set(Enrolment("HMRC-MTD-VAT").withIdentifier("VRN", "999999999")))
 
-  "Calling the .submitVatReturn method" when {
+  "Calling the .submitVatReturn method as a user" which {
 
-    "called by an authenticated user" when {
+    "is an authenticated user" when {
 
-      "the request is non-empty" when {
+      "there is a non-empty request" which {
 
-        "the user has a valid originator ID" when {
+        "has a valid originator ID" when {
 
           "the user is a non-agent" should {
 
@@ -77,7 +77,7 @@ class SubmitVatReturnControllerSpec extends SpecBase with MockVatReturnsService 
           }
         }
 
-        "the user has an invalid originator ID" should {
+        "has an invalid originator ID" should {
 
           lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest().withJsonBody(
             nonAgentVatReturnDetailReadJson).withHeaders("OriginatorID" -> "Something invalid")
@@ -116,6 +116,18 @@ class SubmitVatReturnControllerSpec extends SpecBase with MockVatReturnsService 
         }
       }
     }
-  }
 
+    "is not authenticated" should {
+
+      lazy val result = TestSubmitVatReturnController.submitVatReturn("999999999")(FakeRequest().withJsonBody(
+        nonAgentVatReturnDetailReadJson).withHeaders("OriginatorID" -> "MDTP"))
+
+
+      "return UNAUTHORIZED status" in {
+
+        mockAuthorise()(Future.failed(MissingBearerToken()))
+        status(result) shouldBe Status.UNAUTHORIZED
+      }
+    }
+  }
 }
