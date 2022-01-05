@@ -31,18 +31,12 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
   val excludedPackages = Seq(
     "<empty>",
-    "Reverse.*",
-    "com.kenshoo.play.metrics.*",
-    "controllers..*Reverse.*",
-    ".*standardError*.*",
-    ".*govuk_wrapper*.*",
-    ".*main_template*.*",
-    "uk.gov.hmrc.BuildInfo",
+    ".*Reverse.*",
     "app.*",
     "prod.*",
     "config.*",
-    "testOnlyDoNotUseInAppConf.*",
-    "partials.*")
+    "testOnlyDoNotUseInAppConf.*"
+  )
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
@@ -54,7 +48,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.14.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.18.0",
   "com.typesafe.play" %% "play-json-joda" % "2.6.14"
 )
 
