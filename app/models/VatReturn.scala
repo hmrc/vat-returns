@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ case class VatReturnDetail(periodKey: String,
                            agentReferenceNumber: Option[String] = None)
 
 object VatReturnDetail {
-  
+
   implicit val reads: Reads[VatReturnDetail] = Json.reads[VatReturnDetail]
 
   implicit val writes: Writes[VatReturnDetail] = (

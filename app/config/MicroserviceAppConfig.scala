@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,9 @@ trait AppConfig {
 }
 
 @Singleton
-class MicroserviceAppConfig @Inject()(val environment: Environment, implicit val conf: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
+class MicroserviceAppConfig @Inject()(val environment: Environment,
+                                      implicit val conf: Configuration,
+                                      servicesConfig: ServicesConfig) extends AppConfig {
 
   private def loadConfig(key: String) = servicesConfig.getString(key)
 
@@ -46,8 +48,8 @@ class MicroserviceAppConfig @Inject()(val environment: Environment, implicit val
   override lazy val setupDesReturnsStartPath: String = loadConfig(Keys.setupDesReturnsStartPath)
   override lazy val desSubmitVatReturnPath: String = loadConfig(Keys.desSubmitVatReturnPath)
 
-  override val nrsSubmissionEndpoint: String =
-    s"${servicesConfig.getString(Keys.nrsReceiptsHost)}:${servicesConfig.getString(Keys.nrsReceiptsPort)}${servicesConfig.getString(Keys.nrsSubmissionEndpoint)}"
+  override val nrsSubmissionEndpoint: String = s"${servicesConfig.getString(Keys.nrsReceiptsHost)}:" +
+    s"${servicesConfig.getString(Keys.nrsReceiptsPort)}${servicesConfig.getString(Keys.nrsSubmissionEndpoint)}"
   override val nrsApiKey: String = servicesConfig.getString(Keys.nrsApiKey)
 
   override val features = new Features
