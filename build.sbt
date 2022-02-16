@@ -48,16 +48,14 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.18.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.20.0",
   "com.typesafe.play" %% "play-json-joda" % "2.6.14"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "org.scalatest" %% "scalatest" % "3.1.4",
+  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.20.0",
   "org.pegdown" % "pegdown" % "1.6.0",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0",
   "org.mockito" % "mockito-core" % "3.2.0",
-  "com.typesafe.play" %% "play-test" % PlayVersion.current,
   "com.github.fge" % "json-schema-validator" % "2.2.6",
   "com.github.tomakehurst" % "wiremock-jre8" % "2.26.3",
   "com.vladsch.flexmark" % "flexmark-all" % "0.36.8",
@@ -80,10 +78,9 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.14",
+    scalaVersion := "2.12.15",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     routesImport += "binders.VatReturnsBinders._"
   )
   .configs(IntegrationTest)
