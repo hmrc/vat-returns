@@ -26,6 +26,7 @@ import play.api.libs.ws.{BodyWritable, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
+import org.scalatest.matchers.should.Matchers
 
 trait ComponentSpecBase extends TestSuite with CustomMatchers
   with GuiceOneServerPerSuite with ScalaFutures with IntegrationPatience with Matchers
