@@ -48,12 +48,12 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.20.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.24.0",
   "com.typesafe.play" %% "play-json-joda" % "2.6.14"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.20.0",
+  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.24.0",
   "org.pegdown" % "pegdown" % "1.6.0",
   "org.mockito" % "mockito-core" % "3.2.0",
   "com.github.fge" % "json-schema-validator" % "2.2.6",

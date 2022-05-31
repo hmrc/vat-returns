@@ -30,7 +30,8 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
   val vrn: String = "101202303"
 
-  val headers = Map("OriginatorID" -> "VATUI")
+  val headers = Map("OriginatorID" -> "VATUI",
+  "Authorization" -> "localToken")
 
   val validJson: JsObject = Json.obj(
     "periodKey" -> "17AA",
@@ -122,7 +123,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
         "the json cannot be parsed" in {
 
           AuthStub.stubResponse()
-          val response = await(Future.successful(post("/returns/vrn/999999999")(invalidJson)))
+          val response = await(Future.successful(post("/returns/vrn/999999999", headers)(invalidJson)))
 
           response.status shouldBe INTERNAL_SERVER_ERROR
           response.json shouldBe InvalidJsonResponse.toJson
@@ -131,7 +132,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
         "request does not have an OriginatorID in header" in {
 
           AuthStub.stubResponse()
-          val response = await(Future.successful(post("/returns/vrn/999999999")(validJson)))
+          val response = await(Future.successful(post("/returns/vrn/999999999", Map("Authorization" -> "localToken"))(validJson)))
 
           response.status shouldBe BAD_REQUEST
           response.json shouldBe Json.obj("code" -> "400", "reason" -> "No OriginatorID found in header")
@@ -140,7 +141,8 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
         "OriginatorID in header is invalid" in {
 
           AuthStub.stubResponse()
-          val response = await(Future.successful(post("/returns/vrn/999999999", Map("OriginatorID" -> "Another channel"))(validJson)))
+          val response = await(Future.successful(
+            post("/returns/vrn/999999999", Map("OriginatorID" -> "Another channel","Authorization" -> "localToken"))(validJson)))
 
           response.status shouldBe BAD_REQUEST
           response.json shouldBe Json.obj("code" -> "400", "reason" -> "Invalid OriginatorID header value")
@@ -154,7 +156,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
         AuthStub.stubResponse()
 
-        val response = await(Future.successful(post("/returns/vrn/123123123")(validJson)))
+        val response = await(Future.successful(post("/returns/vrn/123123123", headers)(validJson)))
 
         response.status shouldBe FORBIDDEN
       }
@@ -166,7 +168,7 @@ class SubmitVatReturnControllerISpec extends ComponentSpecBase {
 
         AuthStub.stubResponse(OK, authResponse(otherEnrolment))
 
-        val response = await(Future.successful(post("/returns/vrn/999999999")(validJson)))
+        val response = await(Future.successful(post("/returns/vrn/999999999", headers)(validJson)))
 
         response.status shouldBe FORBIDDEN
       }
