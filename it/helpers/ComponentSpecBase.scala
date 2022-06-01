@@ -80,6 +80,6 @@ trait ComponentSpecBase extends TestSuite with CustomMatchers
     await(buildClient(path, headers).post(body))
 
   def get(uri: String): WSResponse = {
-    await(buildClient(uri).get())
+    await(buildClient(uri).withHttpHeaders("Authorization" -> "localToken").get())
   }
 }
