@@ -18,14 +18,18 @@ package services
 
 import connectors.NrsConnector
 import connectors.httpParsers.NrsResponseParsers.SubmissionResult
+
 import javax.inject.Inject
 import models.nrs.NrsReceiptRequestModel
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.LoggerUtil
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NrsSubmissionService @Inject()(connector: NrsConnector) {
-  def nrsReceiptSubmission(data: NrsReceiptRequestModel)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
+class NrsSubmissionService @Inject()(connector: NrsConnector) extends LoggerUtil {
+  def nrsReceiptSubmission(data: NrsReceiptRequestModel)
+                          (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
+    logger.debug(s"[NrsSubmissionService][nrsReceiptSubmission] Calling NRS connector with model: $data")
     connector.nrsReceiptSubmission(data)
   }
 }
