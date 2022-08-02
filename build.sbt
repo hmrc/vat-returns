@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import play.core.PlayVersion
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
@@ -48,18 +47,14 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.24.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "6.4.0",
   "com.typesafe.play" %% "play-json-joda" % "2.6.14"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.24.0",
-  "org.pegdown" % "pegdown" % "1.6.0",
-  "org.mockito" % "mockito-core" % "3.2.0",
-  "com.github.fge" % "json-schema-validator" % "2.2.6",
-  "com.github.tomakehurst" % "wiremock-jre8" % "2.26.3",
-  "com.vladsch.flexmark" % "flexmark-all" % "0.36.8",
-  "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"
+  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "6.4.0",
+  "org.scalatestplus" %% "mockito-3-4" % "3.2.9.0",
+  "com.github.fge" % "json-schema-validator" % "2.2.6"
 ).map(_ % scope)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
@@ -78,7 +73,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.12.16",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     routesImport += "binders.VatReturnsBinders._"
