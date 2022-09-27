@@ -47,17 +47,17 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "6.4.0",
-  "com.typesafe.play" %% "play-json-joda" % "2.6.14"
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "7.4.0",
+  "com.typesafe.play" %% "play-json-joda" % "2.10.0-RC6"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "6.4.0",
+  "uk.gov.hmrc" %% "bootstrap-test-play-28" % "7.4.0",
   "org.scalatestplus" %% "mockito-3-4" % "3.2.9.0",
   "com.github.fge" % "json-schema-validator" % "2.2.6"
 ).map(_ % scope)
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = {
   tests.map { test =>
     new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
   }
@@ -81,10 +81,10 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
-    Keys.fork in IntegrationTest := false,
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
-    resourceDirectory in IntegrationTest := (baseDirectory apply {baseDir: File => baseDir / "it/resources"}).value,
+    IntegrationTest / Keys.fork := false,
+    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
+    IntegrationTest / resourceDirectory := (baseDirectory apply {baseDir: File => baseDir / "it/resources"}).value,
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false
+    IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest /definedTests).value),
+    IntegrationTest / parallelExecution := false
   )
