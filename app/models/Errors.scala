@@ -17,7 +17,7 @@
 package models
 
 import play.api.http.Status
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.{Format, JsValue, Json, Writes}
 
 sealed trait Errors {
   def toJson: JsValue
@@ -54,12 +54,12 @@ case class ErrorResponse(status: Int, error: Errors) {
 object UnauthenticatedError extends Error(
   code = "UNAUTHENTICATED",
   reason = "Not authenticated"
-){implicit val format: Format[UnauthenticatedError.type] = Json.format[UnauthenticatedError.type]}
+){implicit val writes: Writes[UnauthenticatedError.type] = Writes(model => Json.toJson(model.asInstanceOf[Error]))}
 
 object ForbiddenError extends Error(
   code = "UNAUTHORISED",
   reason = "Not authorised"
-){implicit val format: Format[ForbiddenError.type] = Json.format[ForbiddenError.type]}
+){implicit val writes: Writes[ForbiddenError.type] = Writes(model => Json.toJson(model.asInstanceOf[Error]))}
 
 object InvalidJsonResponse extends ErrorResponse(
   status = Status.INTERNAL_SERVER_ERROR,
@@ -88,4 +88,4 @@ object UnexpectedResponse extends ErrorResponse(
 object InvalidVrn extends Error(
   code = "ERROR_VRN_INVALID",
   reason = "The supplied Vrn is invalid."
-){implicit val format: Format[InvalidVrn.type] = Json.format[InvalidVrn.type]}
+){implicit val writes: Writes[InvalidVrn.type] = Writes(model => Json.toJson(model.asInstanceOf[Error]))}

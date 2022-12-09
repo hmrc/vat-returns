@@ -17,7 +17,6 @@
 package handlers
 
 import config.MicroserviceAppConfig
-
 import javax.inject.{Inject, Singleton}
 import models.Error
 import play.api.http.HttpErrorHandler
@@ -32,8 +31,7 @@ import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.LoggerUtil
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Based on uk.gov.hmrc.play.bootstrap.http.JsonErrorHandler
@@ -41,7 +39,9 @@ import scala.concurrent.Future
   */
 
 @Singleton
-class ErrorHandler @Inject()(val appConfig: MicroserviceAppConfig, auditConnector: AuditConnector)
+class ErrorHandler @Inject()(val appConfig: MicroserviceAppConfig,
+                             auditConnector: AuditConnector)(
+                             implicit val ec: ExecutionContext)
   extends HttpErrorHandler with HttpAuditEvent with LoggerUtil {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
@@ -81,8 +81,7 @@ class ErrorHandler @Inject()(val appConfig: MicroserviceAppConfig, auditConnecto
     val errorResponse = ex match {
       case e: AuthorisationException => Error(play.mvc.Http.Status.UNAUTHORIZED.toString, e.getMessage)
       case e: HttpException => Error(e.responseCode.toString, e.getMessage)
-      case e: Upstream4xxResponse => Error(e.reportAs.toString, e.getMessage)
-      case e: Upstream5xxResponse => Error(e.reportAs.toString, e.getMessage)
+      case e: UpstreamErrorResponse => Error(e.reportAs.toString, e.getMessage)
       case e: Throwable => Error(INTERNAL_SERVER_ERROR.toString, e.getMessage)
     }
 

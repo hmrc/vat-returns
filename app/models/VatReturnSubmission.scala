@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import play.api.libs.json.Writes
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, _}
+import play.api.libs.json.JsPath
 
 case class VatReturnSubmission(periodKey: String,
                                vatDueSales: BigDecimal,

@@ -43,7 +43,7 @@ object PayloadContentType {
     payloadTypeString match {
       case AppJson.contentType => AppJson
       case AppXml.contentType => AppXml
-      case TextHtml.contentType => TextHtml
+      case _ => TextHtml
     }
   }
 }
