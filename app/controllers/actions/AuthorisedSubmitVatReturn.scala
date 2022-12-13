@@ -42,6 +42,7 @@ class AuthorisedSubmitVatReturn @Inject()(val authConnector: AuthConnector, cc: 
           } else {
             authoriseAsIndividual(enrolments, block, vrn)
           }
+        case _ => Future.successful(forbiddenAction("Failed to retrieve enrolments"))
       } recover authExceptionAction
   }
 

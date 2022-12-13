@@ -32,7 +32,7 @@ class FeatureSwitchControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   private lazy val target = new FeatureSwitchController(mockAppConfig, controllerComponents)
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     mockAppConfig.features.useStubFeature(true)
   }
 

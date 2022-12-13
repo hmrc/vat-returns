@@ -28,8 +28,8 @@ object Language {
     languageString <- JsPath.read[String]
   } yield {
     languageString match {
-      case EN.languageCode => EN
       case CY.languageCode => CY
+      case _ => EN
     }
   }
 

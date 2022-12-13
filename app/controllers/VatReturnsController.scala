@@ -17,7 +17,6 @@
 package controllers
 
 import controllers.actions.AuthAction
-
 import javax.inject.{Inject, Singleton}
 import models._
 import play.api.libs.json.Json
@@ -27,11 +26,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.LoggerUtil
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatReturnsController @Inject()(val authenticate: AuthAction, val vatReturnsService: VatReturnsService, cc: ControllerComponents)
+class VatReturnsController @Inject()(val authenticate: AuthAction,
+                                     val vatReturnsService: VatReturnsService,
+                                     cc: ControllerComponents)(
+                                     implicit val ec: ExecutionContext)
   extends BackendController(cc) with LoggerUtil {
 
   def getVatReturns(vrn: String, filters: VatReturnFilters): Action[AnyContent] =
