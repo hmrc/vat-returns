@@ -49,12 +49,12 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc"           %% "bootstrap-backend-play-28"  % "7.12.0",
+  "uk.gov.hmrc"           %% "bootstrap-backend-play-28"  % "7.14.0",
   "com.typesafe.play"     %% "play-json-joda"             % "2.10.0-RC7"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"       %% "bootstrap-test-play-28" % "7.12.0",
+  "uk.gov.hmrc"       %% "bootstrap-test-play-28" % "7.14.0",
   "org.scalatestplus" %% "mockito-3-4"            % "3.2.9.0",
   "com.github.fge"    %  "json-schema-validator"  % "2.2.14"
 ).map(_ % scope)
@@ -70,7 +70,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(coverageSettings: _*)
   .settings(playSettings : _*)
   .settings(scalaSettings: _*)
-  .settings(publishingSettings: _*)
   .settings(PlayKeys.playDefaultPort := 9157)
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
