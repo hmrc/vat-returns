@@ -19,7 +19,6 @@ package audit.models
 import models.VatReturnFilters
 import models.VatReturnFilters.periodKeyValue
 
-// TODO: This code will need tweaking to match audit requirements from TxM or otherwise, or removed if none.
 case class VatReturnRequestAuditModel(vrn: String, queryParams: VatReturnFilters) extends AuditModel {
 
   override val transactionName: String = "vat-returns-request"
