@@ -18,7 +18,6 @@ package audit.models
 
 import play.api.libs.json.{Format, Json}
 
-// TODO: This code will need tweaking to match audit requirements from TXM or otherwise, or removed if none.
 case class TransactionsAuditModel(idType: String,
                                   idValue: String)
 
