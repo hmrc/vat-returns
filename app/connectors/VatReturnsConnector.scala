@@ -18,12 +18,12 @@ package connectors
 
 import config.MicroserviceAppConfig
 import connectors.httpParsers.VatReturnsHttpParser._
-
-import javax.inject.{Inject, Singleton}
-import models.{VatReturnDetail, VatReturnFilters}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import models.{Error, ErrorResponse, VatReturnDetail, VatReturnFilters}
+import play.api.http.Status.BAD_GATEWAY
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpException}
 import utils.LoggerUtil
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -32,7 +32,8 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
   private[connectors] def setupDesVatReturnsUrl(vrn: String): String = appConfig.desServiceUrl +
     appConfig.setupDesReturnsStartPath + vrn
 
-  val desHeaders = Seq("Authorization" -> s"Bearer ${appConfig.desToken}", "Environment" -> appConfig.desEnvironment)
+  val desHeaders: Seq[(String, String)] =
+    Seq("Authorization" -> s"Bearer ${appConfig.desToken}", "Environment" -> appConfig.desEnvironment)
 
   def getVatReturns(vrn: String, queryParameters: VatReturnFilters)
                    (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnDetail]] = {
@@ -46,6 +47,10 @@ class VatReturnsConnector @Inject()(val http: HttpClient, val appConfig: Microse
       case error@Left(message) =>
         logger.warn("[VatReturnsConnector][getVatReturns] Error Received. Message: " + message)
         error
+    }.recover {
+      case ex: HttpException =>
+        logger.warn(s"[VatReturnsConnector][getVatReturns] - HTTP exception received: ${ex.message}")
+        Left(ErrorResponse(BAD_GATEWAY, Error("BAD_GATEWAY", ex.message)))
     }
   }
 }
