@@ -18,15 +18,21 @@ package connectors
 
 import config.MicroserviceAppConfig
 import connectors.httpParsers.NrsResponseParsers._
-import javax.inject.Inject
+import models.Error
 import models.nrs.{AppJson, NrsReceiptRequestModel}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.http.Status.BAD_GATEWAY
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpException}
+
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class NrsConnector @Inject()(http: HttpClient, appConfig: MicroserviceAppConfig) {
-  private def urlToUse(vrn: String): String = appConfig.nrsSubmissionEndpoint + (if (appConfig.features.useStubFeature()) s"/$vrn" else "")
 
-  def nrsReceiptSubmission(data: NrsReceiptRequestModel)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
+  private[connectors] def urlToUse(vrn: String): String =
+    appConfig.nrsSubmissionEndpoint + (if (appConfig.features.useStubFeature()) s"/$vrn" else "")
+
+  def nrsReceiptSubmission(data: NrsReceiptRequestModel)
+                          (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] =
     http.POST[NrsReceiptRequestModel, SubmissionResult](
       urlToUse(data.metadata.searchKeys.vrn),
       data,
@@ -34,6 +40,9 @@ class NrsConnector @Inject()(http: HttpClient, appConfig: MicroserviceAppConfig)
         "Content-Type" -> AppJson.toString,
         "X-API-Key" -> appConfig.nrsApiKey
       )
-    )
-  }
+    ).recover {
+      case ex: HttpException =>
+        logger.warn(s"[NrsConnector][nrsReceiptSubmission] - HTTP exception received: ${ex.message}")
+        Left(Error(BAD_GATEWAY.toString, ex.message))
+    }
 }

@@ -23,6 +23,7 @@ import models._
 import play.api.http.Status
 import models.VatReturnFilters._
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.http.RequestTimeoutException
 
 import scala.concurrent.Future
 
@@ -45,68 +46,71 @@ class SubmitVatReturnConnectorSpec extends SpecBase with MockHttp {
       )
     )
 
-  val successResponse: Either[Nothing, VatReturn] = Right(testReturn)
-  val badRequestSingleError: Either[ErrorResponse, Nothing] = Left(ErrorResponse(Status.BAD_REQUEST, Error(code = "CODE", reason = "ERROR MESSAGE")))
-  val badRequestMultiError = Left(ErrorResponse(Status.BAD_REQUEST, MultiError(
-    failures = Seq(
-      Error(code = "ERROR CODE 1", reason = "ERROR MESSAGE 1"),
-      Error(code = "ERROR CODE 2", reason = "ERROR MESSAGE 2")
-    )
-  )))
-
   val testVrn: String = "555555555"
-
-  object TestVatReturnsConnector extends VatReturnsConnector(mockHttpGet, mockAppConfig)
+  val connector = new VatReturnsConnector(mockHttpGet, mockAppConfig)
 
   "The VatReturnsConnector" should {
 
     "format the request url correctly for vat-returns DES requests" in {
-      val actualUrl: String = TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn)
+      val actualUrl: String = connector.setupDesVatReturnsUrl(testVrn)
       val expectedUrl: String = s"${mockAppConfig.desServiceUrl}${mockAppConfig.setupDesReturnsStartPath}$testVrn"
       actualUrl shouldBe expectedUrl
     }
 
-    "when calling the getVatReturns" when {
-      "calling for a user with all Query Parameters defined and a success response received" should {
+    "return a VatReturn model" when {
 
-        "return a VatReturn model" in {
-          setupMockHttpGet(TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn), Seq(
-            periodKeyValue -> "17AA"
-          ))(successResponse)
-          val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = TestVatReturnsConnector.getVatReturns(
-            vrn = testVrn,
-            queryParameters = VatReturnFilters("17AA")
-          )
-          await(result) shouldBe successResponse
-        }
+      "calling for a user with all Query Parameters defined and a success response received" in {
+
+        val successResponse = Right(testReturn)
+        setupMockHttpGet(connector.setupDesVatReturnsUrl(testVrn),
+                         Seq(periodKeyValue -> "17AA"))(Future.successful(successResponse))
+        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = connector.getVatReturns(
+          vrn = testVrn,
+          queryParameters = VatReturnFilters("17AA")
+        )
+        await(result) shouldBe successResponse
       }
     }
 
-    "calling for a user with non-success response received, single error" should {
+    "return an Error model" when {
 
-      "return a Error model" in {
-        setupMockHttpGet(TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn), Seq(
-          periodKeyValue -> "17AA"
-        ))(badRequestSingleError)
-        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = TestVatReturnsConnector.getVatReturns(
+      "calling for a user with non-success response received, single error" in {
+        val badRequestSingleError = Left(ErrorResponse(Status.BAD_REQUEST, Error(code = "CODE", reason = "ERROR MESSAGE")))
+        setupMockHttpGet(connector.setupDesVatReturnsUrl(testVrn),
+                         Seq(periodKeyValue -> "17AA"))(Future.successful(badRequestSingleError))
+        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = connector.getVatReturns(
           vrn = testVrn,
           queryParameters = VatReturnFilters("17AA")
         )
         await(result) shouldBe badRequestSingleError
       }
-    }
 
-    "calling for a user with non-success response received, multi error" should {
+      "calling for a user with non-success response received, multi error" in {
 
-      "return a MultiError model" in {
-        setupMockHttpGet(TestVatReturnsConnector.setupDesVatReturnsUrl(testVrn), Seq(
-          periodKeyValue -> "17AA"
-        ))(badRequestMultiError)
-        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = TestVatReturnsConnector.getVatReturns(
+        val badRequestMultiError = Left(ErrorResponse(Status.BAD_REQUEST, MultiError(
+          failures = Seq(
+            Error(code = "ERROR CODE 1", reason = "ERROR MESSAGE 1"),
+            Error(code = "ERROR CODE 2", reason = "ERROR MESSAGE 2")
+          )
+        )))
+        setupMockHttpGet(connector.setupDesVatReturnsUrl(testVrn),
+                         Seq(periodKeyValue -> "17AA"))(Future.successful(badRequestMultiError))
+        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = connector.getVatReturns(
           vrn = testVrn,
           queryParameters = VatReturnFilters("17AA")
         )
         await(result) shouldBe badRequestMultiError
+      }
+
+      "a HTTP exception is received" in {
+
+        val exception = new RequestTimeoutException("Request timed out!!!")
+        setupMockHttpGet(connector.setupDesVatReturnsUrl(testVrn), Seq(periodKeyValue -> "17AA"))(Future.failed(exception))
+        val result: Future[VatReturnsHttpParser.HttpGetResult[VatReturnDetail]] = connector.getVatReturns(
+          vrn = testVrn,
+          queryParameters = VatReturnFilters("17AA")
+        )
+        await(result) shouldBe Left(ErrorResponse(Status.BAD_GATEWAY, Error("BAD_GATEWAY", exception.message)))
       }
     }
   }
