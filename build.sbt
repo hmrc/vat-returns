@@ -17,15 +17,10 @@
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "vat-returns"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
-lazy val plugins: Seq[Plugins] = Seq.empty
-lazy val playSettings: Seq[Setting[_]] = Seq.empty
-
-scalacOptions ++= Seq("-Wconf:cat=unused-imports&src=.*routes.*:s")
 
 lazy val coverageSettings: Seq[Setting[_]] = {
   import scoverage.ScoverageKeys
@@ -48,9 +43,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 }
 
 val compile = Seq(
-  ws,
-  "uk.gov.hmrc"           %% "bootstrap-backend-play-28"  % "7.15.0",
-  "com.typesafe.play"     %% "play-json-joda"             % "2.10.0-RC7"
+  "uk.gov.hmrc"           %% "bootstrap-backend-play-28"  % "7.15.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
@@ -66,9 +59,9 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = {
 }
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins : _*)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(coverageSettings: _*)
-  .settings(playSettings : _*)
   .settings(scalaSettings: _*)
   .settings(PlayKeys.playDefaultPort := 9157)
   .settings(defaultSettings(): _*)
@@ -77,7 +70,8 @@ lazy val microservice = Project(appName, file("."))
     scalaVersion := "2.13.8",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
-    routesImport += "binders.VatReturnsBinders._"
+    routesImport += "binders.VatReturnsBinders._",
+    scalacOptions ++= Seq("-Wconf:cat=unused-imports&src=.*routes.*:s")
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
