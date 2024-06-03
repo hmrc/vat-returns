@@ -16,7 +16,7 @@
 
 package helpers
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import config.MicroserviceAppConfig
 import org.scalatest._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}

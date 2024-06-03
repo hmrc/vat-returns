@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ trait SpecBase extends AnyWordSpecLike with Matchers with OptionValues with Guic
 
   lazy val mockAppConfig: MicroserviceAppConfig = inject[MicroserviceAppConfig]
 
-  implicit lazy val controllerComponents = inject[ControllerComponents]
+  implicit lazy val controllerComponents: ControllerComponents = inject[ControllerComponents]
 
   implicit lazy val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders(REFERER -> "/dummy/referrer/path")
   implicit lazy val ec: ExecutionContext = inject[ExecutionContext]

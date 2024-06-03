@@ -42,14 +42,17 @@ lazy val coverageSettings: Seq[Setting[_]] = {
   )
 }
 
+val playVersion = "play-30"
+val bootstrapVersion = "8.5.0"
+
 val compile = Seq(
-  "uk.gov.hmrc"           %% "bootstrap-backend-play-28"  % "7.15.0"
+  "uk.gov.hmrc" %% s"bootstrap-backend-$playVersion" % bootstrapVersion
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"       %% "bootstrap-test-play-28" % "7.15.0",
-  "org.scalatestplus" %% "mockito-3-4"            % "3.2.9.0",
-  "com.github.fge"    %  "json-schema-validator"  % "2.2.14"
+  "uk.gov.hmrc"               %% s"bootstrap-test-$playVersion" % bootstrapVersion,
+  "org.scalatestplus"         %% "mockito-3-4"                  % "3.2.10.0",
+  "com.github.java-json-tools" % "json-schema-validator"        % "2.2.14"
 ).map(_ % scope)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = {
@@ -67,7 +70,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.12",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     routesImport += "binders.VatReturnsBinders._",
