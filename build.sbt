@@ -15,6 +15,7 @@
  */
 
 import sbt.Tests.{Group, SubProcess}
+import uk.gov.hmrc.DefaultBuildSettings
 import uk.gov.hmrc.DefaultBuildSettings.*
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 
@@ -55,11 +56,6 @@ def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "com.github.java-json-tools" % "json-schema-validator"        % "2.2.14"
 ).map(_ % scope)
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
-  tests.map { test =>
-    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
@@ -82,6 +78,5 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
     IntegrationTest / resourceDirectory          := (baseDirectory apply { baseDir: File => baseDir / "it/resources" }).value,
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / testGrouping      := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
     IntegrationTest / parallelExecution := false
   )

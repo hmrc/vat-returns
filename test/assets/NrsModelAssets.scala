@@ -16,11 +16,10 @@
 
 package assets
 
-import java.time.{LocalDateTime, Month}
-import java.time.format.DateTimeFormatter
-
 import models.nrs.identityData._
 import models.nrs.{IdentityData, Metadata, PayloadContentType, SearchKeys}
+
+import java.time.{LocalDateTime, Month}
 
 object NrsModelAssets {
 
@@ -32,7 +31,6 @@ object NrsModelAssets {
   val nrSubmissionId = "2dd537bc-4244-4ebf-bac9-96321be13cdc"
 
   val genericTime: LocalDateTime = LocalDateTime.of(1986, Month.APRIL, 8, 12, 30)
-  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm")
 
   val credentials = IdentityCredentials("providerId", "providerType")
   val name = IdentityName(Some("Test"), Some("Name"))
