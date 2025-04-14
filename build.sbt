@@ -15,14 +15,15 @@
  */
 
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings._
+import uk.gov.hmrc.DefaultBuildSettings
+import uk.gov.hmrc.DefaultBuildSettings.*
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 
 val appName = "vat-returns"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
-lazy val coverageSettings: Seq[Setting[_]] = {
+lazy val coverageSettings: Seq[Setting[?]] = {
   import scoverage.ScoverageKeys
 
   val excludedPackages = Seq(
@@ -37,13 +38,13 @@ lazy val coverageSettings: Seq[Setting[_]] = {
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
+    ScoverageKeys.coverageFailOnMinimum    := true,
+    ScoverageKeys.coverageHighlighting     := true
   )
 }
 
-val playVersion = "play-30"
-val bootstrapVersion = "8.5.0"
+val playVersion      = "play-30"
+val bootstrapVersion = "8.6.0"
 
 val compile = Seq(
   "uk.gov.hmrc" %% s"bootstrap-backend-$playVersion" % bootstrapVersion
@@ -55,34 +56,27 @@ def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "com.github.java-json-tools" % "json-schema-validator"        % "2.2.14"
 ).map(_ % scope)
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = {
-  tests.map { test =>
-    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
-}
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(coverageSettings: _*)
-  .settings(scalaSettings: _*)
+  .settings(coverageSettings *)
+  .settings(scalaSettings *)
   .settings(PlayKeys.playDefaultPort := 9157)
-  .settings(defaultSettings(): _*)
+  .settings(defaultSettings() *)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.13.12",
+    scalaVersion := "2.13.16",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     routesImport += "binders.VatReturnsBinders._",
-    scalacOptions ++= Seq("-Wconf:cat=unused-imports&src=.*routes.*:s")
+    scalacOptions ++= Seq("-Wconf:cat=unused-imports&src=.*routes.*:s", "-Wconf:cat=unused&src=routes/.*:s")
   )
   .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings) *)
   .settings(
-    IntegrationTest / Keys.fork := false,
+    IntegrationTest / Keys.fork                  := false,
     IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
-    IntegrationTest / resourceDirectory := (baseDirectory apply {baseDir: File => baseDir / "it/resources"}).value,
+    IntegrationTest / resourceDirectory          := (baseDirectory apply { baseDir: File => baseDir / "it/resources" }).value,
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest /definedTests).value),
     IntegrationTest / parallelExecution := false
   )
